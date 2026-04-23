@@ -1,0 +1,1 @@
+ALTER TABLE public.journal_entries ADD COLUMN quest_giver_id text, ADD COLUMN quest_giver_line text;

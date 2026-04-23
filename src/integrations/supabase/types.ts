@@ -55,6 +55,8 @@ export type Database = {
           fun_fact: string | null
           id: string
           image_path: string
+          quest_giver_id: string | null
+          quest_giver_line: string | null
           quest_title: string | null
           title: string
         }
@@ -65,6 +67,8 @@ export type Database = {
           fun_fact?: string | null
           id?: string
           image_path: string
+          quest_giver_id?: string | null
+          quest_giver_line?: string | null
           quest_title?: string | null
           title: string
         }
@@ -75,6 +79,8 @@ export type Database = {
           fun_fact?: string | null
           id?: string
           image_path?: string
+          quest_giver_id?: string | null
+          quest_giver_line?: string | null
           quest_title?: string | null
           title?: string
         }
