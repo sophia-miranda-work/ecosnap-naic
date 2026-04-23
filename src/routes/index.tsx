@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowRight, Compass, Footprints, RefreshCw, Sparkles, X } from "lucide-react";
+import { ArrowRight, Compass, Footprints, MapPin, RefreshCw, Sparkles, X } from "lucide-react";
+import { useWalkTracker } from "@/hooks/use-walk-tracker";
 
 export const Route = createFileRoute("/")({
   head: () => ({
