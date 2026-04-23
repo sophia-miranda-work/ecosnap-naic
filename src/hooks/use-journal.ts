@@ -11,6 +11,8 @@ export type JournalEntry = {
   image_path: string;
   image_url: string;
   quest_title: string | null;
+  quest_giver_id: string | null;
+  quest_giver_line: string | null;
   created_at: string;
 };
 
@@ -40,7 +42,7 @@ export function useJournal() {
     const deviceId = getDeviceId();
     const { data, error } = await supabase
       .from("journal_entries")
-      .select("id, category, title, fun_fact, image_path, quest_title, created_at")
+      .select("id, category, title, fun_fact, image_path, quest_title, quest_giver_id, quest_giver_line, created_at")
       .eq("device_id", deviceId)
       .order("created_at", { ascending: false });
 
@@ -70,6 +72,8 @@ export function useJournal() {
       title: string;
       funFact: string;
       questTitle?: string | null;
+      questGiverId?: string | null;
+      questGiverLine?: string | null;
     }) => {
       const deviceId = getDeviceId();
       const blob = dataUrlToBlob(input.sketchDataUrl);
@@ -90,8 +94,10 @@ export function useJournal() {
           fun_fact: input.funFact,
           image_path: path,
           quest_title: input.questTitle ?? null,
+          quest_giver_id: input.questGiverId ?? null,
+          quest_giver_line: input.questGiverLine ?? null,
         })
-        .select("id, category, title, fun_fact, image_path, quest_title, created_at")
+        .select("id, category, title, fun_fact, image_path, quest_title, quest_giver_id, quest_giver_line, created_at")
         .single();
 
       if (insert.error) throw insert.error;

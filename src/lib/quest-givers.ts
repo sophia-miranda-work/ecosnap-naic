@@ -5,6 +5,9 @@ export type QuestGiver = {
   avatar: string;
   accent: string; // tailwind-friendly bg utility for the bubble tail
   greetings: string[];
+  bio: string;
+  habitat: string;
+  catchphrase: string;
 };
 
 /**
@@ -24,6 +27,9 @@ export const QUEST_GIVERS: QuestGiver[] = [
       "I brewed you a quest with the morning dew.",
       "My broom and I have been waiting.",
     ],
+    bio: "Willow keeps a tidy cottage at the edge of the bramble. She brews tea from things most people step over, and believes every walk is a small spell waiting to be cast.",
+    habitat: "Hedgerows & herb gardens",
+    catchphrase: "Bring me a wonder; I'll trade you a story.",
   },
   {
     id: "professor-hoot",
@@ -37,6 +43,9 @@ export const QUEST_GIVERS: QuestGiver[] = [
       "I have a riddle wrapped in a walk for you.",
       "Open your notebook — class is in session.",
     ],
+    bio: "A retired lecturer of Applied Wandering. Professor Hoot grades on curiosity, not correctness, and keeps detailed notes on every cloud he's ever met.",
+    habitat: "Old oaks & quiet libraries",
+    catchphrase: "Look twice. Then look once more.",
   },
   {
     id: "pip",
@@ -50,6 +59,9 @@ export const QUEST_GIVERS: QuestGiver[] = [
       "Tail high, eyes sharp, off we go!",
       "Bet you can't spot it before I would.",
     ],
+    bio: "Fastest paws in the meadow, loudest grin in the woods. Pip scouts trails before sunrise and leaves tiny pawprints next to anything worth seeing.",
+    habitat: "Tall grass & forest edges",
+    catchphrase: "Race you to the next bend!",
   },
   {
     id: "mossback",
@@ -63,6 +75,9 @@ export const QUEST_GIVERS: QuestGiver[] = [
       "Patience is half the quest, friend.",
       "Hop along when you're ready.",
     ],
+    bio: "Mossback has sat on the same lily pad for longer than anyone remembers. He measures time in ripples and considers a good blink to be a full conversation.",
+    habitat: "Ponds & damp stones",
+    catchphrase: "Stillness is its own adventure.",
   },
   {
     id: "clover",
@@ -76,6 +91,9 @@ export const QUEST_GIVERS: QuestGiver[] = [
       "Hop hop! Adventure's calling.",
       "Bring me back a story, won't you?",
     ],
+    bio: "Clover greets every dawn like it's her birthday. She collects four-leafed clovers, tiny pebbles, and even tinier rumors from the wildflowers.",
+    habitat: "Sunny meadows & garden paths",
+    catchphrase: "Today's the loveliest day yet!",
   },
 ];
 
@@ -104,4 +122,9 @@ export function pickGreeting(giver: QuestGiver, date = new Date()): string {
   const seed =
     date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate();
   return giver.greetings[seed % giver.greetings.length];
+}
+
+export function getGiverById(id: string | null | undefined): QuestGiver | undefined {
+  if (!id) return undefined;
+  return QUEST_GIVERS.find((g) => g.id === id);
 }
