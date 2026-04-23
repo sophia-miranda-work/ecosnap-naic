@@ -1,10 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
+import { Sparkles, X } from "lucide-react";
+import { useJournal, type JournalEntry } from "@/hooks/use-journal";
+import { CATEGORIES, CATEGORY_BY_ID, type CategoryId } from "@/lib/journal-categories";
 
 export const Route = createFileRoute("/journal")({
   head: () => ({
     meta: [
       { title: "Journal — Explorer's Notebook" },
-      { name: "description", content: "Your collected sketches from completed nature quests." },
+      { name: "description", content: "Your collected sketches from completed nature quests, sorted by category." },
       { property: "og:title", content: "Journal — Explorer's Notebook" },
       { property: "og:description", content: "A Pokédex-style grid of every sketch you've collected on your walks." },
     ],
@@ -12,57 +16,231 @@ export const Route = createFileRoute("/journal")({
   component: JournalPage,
 });
 
-// Mocked entries — sketches will be wired up once camera is implemented.
-const MOCK_ENTRIES = [
-  { id: 1, emoji: "🌸", title: "Five-petal flower", date: "Apr 22" },
-  { id: 2, emoji: "🍂", title: "Heart-shaped leaf", date: "Apr 21" },
-  { id: 3, emoji: "🐦", title: "Yellow bird", date: "Apr 20" },
-  { id: 4, emoji: "🪨", title: "Smooth river stone", date: "Apr 19" },
-  { id: 5, emoji: "🍄", title: "Tiny mushroom", date: "Apr 18" },
-  { id: 6, emoji: "🌿", title: "Fern frond", date: "Apr 17" },
-];
-const TOTAL_SLOTS = 12;
+type Filter = "all" | CategoryId;
 
 function JournalPage() {
-  const slots = Array.from({ length: TOTAL_SLOTS }, (_, i) => MOCK_ENTRIES[i] ?? null);
+  const { entries, loading, error } = useJournal();
+  const [filter, setFilter] = useState<Filter>("all");
+  const [open, setOpen] = useState<JournalEntry | null>(null);
+
+  const counts = useMemo(() => {
+    const map = new Map<CategoryId, number>();
+    for (const e of entries) map.set(e.category, (map.get(e.category) ?? 0) + 1);
+    return map;
+  }, [entries]);
+
+  const visible = useMemo(
+    () => (filter === "all" ? entries : entries.filter((e) => e.category === filter)),
+    [entries, filter],
+  );
+
+  // Pad with empty slots so the grid keeps the cozy "collection" feel
+  const TOTAL_SLOTS = 12;
+  const padded = useMemo(() => {
+    const slots: (JournalEntry | null)[] = visible.slice(0, TOTAL_SLOTS);
+    while (slots.length < TOTAL_SLOTS) slots.push(null);
+    return slots;
+  }, [visible]);
 
   return (
     <div className="px-5 pt-8">
-      <header className="mb-6">
+      <header className="mb-5">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
           Field Records
         </p>
         <h1 className="mt-1 text-3xl font-bold text-foreground">Your Journal</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          {MOCK_ENTRIES.length} of {TOTAL_SLOTS} discoveries this month
+          {entries.length} {entries.length === 1 ? "discovery" : "discoveries"} collected
         </p>
       </header>
 
-      <div className="grid grid-cols-3 gap-3">
-        {slots.map((entry, i) => (
-          <div
-            key={i}
-            className={
-              entry
-                ? "parchment-card aspect-square flex flex-col items-center justify-center p-2 text-center"
-                : "aspect-square flex items-center justify-center rounded-2xl border border-dashed border-border/70 bg-muted/30 text-muted-foreground"
-            }
+      {/* Category filter row */}
+      <div className="mb-4 -mx-5 overflow-x-auto px-5 pb-1">
+        <div className="flex items-center gap-2 whitespace-nowrap">
+          <FilterChip
+            active={filter === "all"}
+            onClick={() => setFilter("all")}
+            label={`All · ${entries.length}`}
+            emoji="📔"
+          />
+          {CATEGORIES.map((c) => {
+            const n = counts.get(c.id) ?? 0;
+            return (
+              <FilterChip
+                key={c.id}
+                active={filter === c.id}
+                onClick={() => setFilter(c.id)}
+                label={`${c.label} · ${n}`}
+                emoji={c.emoji}
+                dim={n === 0}
+              />
+            );
+          })}
+        </div>
+      </div>
+
+      {error && (
+        <p className="mb-3 rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive">
+          {error}
+        </p>
+      )}
+
+      {loading && entries.length === 0 ? (
+        <div className="grid grid-cols-3 gap-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div
+              key={i}
+              className="aspect-square animate-pulse rounded-2xl bg-muted/60"
+            />
+          ))}
+        </div>
+      ) : visible.length === 0 ? (
+        <div className="parchment-card flex flex-col items-center justify-center px-6 py-10 text-center">
+          <span className="text-4xl" aria-hidden>
+            🌱
+          </span>
+          <p className="mt-3 text-sm font-semibold text-foreground">
+            {filter === "all"
+              ? "Your journal is empty"
+              : `No ${CATEGORY_BY_ID[filter as CategoryId].label.toLowerCase()} sketches yet`}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Head outside, complete a quest, and snap your first proof.
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-3 gap-3">
+          {padded.map((entry, i) => (
+            <button
+              key={entry?.id ?? `empty-${i}`}
+              type="button"
+              disabled={!entry}
+              onClick={() => entry && setOpen(entry)}
+              className={
+                entry
+                  ? "parchment-card aspect-square flex flex-col overflow-hidden p-0 text-center transition-transform active:scale-95"
+                  : "aspect-square flex items-center justify-center rounded-2xl border border-dashed border-border/70 bg-muted/30 text-muted-foreground"
+              }
+            >
+              {entry ? (
+                <>
+                  <div className="relative flex-1 w-full overflow-hidden">
+                    <img
+                      src={entry.image_url}
+                      alt={entry.title}
+                      className="h-full w-full object-cover"
+                      loading="lazy"
+                    />
+                    <span
+                      className="absolute right-1 top-1 grid h-6 w-6 place-items-center rounded-full bg-background/90 text-sm shadow-sm"
+                      aria-hidden
+                      title={CATEGORY_BY_ID[entry.category].label}
+                    >
+                      {CATEGORY_BY_ID[entry.category].emoji}
+                    </span>
+                  </div>
+                  <span className="px-1 pb-1 pt-1 text-[10px] font-semibold leading-tight text-foreground line-clamp-1">
+                    {entry.title}
+                  </span>
+                </>
+              ) : (
+                <span className="text-2xl opacity-40">?</span>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {open && <EntryModal entry={open} onClose={() => setOpen(null)} />}
+    </div>
+  );
+}
+
+function FilterChip({
+  active,
+  onClick,
+  label,
+  emoji,
+  dim,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+  emoji: string;
+  dim?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={
+        "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors " +
+        (active
+          ? "border-primary bg-primary text-primary-foreground"
+          : dim
+            ? "border-border bg-card/50 text-muted-foreground/70"
+            : "border-border bg-card text-foreground hover:bg-muted")
+      }
+    >
+      <span aria-hidden>{emoji}</span>
+      <span>{label}</span>
+    </button>
+  );
+}
+
+function EntryModal({ entry, onClose }: { entry: JournalEntry; onClose: () => void }) {
+  const cat = CATEGORY_BY_ID[entry.category];
+  const date = new Date(entry.created_at).toLocaleDateString(undefined, {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
+  return (
+    <div
+      className="fixed inset-0 z-[60] flex items-end justify-center bg-foreground/40 backdrop-blur-sm sm:items-center"
+      onClick={onClose}
+    >
+      <div
+        className="parchment-card mx-4 mb-4 w-full max-w-[448px] overflow-hidden p-0"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-label={entry.title}
+      >
+        <div className="relative">
+          <img src={entry.image_url} alt={entry.title} className="h-64 w-full object-cover" />
+          <button
+            type="button"
+            onClick={onClose}
+            className="absolute right-2 top-2 rounded-full bg-background/90 p-1.5 text-foreground shadow-sm hover:bg-background"
+            aria-label="Close"
           >
-            {entry ? (
-              <>
-                <span className="text-3xl" aria-hidden>
-                  {entry.emoji}
-                </span>
-                <span className="mt-1 text-[10px] font-semibold leading-tight text-foreground line-clamp-2">
-                  {entry.title}
-                </span>
-                <span className="text-[9px] text-muted-foreground">{entry.date}</span>
-              </>
-            ) : (
-              <span className="text-2xl opacity-40">?</span>
-            )}
-          </div>
-        ))}
+            <X className="h-4 w-4" />
+          </button>
+          <span className="absolute left-2 top-2 inline-flex items-center gap-1.5 rounded-full bg-background/90 px-2.5 py-1 text-xs font-semibold text-foreground shadow-sm">
+            <span aria-hidden>{cat.emoji}</span>
+            {cat.label}
+          </span>
+        </div>
+        <div className="p-5">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+            {date}
+          </p>
+          <h2 className="mt-1 text-xl font-bold text-foreground">{entry.title}</h2>
+          {entry.quest_title && entry.quest_title !== entry.title && (
+            <p className="mt-1 text-xs text-muted-foreground">
+              From quest: <span className="font-medium">{entry.quest_title}</span>
+            </p>
+          )}
+          {entry.fun_fact && (
+            <div className="mt-4 rounded-2xl border border-border bg-muted/40 p-3">
+              <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                <Sparkles className="h-3 w-3" />
+                Did you know?
+              </div>
+              <p className="mt-1 text-sm leading-snug text-foreground">{entry.fun_fact}</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
