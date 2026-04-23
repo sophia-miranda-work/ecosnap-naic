@@ -1,10 +1,16 @@
 import { useEffect, useRef, useState } from "react";
-import { Camera, RefreshCw, Check, X, AlertCircle } from "lucide-react";
+import { Camera, RefreshCw, Check, X, AlertCircle, Sparkles, Loader2 } from "lucide-react";
+import { CATEGORIES, type CategoryId, pickFunFact } from "@/lib/journal-categories";
 
 type Props = {
   questTitle: string;
   onClose: () => void;
-  onCapture: (sketchDataUrl: string) => void;
+  onCapture: (result: {
+    sketchDataUrl: string;
+    category: CategoryId;
+    title: string;
+    funFact: string;
+  }) => Promise<void> | void;
 };
 
 type Status = "idle" | "requesting" | "ready" | "denied" | "unavailable" | "error";
@@ -96,6 +102,13 @@ export function QuestCamera({ questTitle, onClose, onCapture }: Props) {
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  // Post-capture flow: pick a category, then see the fun fact, then save.
+  const [step, setStep] = useState<"capture" | "categorize" | "fact">("capture");
+  const [category, setCategory] = useState<CategoryId | null>(null);
+  const [title, setTitle] = useState("");
+  const [funFact, setFunFact] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -158,12 +171,40 @@ export function QuestCamera({ questTitle, onClose, onCapture }: Props) {
     ctx.drawImage(video, 0, 0, w, h);
     applySketchFilter(ctx, w, h);
     setPreview(canvas.toDataURL("image/jpeg", 0.85));
+    setStep("categorize");
+    setTitle(questTitle);
   };
 
-  const retake = () => setPreview(null);
+  const retake = () => {
+    setPreview(null);
+    setStep("capture");
+    setCategory(null);
+    setFunFact("");
+    setSaveError(null);
+  };
 
-  const confirm = () => {
-    if (preview) onCapture(preview);
+  const pickCategory = (id: CategoryId) => {
+    setCategory(id);
+    setFunFact(pickFunFact(id));
+    setStep("fact");
+  };
+
+  const confirm = async () => {
+    if (!preview || !category) return;
+    setSaving(true);
+    setSaveError(null);
+    try {
+      await onCapture({
+        sketchDataUrl: preview,
+        category,
+        title: title.trim() || questTitle,
+        funFact,
+      });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Couldn't save sketch.";
+      setSaveError(msg);
+      setSaving(false);
+    }
   };
 
   return (
@@ -233,11 +274,77 @@ export function QuestCamera({ questTitle, onClose, onCapture }: Props) {
         {!preview && status === "ready" && (
           <div className="pointer-events-none absolute inset-4 rounded-2xl border-2 border-dashed border-background/40" />
         )}
+
+        {/* Step 2: Categorize overlay */}
+        {preview && step === "categorize" && (
+          <div className="absolute inset-0 flex flex-col bg-foreground/85 p-5 text-background">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] opacity-70">
+              What did you find?
+            </p>
+            <p className="mt-1 text-base font-bold">Pick a category for your sketch</p>
+            <div className="mt-4 grid flex-1 grid-cols-3 content-start gap-2 overflow-y-auto">
+              {CATEGORIES.map((c) => (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => pickCategory(c.id)}
+                  className="flex flex-col items-center gap-1 rounded-2xl border border-background/15 bg-background/10 px-2 py-3 transition-colors hover:bg-background/20 active:scale-95"
+                >
+                  <span className="text-2xl" aria-hidden>
+                    {c.emoji}
+                  </span>
+                  <span className="text-[10px] font-semibold uppercase tracking-wider">
+                    {c.label}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Step 3: Fun fact overlay */}
+        {preview && step === "fact" && category && (
+          <div className="absolute inset-0 flex flex-col bg-foreground/90 p-5 text-background">
+            <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] opacity-70">
+              <Sparkles className="h-3 w-3" />
+              Did you know?
+            </div>
+            <p className="mt-2 text-2xl" aria-hidden>
+              {CATEGORIES.find((c) => c.id === category)?.emoji}
+            </p>
+            <p className="mt-2 text-base font-semibold leading-snug">{funFact}</p>
+            <button
+              type="button"
+              onClick={() => setFunFact(pickFunFact(category))}
+              className="mt-3 inline-flex w-fit items-center gap-1.5 rounded-full bg-background/15 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider hover:bg-background/25"
+            >
+              <RefreshCw className="h-3 w-3" />
+              Another fact
+            </button>
+
+            <div className="mt-auto">
+              <label className="block text-[10px] font-semibold uppercase tracking-[0.2em] opacity-70">
+                Sketch title
+              </label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                maxLength={60}
+                className="mt-1 w-full rounded-xl border border-background/20 bg-background/10 px-3 py-2 text-sm text-background placeholder:text-background/50 focus:outline-none focus:ring-2 focus:ring-primary/60"
+                placeholder="Give it a name…"
+              />
+              {saveError && (
+                <p className="mt-2 text-xs text-bloom">{saveError}</p>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Footer controls */}
       <div className="flex items-center justify-around px-6 pb-8 pt-5">
-        {!preview ? (
+        {step === "capture" && (
           <>
             <div className="w-12" />
             <button
@@ -251,11 +358,27 @@ export function QuestCamera({ questTitle, onClose, onCapture }: Props) {
             </button>
             <div className="w-12" />
           </>
-        ) : (
+        )}
+        {step === "categorize" && (
+          <button
+            type="button"
+            onClick={retake}
+            className="flex flex-col items-center gap-1 text-background"
+          >
+            <span className="grid h-14 w-14 place-items-center rounded-full bg-background/15">
+              <RefreshCw className="h-5 w-5" />
+            </span>
+            <span className="text-[10px] font-semibold uppercase tracking-wider">
+              Retake
+            </span>
+          </button>
+        )}
+        {step === "fact" && (
           <>
             <button
               type="button"
               onClick={retake}
+              disabled={saving}
               className="flex flex-col items-center gap-1 text-background"
             >
               <span className="grid h-14 w-14 place-items-center rounded-full bg-background/15">
@@ -268,13 +391,18 @@ export function QuestCamera({ questTitle, onClose, onCapture }: Props) {
             <button
               type="button"
               onClick={confirm}
+              disabled={saving}
               className="flex flex-col items-center gap-1 text-background"
             >
-              <span className="grid h-16 w-16 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg">
-                <Check className="h-7 w-7" />
+              <span className="grid h-16 w-16 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg disabled:opacity-60">
+                {saving ? (
+                  <Loader2 className="h-7 w-7 animate-spin" />
+                ) : (
+                  <Check className="h-7 w-7" />
+                )}
               </span>
               <span className="text-[10px] font-semibold uppercase tracking-wider">
-                Save sketch
+                {saving ? "Saving…" : "Save sketch"}
               </span>
             </button>
             <div className="w-14" />
