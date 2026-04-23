@@ -1,10 +1,16 @@
 import { useEffect, useRef, useState } from "react";
-import { Camera, RefreshCw, Check, X, AlertCircle } from "lucide-react";
+import { Camera, RefreshCw, Check, X, AlertCircle, Sparkles, Loader2 } from "lucide-react";
+import { CATEGORIES, type CategoryId, pickFunFact } from "@/lib/journal-categories";
 
 type Props = {
   questTitle: string;
   onClose: () => void;
-  onCapture: (sketchDataUrl: string) => void;
+  onCapture: (result: {
+    sketchDataUrl: string;
+    category: CategoryId;
+    title: string;
+    funFact: string;
+  }) => Promise<void> | void;
 };
 
 type Status = "idle" | "requesting" | "ready" | "denied" | "unavailable" | "error";
@@ -96,6 +102,13 @@ export function QuestCamera({ questTitle, onClose, onCapture }: Props) {
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  // Post-capture flow: pick a category, then see the fun fact, then save.
+  const [step, setStep] = useState<"capture" | "categorize" | "fact">("capture");
+  const [category, setCategory] = useState<CategoryId | null>(null);
+  const [title, setTitle] = useState("");
+  const [funFact, setFunFact] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -158,12 +171,40 @@ export function QuestCamera({ questTitle, onClose, onCapture }: Props) {
     ctx.drawImage(video, 0, 0, w, h);
     applySketchFilter(ctx, w, h);
     setPreview(canvas.toDataURL("image/jpeg", 0.85));
+    setStep("categorize");
+    setTitle(questTitle);
   };
 
-  const retake = () => setPreview(null);
+  const retake = () => {
+    setPreview(null);
+    setStep("capture");
+    setCategory(null);
+    setFunFact("");
+    setSaveError(null);
+  };
 
-  const confirm = () => {
-    if (preview) onCapture(preview);
+  const pickCategory = (id: CategoryId) => {
+    setCategory(id);
+    setFunFact(pickFunFact(id));
+    setStep("fact");
+  };
+
+  const confirm = async () => {
+    if (!preview || !category) return;
+    setSaving(true);
+    setSaveError(null);
+    try {
+      await onCapture({
+        sketchDataUrl: preview,
+        category,
+        title: title.trim() || questTitle,
+        funFact,
+      });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Couldn't save sketch.";
+      setSaveError(msg);
+      setSaving(false);
+    }
   };
 
   return (
