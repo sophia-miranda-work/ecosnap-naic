@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowRight, Compass, Footprints, RefreshCw, Sparkles, X } from "lucide-react";
+import { ArrowRight, Compass, Footprints, MapPin, RefreshCw, Sparkles, X } from "lucide-react";
+import { useWalkTracker } from "@/hooks/use-walk-tracker";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -41,9 +42,12 @@ function Index() {
   const [questIndex, setQuestIndex] = useState(0);
   const quest = QUEST_POOL[questIndex];
   const streak = 7;
-  const distanceKm = 1.2;
 
   const [walk, setWalk] = useState<WalkState>({ phase: "idle" });
+
+  // Live geolocation tracking — only active during the "walking" phase.
+  const tracker = useWalkTracker(walk.phase === "walking");
+  const distanceKm = tracker.distanceMeters / 1000;
 
   return (
     <div className="px-5 pt-8">
@@ -96,8 +100,10 @@ function Index() {
       <section className="mt-4 grid grid-cols-2 gap-3">
         <div className="parchment-card p-4">
           <Footprints className="h-5 w-5 text-primary" />
-          <p className="mt-3 text-2xl font-bold text-foreground">{distanceKm.toFixed(1)} km</p>
-          <p className="text-xs text-muted-foreground">walked today</p>
+          <p className="mt-3 text-2xl font-bold text-foreground">{distanceKm.toFixed(2)} km</p>
+          <p className="text-xs text-muted-foreground">
+            {walk.phase === "walking" ? "tracking live" : "walked this trip"}
+          </p>
         </div>
         <div className="parchment-card p-4">
           <Sparkles className="h-5 w-5 text-accent" />
@@ -131,7 +137,21 @@ function Index() {
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                 Walk in progress
               </p>
-              <p className="mt-1 text-lg font-bold text-foreground">Have fun out there 🍃</p>
+              <p className="mt-1 text-lg font-bold text-foreground">
+                {distanceKm.toFixed(2)} km · {tracker.points} pts
+              </p>
+              <p className="mt-1 inline-flex items-center gap-1 text-xs text-muted-foreground">
+                <MapPin className="h-3 w-3" />
+                {tracker.status === "requesting" && "Waiting for GPS…"}
+                {tracker.status === "tracking" && "GPS locked · have fun out there 🍃"}
+                {tracker.status === "denied" &&
+                  "Location denied — distance won't be tracked."}
+                {tracker.status === "unavailable" &&
+                  "Geolocation unavailable in this browser."}
+                {tracker.status === "error" &&
+                  (tracker.error ?? "Couldn't read location.")}
+                {tracker.status === "idle" && "Starting GPS…"}
+              </p>
             </div>
             <button
               type="button"
