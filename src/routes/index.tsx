@@ -42,9 +42,12 @@ function Index() {
   const [questIndex, setQuestIndex] = useState(0);
   const quest = QUEST_POOL[questIndex];
   const streak = 7;
-  const distanceKm = 1.2;
 
   const [walk, setWalk] = useState<WalkState>({ phase: "idle" });
+
+  // Live geolocation tracking — only active during the "walking" phase.
+  const tracker = useWalkTracker(walk.phase === "walking");
+  const distanceKm = tracker.distanceMeters / 1000;
 
   return (
     <div className="px-5 pt-8">
