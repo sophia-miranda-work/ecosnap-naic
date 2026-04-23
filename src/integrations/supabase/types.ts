@@ -14,7 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      journal_entries: {
+        Row: {
+          category: Database["public"]["Enums"]["journal_category"]
+          created_at: string
+          device_id: string
+          fun_fact: string | null
+          id: string
+          image_path: string
+          quest_title: string | null
+          title: string
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["journal_category"]
+          created_at?: string
+          device_id: string
+          fun_fact?: string | null
+          id?: string
+          image_path: string
+          quest_title?: string | null
+          title: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["journal_category"]
+          created_at?: string
+          device_id?: string
+          fun_fact?: string | null
+          id?: string
+          image_path?: string
+          quest_title?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +55,17 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      journal_category:
+        | "tree"
+        | "plant"
+        | "flower"
+        | "bird"
+        | "insect"
+        | "mushroom"
+        | "stone"
+        | "water"
+        | "sky"
+        | "other"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +192,19 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      journal_category: [
+        "tree",
+        "plant",
+        "flower",
+        "bird",
+        "insect",
+        "mushroom",
+        "stone",
+        "water",
+        "sky",
+        "other",
+      ],
+    },
   },
 } as const
