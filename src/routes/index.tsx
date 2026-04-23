@@ -100,8 +100,10 @@ function Index() {
       <section className="mt-4 grid grid-cols-2 gap-3">
         <div className="parchment-card p-4">
           <Footprints className="h-5 w-5 text-primary" />
-          <p className="mt-3 text-2xl font-bold text-foreground">{distanceKm.toFixed(1)} km</p>
-          <p className="text-xs text-muted-foreground">walked today</p>
+          <p className="mt-3 text-2xl font-bold text-foreground">{distanceKm.toFixed(2)} km</p>
+          <p className="text-xs text-muted-foreground">
+            {walk.phase === "walking" ? "tracking live" : "walked this trip"}
+          </p>
         </div>
         <div className="parchment-card p-4">
           <Sparkles className="h-5 w-5 text-accent" />
