@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowRight, Compass, Footprints, MapPin, RefreshCw, Sparkles, X } from "lucide-react";
+import { ArrowRight, Camera, Check, Compass, Footprints, MapPin, RefreshCw, Sparkles, X } from "lucide-react";
 import { useWalkTracker } from "@/hooks/use-walk-tracker";
+import { QuestCamera } from "@/components/quest-camera";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -44,10 +45,13 @@ function Index() {
   const streak = 7;
 
   const [walk, setWalk] = useState<WalkState>({ phase: "idle" });
+  const [cameraOpen, setCameraOpen] = useState(false);
+  const [proofSketch, setProofSketch] = useState<string | null>(null);
 
   // Live geolocation tracking — only active during the "walking" phase.
   const tracker = useWalkTracker(walk.phase === "walking");
   const distanceKm = tracker.distanceMeters / 1000;
+  const questDone = proofSketch !== null;
 
   return (
     <div className="px-5 pt-8">
@@ -70,7 +74,12 @@ function Index() {
 
       {/* Daily Quest card */}
       <section className="mt-6">
-        <div className="quest-card relative overflow-hidden p-6">
+        <button
+          type="button"
+          onClick={() => setCameraOpen(true)}
+          aria-label={`Capture proof for: ${quest.title}`}
+          className="quest-card group relative block w-full overflow-hidden p-6 text-left transition-transform active:scale-[0.99]"
+        >
           <div className="absolute -right-6 -top-6 text-[8rem] opacity-20 select-none" aria-hidden>
             {quest.emoji}
           </div>
@@ -84,17 +93,60 @@ function Index() {
             </h2>
             <p className="mt-2 text-sm text-primary-foreground/80">{quest.hint}</p>
 
-            <button
-              type="button"
-              onClick={() => setQuestIndex((i) => (i + 1) % QUEST_POOL.length)}
-              className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-primary-foreground/15 px-3 py-1 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary-foreground/25"
-            >
-              <RefreshCw className="h-3 w-3" />
-              Reroll (preview)
-            </button>
+            <div className="mt-4 flex items-center justify-between gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-foreground px-3 py-1.5 text-xs font-bold text-primary shadow-sm">
+                {questDone ? (
+                  <>
+                    <Check className="h-3.5 w-3.5" />
+                    Sketch saved
+                  </>
+                ) : (
+                  <>
+                    <Camera className="h-3.5 w-3.5" />
+                    Tap to capture proof
+                  </>
+                )}
+              </span>
+              <span
+                role="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setQuestIndex((i) => (i + 1) % QUEST_POOL.length);
+                  setProofSketch(null);
+                }}
+                className="inline-flex items-center gap-1.5 rounded-full bg-primary-foreground/15 px-3 py-1 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary-foreground/25"
+              >
+                <RefreshCw className="h-3 w-3" />
+                Reroll
+              </span>
+            </div>
           </div>
-        </div>
+        </button>
       </section>
+
+      {/* Captured proof preview */}
+      {proofSketch && (
+        <section className="mt-3 parchment-card flex items-center gap-3 p-3">
+          <img
+            src={proofSketch}
+            alt="Your sketch proof"
+            className="h-16 w-16 rounded-xl object-cover"
+          />
+          <div className="flex-1">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+              Quest complete
+            </p>
+            <p className="text-sm font-bold text-foreground line-clamp-1">{quest.title}</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setCameraOpen(true)}
+            className="rounded-full bg-muted px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-foreground hover:bg-muted/70"
+          >
+            Retake
+          </button>
+        </section>
+      )}
 
       {/* Walk stats */}
       <section className="mt-4 grid grid-cols-2 gap-3">
@@ -107,7 +159,7 @@ function Index() {
         </div>
         <div className="parchment-card p-4">
           <Sparkles className="h-5 w-5 text-accent" />
-          <p className="mt-3 text-2xl font-bold text-foreground">0 / 1</p>
+          <p className="mt-3 text-2xl font-bold text-foreground">{questDone ? "1" : "0"} / 1</p>
           <p className="text-xs text-muted-foreground">quests today</p>
         </div>
       </section>
@@ -203,6 +255,18 @@ function Index() {
             } else if (walk.phase === "postmood") {
               setWalk({ phase: "done", startMood: walk.startMood, endMood: mood });
             }
+          }}
+        />
+      )}
+
+      {/* Camera capture modal */}
+      {cameraOpen && (
+        <QuestCamera
+          questTitle={quest.title}
+          onClose={() => setCameraOpen(false)}
+          onCapture={(dataUrl) => {
+            setProofSketch(dataUrl);
+            setCameraOpen(false);
           }}
         />
       )}
