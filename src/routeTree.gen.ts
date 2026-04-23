@@ -9,11 +9,17 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ShopRouteImport } from './routes/shop'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as JournalRouteImport } from './routes/journal'
 import { Route as CastRouteImport } from './routes/cast'
 import { Route as IndexRouteImport } from './routes/index'
 
+const ShopRoute = ShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -40,12 +46,14 @@ export interface FileRoutesByFullPath {
   '/cast': typeof CastRoute
   '/journal': typeof JournalRoute
   '/profile': typeof ProfileRoute
+  '/shop': typeof ShopRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/cast': typeof CastRoute
   '/journal': typeof JournalRoute
   '/profile': typeof ProfileRoute
+  '/shop': typeof ShopRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +61,14 @@ export interface FileRoutesById {
   '/cast': typeof CastRoute
   '/journal': typeof JournalRoute
   '/profile': typeof ProfileRoute
+  '/shop': typeof ShopRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/cast' | '/journal' | '/profile'
+  fullPaths: '/' | '/cast' | '/journal' | '/profile' | '/shop'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/cast' | '/journal' | '/profile'
-  id: '__root__' | '/' | '/cast' | '/journal' | '/profile'
+  to: '/' | '/cast' | '/journal' | '/profile' | '/shop'
+  id: '__root__' | '/' | '/cast' | '/journal' | '/profile' | '/shop'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,10 +76,18 @@ export interface RootRouteChildren {
   CastRoute: typeof CastRoute
   JournalRoute: typeof JournalRoute
   ProfileRoute: typeof ProfileRoute
+  ShopRoute: typeof ShopRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/shop': {
+      id: '/shop'
+      path: '/shop'
+      fullPath: '/shop'
+      preLoaderRoute: typeof ShopRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/profile': {
       id: '/profile'
       path: '/profile'
@@ -107,7 +124,17 @@ const rootRouteChildren: RootRouteChildren = {
   CastRoute: CastRoute,
   JournalRoute: JournalRoute,
   ProfileRoute: ProfileRoute,
+  ShopRoute: ShopRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
