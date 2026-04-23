@@ -258,6 +258,18 @@ function Index() {
           }}
         />
       )}
+
+      {/* Camera capture modal */}
+      {cameraOpen && (
+        <QuestCamera
+          questTitle={quest.title}
+          onClose={() => setCameraOpen(false)}
+          onCapture={(dataUrl) => {
+            setProofSketch(dataUrl);
+            setCameraOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 }
