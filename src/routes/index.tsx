@@ -5,6 +5,7 @@ import { useWalkTracker } from "@/hooks/use-walk-tracker";
 import { QuestCamera } from "@/components/quest-camera";
 import { useJournal, type JournalEntry } from "@/hooks/use-journal";
 import { useCharacter } from "@/hooks/use-character";
+import { pickDailyGiver, pickGreeting, QUEST_INTROS } from "@/lib/quest-givers";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -45,6 +46,11 @@ function Index() {
   const [questIndex, setQuestIndex] = useState(0);
   const quest = QUEST_POOL[questIndex];
   const streak = 7;
+
+  // Today's quest-giver (rotates daily across our small cast).
+  const giver = pickDailyGiver();
+  const greeting = pickGreeting(giver);
+  const questIntro = QUEST_INTROS[quest.title];
 
   const [walk, setWalk] = useState<WalkState>({ phase: "idle" });
   const [cameraOpen, setCameraOpen] = useState(false);
