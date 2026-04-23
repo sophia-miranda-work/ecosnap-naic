@@ -2,6 +2,8 @@ import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/r
 import { Home, BookOpen, User } from "lucide-react";
 
 import appCss from "../styles.css?url";
+import { useCharacter } from "@/hooks/use-character";
+import { CharacterCreator } from "@/components/character-creator";
 
 function NotFoundComponent() {
   return (
@@ -80,8 +82,22 @@ function RootComponent() {
           <Outlet />
         </main>
         <BottomTabs />
+        <CharacterOnboardingGate />
       </div>
     </div>
+  );
+}
+
+function CharacterOnboardingGate() {
+  const { character, loading } = useCharacter();
+  if (loading || character) return null;
+  return (
+    <CharacterCreator
+      onClose={() => {
+        /* non-dismissible on first run */
+      }}
+      dismissible={false}
+    />
   );
 }
 
