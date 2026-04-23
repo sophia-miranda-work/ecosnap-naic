@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      characters: {
+        Row: {
+          accent: string
+          avatar: string
+          bio: string | null
+          created_at: string
+          device_id: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          accent?: string
+          avatar?: string
+          bio?: string | null
+          created_at?: string
+          device_id: string
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          accent?: string
+          avatar?: string
+          bio?: string | null
+          created_at?: string
+          device_id?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       journal_entries: {
         Row: {
           category: Database["public"]["Enums"]["journal_category"]
