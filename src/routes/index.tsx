@@ -6,6 +6,7 @@ import { QuestCamera } from "@/components/quest-camera";
 import { useJournal, type JournalEntry } from "@/hooks/use-journal";
 import { useCharacter } from "@/hooks/use-character";
 import { pickDailyGiver, pickGreeting, QUEST_INTROS } from "@/lib/quest-givers";
+import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -312,6 +313,8 @@ function Index() {
               title,
               funFact,
               questTitle: quest.title,
+              questGiverId: giver.id,
+              questGiverLine: questIntro ?? greeting,
             });
             setProofEntry(entry);
             setCameraOpen(false);
