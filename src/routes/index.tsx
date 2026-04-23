@@ -100,6 +100,13 @@ function Index() {
               <Compass className="h-3.5 w-3.5" />
               {giver.name} · {giver.role}
             </div>
+            <Link
+              to="/cast"
+              onClick={(e) => e.stopPropagation()}
+              className="absolute right-0 top-0 inline-flex items-center rounded-full bg-primary-foreground/15 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-primary-foreground hover:bg-primary-foreground/25"
+            >
+              Meet the cast
+            </Link>
 
             {/* Quest-giver speech bubble */}
             <div className="mt-3 flex items-start gap-3">
