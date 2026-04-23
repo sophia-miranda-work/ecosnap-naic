@@ -97,12 +97,37 @@ function Index() {
           <div className="relative">
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground/80">
               <Compass className="h-3.5 w-3.5" />
-              Today's Quest
+              {giver.name} · {giver.role}
             </div>
-            <h2 className="mt-2 text-2xl font-bold leading-tight text-primary-foreground">
+
+            {/* Quest-giver speech bubble */}
+            <div className="mt-3 flex items-start gap-3">
+              <div
+                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary-foreground text-3xl shadow-md ring-2 ring-primary-foreground/40"
+                aria-hidden
+              >
+                {giver.avatar}
+              </div>
+              <div className="relative flex-1 rounded-2xl rounded-tl-sm bg-primary-foreground/95 p-3 text-foreground shadow-sm">
+                <span
+                  className="absolute -left-1.5 top-3 h-3 w-3 rotate-45 bg-primary-foreground/95"
+                  aria-hidden
+                />
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  {greeting}
+                </p>
+                {questIntro && (
+                  <p className="mt-1 text-sm italic leading-snug text-foreground/80">
+                    "{questIntro}"
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <h2 className="mt-4 text-2xl font-bold leading-tight text-primary-foreground">
               {quest.title}
             </h2>
-            <p className="mt-2 text-sm text-primary-foreground/80">{quest.hint}</p>
+            <p className="mt-1 text-sm text-primary-foreground/80">{quest.hint}</p>
 
             <div className="mt-4 flex items-center justify-between gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-foreground px-3 py-1.5 text-xs font-bold text-primary shadow-sm">
