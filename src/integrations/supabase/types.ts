@@ -14,13 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      character_items: {
+        Row: {
+          acquired_at: string
+          character_id: string
+          id: string
+          item_id: string
+        }
+        Insert: {
+          acquired_at?: string
+          character_id: string
+          id?: string
+          item_id: string
+        }
+        Update: {
+          acquired_at?: string
+          character_id?: string
+          id?: string
+          item_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "character_items_character_id_fkey"
+            columns: ["character_id"]
+            isOneToOne: false
+            referencedRelation: "characters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       characters: {
         Row: {
           accent: string
           avatar: string
           bio: string | null
+          coins: number
           created_at: string
           device_id: string
+          dressup: Json
           id: string
           name: string
           updated_at: string
@@ -29,8 +60,10 @@ export type Database = {
           accent?: string
           avatar?: string
           bio?: string | null
+          coins?: number
           created_at?: string
           device_id: string
+          dressup?: Json
           id?: string
           name: string
           updated_at?: string
@@ -39,8 +72,10 @@ export type Database = {
           accent?: string
           avatar?: string
           bio?: string | null
+          coins?: number
           created_at?: string
           device_id?: string
+          dressup?: Json
           id?: string
           name?: string
           updated_at?: string
@@ -91,7 +126,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      award_coins: {
+        Args: { _amount: number; _device_id: string }
+        Returns: number
+      }
+      purchase_item: {
+        Args: { _character_id: string; _item_id: string; _price: number }
+        Returns: {
+          coins: number
+          owned: boolean
+        }[]
+      }
     }
     Enums: {
       journal_category:

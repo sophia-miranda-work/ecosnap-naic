@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getDeviceId } from "@/lib/device-id";
 import type { CategoryId } from "@/lib/journal-categories";
+import { COINS_PER_ENTRY } from "@/lib/shop";
 
 export type JournalEntry = {
   id: string;
@@ -108,7 +109,24 @@ export function useJournal() {
         image_url: publicUrl(insert.data.image_path),
       };
       setEntries((prev) => [newEntry, ...prev]);
-      return newEntry;
+
+      // Reward coins for completing the quest. Best-effort — don't fail the
+      // save if the RPC errors out.
+      let coinsAwarded = 0;
+      let newBalance: number | null = null;
+      try {
+        const { data: bal, error: rpcErr } = await supabase.rpc("award_coins", {
+          _device_id: deviceId,
+          _amount: COINS_PER_ENTRY,
+        });
+        if (!rpcErr && typeof bal === "number") {
+          coinsAwarded = COINS_PER_ENTRY;
+          newBalance = bal;
+        }
+      } catch {
+        // ignore — coins are a bonus
+      }
+      return { entry: newEntry, coinsAwarded, newBalance };
     },
     [],
   );

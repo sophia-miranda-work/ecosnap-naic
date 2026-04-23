@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowRight, Camera, Check, Compass, Footprints, MapPin, RefreshCw, Sparkles, X } from "lucide-react";
+import { ArrowRight, Camera, Check, Coins, Compass, Footprints, MapPin, RefreshCw, Sparkles, X } from "lucide-react";
 import { useWalkTracker } from "@/hooks/use-walk-tracker";
 import { QuestCamera } from "@/components/quest-camera";
 import { useJournal, type JournalEntry } from "@/hooks/use-journal";
@@ -56,6 +56,7 @@ function Index() {
   const [walk, setWalk] = useState<WalkState>({ phase: "idle" });
   const [cameraOpen, setCameraOpen] = useState(false);
   const [proofEntry, setProofEntry] = useState<JournalEntry | null>(null);
+  const [coinFlash, setCoinFlash] = useState<number | null>(null);
   const journal = useJournal();
   const { character } = useCharacter();
   const explorerName = character?.name?.split(" ")[0] ?? "Explorer";
@@ -314,7 +315,7 @@ function Index() {
           questTitle={quest.title}
           onClose={() => setCameraOpen(false)}
           onCapture={async ({ sketchDataUrl, category, title, funFact }) => {
-            const entry = await journal.addEntry({
+            const result = await journal.addEntry({
               sketchDataUrl,
               category,
               title,
@@ -323,10 +324,29 @@ function Index() {
               questGiverId: giver.id,
               questGiverLine: questIntro ?? greeting,
             });
-            setProofEntry(entry);
+            setProofEntry(result.entry);
+            if (result.coinsAwarded > 0) {
+              setCoinFlash(result.coinsAwarded);
+              setTimeout(() => setCoinFlash(null), 3000);
+            }
             setCameraOpen(false);
           }}
         />
+      )}
+
+      {/* Coin reward toast */}
+      {coinFlash !== null && (
+        <div
+          className="fixed bottom-28 left-1/2 z-[80] -translate-x-1/2 animate-in fade-in slide-in-from-bottom-4"
+          role="status"
+        >
+          <div className="parchment-card flex items-center gap-2 px-4 py-2.5">
+            <Coins className="h-5 w-5 text-accent" />
+            <span className="text-sm font-bold text-foreground">
+              +{coinFlash} coins from {giver.name}!
+            </span>
+          </div>
+        </div>
       )}
     </div>
   );
