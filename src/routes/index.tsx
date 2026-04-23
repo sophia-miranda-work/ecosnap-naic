@@ -3,6 +3,7 @@ import { useState } from "react";
 import { ArrowRight, Camera, Check, Compass, Footprints, MapPin, RefreshCw, Sparkles, X } from "lucide-react";
 import { useWalkTracker } from "@/hooks/use-walk-tracker";
 import { QuestCamera } from "@/components/quest-camera";
+import { useJournal, type JournalEntry } from "@/hooks/use-journal";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -46,12 +47,13 @@ function Index() {
 
   const [walk, setWalk] = useState<WalkState>({ phase: "idle" });
   const [cameraOpen, setCameraOpen] = useState(false);
-  const [proofSketch, setProofSketch] = useState<string | null>(null);
+  const [proofEntry, setProofEntry] = useState<JournalEntry | null>(null);
+  const journal = useJournal();
 
   // Live geolocation tracking — only active during the "walking" phase.
   const tracker = useWalkTracker(walk.phase === "walking");
   const distanceKm = tracker.distanceMeters / 1000;
-  const questDone = proofSketch !== null;
+  const questDone = proofEntry !== null;
 
   return (
     <div className="px-5 pt-8">
@@ -112,7 +114,7 @@ function Index() {
                 onClick={(e) => {
                   e.stopPropagation();
                   setQuestIndex((i) => (i + 1) % QUEST_POOL.length);
-                  setProofSketch(null);
+                  setProofEntry(null);
                 }}
                 className="inline-flex items-center gap-1.5 rounded-full bg-primary-foreground/15 px-3 py-1 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary-foreground/25"
               >
@@ -125,10 +127,10 @@ function Index() {
       </section>
 
       {/* Captured proof preview */}
-      {proofSketch && (
+      {proofEntry && (
         <section className="mt-3 parchment-card flex items-center gap-3 p-3">
           <img
-            src={proofSketch}
+            src={proofEntry.image_url}
             alt="Your sketch proof"
             className="h-16 w-16 rounded-xl object-cover"
           />
@@ -136,7 +138,12 @@ function Index() {
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               Quest complete
             </p>
-            <p className="text-sm font-bold text-foreground line-clamp-1">{quest.title}</p>
+            <p className="text-sm font-bold text-foreground line-clamp-1">{proofEntry.title}</p>
+            {proofEntry.fun_fact && (
+              <p className="mt-0.5 text-[11px] text-muted-foreground line-clamp-2">
+                ✨ {proofEntry.fun_fact}
+              </p>
+            )}
           </div>
           <button
             type="button"
@@ -264,8 +271,15 @@ function Index() {
         <QuestCamera
           questTitle={quest.title}
           onClose={() => setCameraOpen(false)}
-          onCapture={(dataUrl) => {
-            setProofSketch(dataUrl);
+          onCapture={async ({ sketchDataUrl, category, title, funFact }) => {
+            const entry = await journal.addEntry({
+              sketchDataUrl,
+              category,
+              title,
+              funFact,
+              questTitle: quest.title,
+            });
+            setProofEntry(entry);
             setCameraOpen(false);
           }}
         />
