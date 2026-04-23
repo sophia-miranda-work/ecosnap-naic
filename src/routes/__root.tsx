@@ -1,4 +1,5 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { Home, BookOpen, User } from "lucide-react";
 
 import appCss from "../styles.css?url";
 
@@ -28,17 +29,24 @@ export const Route = createRootRoute({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
+      { name: "theme-color", content: "#e8dfc6" },
+      { title: "Explorer's Notebook — Daily nature quests" },
+      { name: "description", content: "A cozy walking companion. Get a daily nature quest, track your walk, log your mood, and collect sketched memories in your journal." },
+      { name: "author", content: "Explorer's Notebook" },
+      { property: "og:title", content: "Explorer's Notebook" },
+      { property: "og:description", content: "Gamify your daily walks with nature-themed quests, mood tracking, and a sketchbook journal." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Nunito:wght@400;500;600;700&display=swap",
+      },
       {
         rel: "stylesheet",
         href: appCss,
@@ -65,5 +73,44 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
-  return <Outlet />;
+  return (
+    <div className="min-h-[100dvh] flex justify-center bg-background">
+      <div className="relative w-full max-w-[480px] min-h-[100dvh] flex flex-col">
+        <main className="flex-1 pb-28">
+          <Outlet />
+        </main>
+        <BottomTabs />
+      </div>
+    </div>
+  );
+}
+
+function BottomTabs() {
+  const tabs = [
+    { to: "/", label: "Home", icon: Home },
+    { to: "/journal", label: "Journal", icon: BookOpen },
+    { to: "/profile", label: "Profile", icon: User },
+  ] as const;
+
+  return (
+    <nav
+      className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] px-4 pb-[max(env(safe-area-inset-bottom),0.75rem)] pt-2 z-50"
+      aria-label="Primary"
+    >
+      <ul className="parchment-card flex items-center justify-around px-2 py-2">
+        {tabs.map(({ to, label, icon: Icon }) => (
+          <li key={to} className="flex-1">
+            <Link
+              to={to}
+              activeOptions={{ exact: true }}
+              className="group flex flex-col items-center gap-1 rounded-2xl px-3 py-2 text-muted-foreground transition-colors data-[status=active]:text-primary"
+            >
+              <Icon className="h-5 w-5 transition-transform group-hover:scale-110 group-data-[status=active]:scale-110" />
+              <span className="text-[11px] font-semibold tracking-wide uppercase">{label}</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
 }

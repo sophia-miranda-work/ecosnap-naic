@@ -1,26 +1,250 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { ArrowRight, Compass, Footprints, RefreshCw, Sparkles, X } from "lucide-react";
 
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Today — Explorer's Notebook" },
+      { name: "description", content: "Your daily nature quest awaits. Log your mood, head outside, and collect a sketch." },
+      { property: "og:title", content: "Today — Explorer's Notebook" },
+      { property: "og:description", content: "A new nature-themed adventure every day. Walk, wonder, and sketch." },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. For sites with multiple pages (About, Services, Contact, etc.),
-// create separate route files (about.tsx, services.tsx, contact.tsx) — don't put all pages in this file.
-function PlaceholderIndex() {
+const QUEST_POOL = [
+  { emoji: "🌸", title: "Find a flower with 5 petals", hint: "Look low along garden walls and meadows." },
+  { emoji: "🍃", title: "Spot a uniquely shaped leaf", hint: "Hearts, stars, or hands — anything but oval." },
+  { emoji: "🐦", title: "Spot a yellow bird", hint: "Listen first; they often sing before they show." },
+  { emoji: "🪶", title: "Find a fallen feather", hint: "Edges of paths and under tall trees." },
+  { emoji: "🍄", title: "Discover a mushroom", hint: "Damp shaded spots after recent rain." },
+] as const;
+
+const MOODS = [
+  { value: "sad", emoji: "☹️", label: "Low" },
+  { value: "meh", emoji: "😐", label: "Okay" },
+  { value: "good", emoji: "🙂", label: "Good" },
+  { value: "great", emoji: "😄", label: "Great" },
+] as const;
+
+type WalkState =
+  | { phase: "idle" }
+  | { phase: "premood" }
+  | { phase: "walking"; startMood: string }
+  | { phase: "postmood"; startMood: string }
+  | { phase: "done"; startMood: string; endMood: string };
+
+function Index() {
+  // Mock: stable quest for the day (later: pick by date seed + persist).
+  const [questIndex, setQuestIndex] = useState(0);
+  const quest = QUEST_POOL[questIndex];
+  const streak = 7;
+  const distanceKm = 1.2;
+
+  const [walk, setWalk] = useState<WalkState>({ phase: "idle" });
+
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="px-5 pt-8">
+      {/* Greeting + streak */}
+      <header className="flex items-start justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+            Wednesday · Apr 23
+          </p>
+          <h1 className="mt-1 text-3xl font-bold text-foreground">Good morning,<br/>Explorer</h1>
+        </div>
+        <div className="parchment-card flex flex-col items-center px-3 py-2 text-center">
+          <span className="text-2xl leading-none" aria-hidden>🌸</span>
+          <span className="mt-1 text-lg font-bold leading-none text-foreground">{streak}</span>
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            day streak
+          </span>
+        </div>
+      </header>
+
+      {/* Daily Quest card */}
+      <section className="mt-6">
+        <div className="quest-card relative overflow-hidden p-6">
+          <div className="absolute -right-6 -top-6 text-[8rem] opacity-20 select-none" aria-hidden>
+            {quest.emoji}
+          </div>
+          <div className="relative">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground/80">
+              <Compass className="h-3.5 w-3.5" />
+              Today's Quest
+            </div>
+            <h2 className="mt-2 text-2xl font-bold leading-tight text-primary-foreground">
+              {quest.title}
+            </h2>
+            <p className="mt-2 text-sm text-primary-foreground/80">{quest.hint}</p>
+
+            <button
+              type="button"
+              onClick={() => setQuestIndex((i) => (i + 1) % QUEST_POOL.length)}
+              className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-primary-foreground/15 px-3 py-1 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary-foreground/25"
+            >
+              <RefreshCw className="h-3 w-3" />
+              Reroll (preview)
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Walk stats */}
+      <section className="mt-4 grid grid-cols-2 gap-3">
+        <div className="parchment-card p-4">
+          <Footprints className="h-5 w-5 text-primary" />
+          <p className="mt-3 text-2xl font-bold text-foreground">{distanceKm.toFixed(1)} km</p>
+          <p className="text-xs text-muted-foreground">walked today</p>
+        </div>
+        <div className="parchment-card p-4">
+          <Sparkles className="h-5 w-5 text-accent" />
+          <p className="mt-3 text-2xl font-bold text-foreground">0 / 1</p>
+          <p className="text-xs text-muted-foreground">quests today</p>
+        </div>
+      </section>
+
+      {/* Start walk CTA */}
+      <section className="mt-6">
+        <button
+          type="button"
+          onClick={() => setWalk({ phase: "premood" })}
+          className="group flex w-full items-center justify-between rounded-2xl bg-foreground px-6 py-4 text-background shadow-[0_8px_24px_-12px_oklch(0.3_0.05_60_/_0.4)] transition-transform active:scale-[0.98]"
+        >
+          <span className="text-left">
+            <span className="block text-xs font-semibold uppercase tracking-[0.2em] opacity-70">
+              Ready when you are
+            </span>
+            <span className="block text-lg font-bold">Start your walk</span>
+          </span>
+          <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+        </button>
+      </section>
+
+      {/* Walking-in-progress preview banner */}
+      {walk.phase === "walking" && (
+        <section className="mt-4 parchment-card p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                Walk in progress
+              </p>
+              <p className="mt-1 text-lg font-bold text-foreground">Have fun out there 🍃</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setWalk({ phase: "postmood", startMood: walk.startMood })}
+              className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
+            >
+              Finish
+            </button>
+          </div>
+        </section>
+      )}
+
+      {walk.phase === "done" && (
+        <section className="mt-4 parchment-card p-4 text-center">
+          <p className="text-3xl">🌿</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Nice walk! You went from{" "}
+            <span className="font-semibold text-foreground">
+              {MOODS.find((m) => m.value === walk.startMood)?.emoji}
+            </span>{" "}
+            to{" "}
+            <span className="font-semibold text-foreground">
+              {MOODS.find((m) => m.value === walk.endMood)?.emoji}
+            </span>
+          </p>
+          <button
+            type="button"
+            onClick={() => setWalk({ phase: "idle" })}
+            className="mt-3 text-xs font-semibold uppercase tracking-wider text-primary"
+          >
+            Done
+          </button>
+        </section>
+      )}
+
+      {/* Mood modals */}
+      {(walk.phase === "premood" || walk.phase === "postmood") && (
+        <MoodSheet
+          title={walk.phase === "premood" ? "How are you feeling?" : "How do you feel now?"}
+          subtitle={
+            walk.phase === "premood"
+              ? "Log your mood before heading out."
+              : "A quick check-in before we wrap up."
+          }
+          onClose={() => setWalk({ phase: "idle" })}
+          onPick={(mood) => {
+            if (walk.phase === "premood") {
+              setWalk({ phase: "walking", startMood: mood });
+            } else if (walk.phase === "postmood") {
+              setWalk({ phase: "done", startMood: walk.startMood, endMood: mood });
+            }
+          }}
+        />
+      )}
     </div>
   );
 }
 
-function Index() {
-  return <PlaceholderIndex />;
+function MoodSheet({
+  title,
+  subtitle,
+  onClose,
+  onPick,
+}: {
+  title: string;
+  subtitle: string;
+  onClose: () => void;
+  onPick: (mood: string) => void;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-[60] flex items-end justify-center bg-foreground/40 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="parchment-card mx-4 mb-4 w-full max-w-[448px] p-6"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-label={title}
+      >
+        <div className="flex items-start justify-between">
+          <div>
+            <h3 className="text-xl font-bold text-foreground">{title}</h3>
+            <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-full p-1 text-muted-foreground hover:bg-muted"
+            aria-label="Close"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        <div className="mt-5 grid grid-cols-4 gap-2">
+          {MOODS.map((m) => (
+            <button
+              key={m.value}
+              type="button"
+              onClick={() => onPick(m.value)}
+              className="flex flex-col items-center gap-1 rounded-2xl border border-border bg-card py-3 transition-transform active:scale-95 hover:bg-accent/30"
+            >
+              <span className="text-3xl" aria-hidden>
+                {m.emoji}
+              </span>
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                {m.label}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }
