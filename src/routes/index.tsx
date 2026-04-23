@@ -59,7 +59,7 @@ function Index() {
       <header className="flex items-start justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-            Wednesday · Apr 23
+            THURSDAY · APR 23
           </p>
           <h1 className="mt-1 text-3xl font-bold text-foreground">Good morning,<br/>Explorer</h1>
         </div>
