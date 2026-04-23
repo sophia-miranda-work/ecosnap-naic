@@ -159,7 +159,7 @@ function Index() {
         </div>
         <div className="parchment-card p-4">
           <Sparkles className="h-5 w-5 text-accent" />
-          <p className="mt-3 text-2xl font-bold text-foreground">0 / 1</p>
+          <p className="mt-3 text-2xl font-bold text-foreground">{questDone ? "1" : "0"} / 1</p>
           <p className="text-xs text-muted-foreground">quests today</p>
         </div>
       </section>
