@@ -137,7 +137,21 @@ function Index() {
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                 Walk in progress
               </p>
-              <p className="mt-1 text-lg font-bold text-foreground">Have fun out there 🍃</p>
+              <p className="mt-1 text-lg font-bold text-foreground">
+                {distanceKm.toFixed(2)} km · {tracker.points} pts
+              </p>
+              <p className="mt-1 inline-flex items-center gap-1 text-xs text-muted-foreground">
+                <MapPin className="h-3 w-3" />
+                {tracker.status === "requesting" && "Waiting for GPS…"}
+                {tracker.status === "tracking" && "GPS locked · have fun out there 🍃"}
+                {tracker.status === "denied" &&
+                  "Location denied — distance won't be tracked."}
+                {tracker.status === "unavailable" &&
+                  "Geolocation unavailable in this browser."}
+                {tracker.status === "error" &&
+                  (tracker.error ?? "Couldn't read location.")}
+                {tracker.status === "idle" && "Starting GPS…"}
+              </p>
             </div>
             <button
               type="button"
