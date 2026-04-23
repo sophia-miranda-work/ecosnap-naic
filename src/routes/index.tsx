@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowRight, Compass, Footprints, MapPin, RefreshCw, Sparkles, X } from "lucide-react";
+import { ArrowRight, Camera, Check, Compass, Footprints, MapPin, RefreshCw, Sparkles, X } from "lucide-react";
 import { useWalkTracker } from "@/hooks/use-walk-tracker";
+import { QuestCamera } from "@/components/quest-camera";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -44,10 +45,13 @@ function Index() {
   const streak = 7;
 
   const [walk, setWalk] = useState<WalkState>({ phase: "idle" });
+  const [cameraOpen, setCameraOpen] = useState(false);
+  const [proofSketch, setProofSketch] = useState<string | null>(null);
 
   // Live geolocation tracking — only active during the "walking" phase.
   const tracker = useWalkTracker(walk.phase === "walking");
   const distanceKm = tracker.distanceMeters / 1000;
+  const questDone = proofSketch !== null;
 
   return (
     <div className="px-5 pt-8">
