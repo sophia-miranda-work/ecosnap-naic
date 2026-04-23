@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { Sparkles, X } from "lucide-react";
 import { useJournal, type JournalEntry } from "@/hooks/use-journal";
 import { CATEGORIES, CATEGORY_BY_ID, type CategoryId } from "@/lib/journal-categories";
+import { getGiverById } from "@/lib/quest-givers";
 
 export const Route = createFileRoute("/journal")({
   head: () => ({
@@ -231,6 +232,25 @@ function EntryModal({ entry, onClose }: { entry: JournalEntry; onClose: () => vo
               From quest: <span className="font-medium">{entry.quest_title}</span>
             </p>
           )}
+          {entry.quest_giver_id && entry.quest_giver_line && (() => {
+            const g = getGiverById(entry.quest_giver_id);
+            if (!g) return null;
+            return (
+              <div className="mt-3 flex items-start gap-2 rounded-2xl border border-border bg-card/60 p-3">
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-muted text-xl" aria-hidden>
+                  {g.avatar}
+                </span>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    {g.name} · {g.role}
+                  </p>
+                  <p className="mt-0.5 text-sm italic leading-snug text-foreground/85">
+                    "{entry.quest_giver_line}"
+                  </p>
+                </div>
+              </div>
+            );
+          })()}
           {entry.fun_fact && (
             <div className="mt-4 rounded-2xl border border-border bg-muted/40 p-3">
               <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">

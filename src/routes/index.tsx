@@ -6,6 +6,7 @@ import { QuestCamera } from "@/components/quest-camera";
 import { useJournal, type JournalEntry } from "@/hooks/use-journal";
 import { useCharacter } from "@/hooks/use-character";
 import { pickDailyGiver, pickGreeting, QUEST_INTROS } from "@/lib/quest-givers";
+import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -99,6 +100,13 @@ function Index() {
               <Compass className="h-3.5 w-3.5" />
               {giver.name} · {giver.role}
             </div>
+            <Link
+              to="/cast"
+              onClick={(e) => e.stopPropagation()}
+              className="absolute right-0 top-0 inline-flex items-center rounded-full bg-primary-foreground/15 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-primary-foreground hover:bg-primary-foreground/25"
+            >
+              Meet the cast
+            </Link>
 
             {/* Quest-giver speech bubble */}
             <div className="mt-3 flex items-start gap-3">
@@ -312,6 +320,8 @@ function Index() {
               title,
               funFact,
               questTitle: quest.title,
+              questGiverId: giver.id,
+              questGiverLine: questIntro ?? greeting,
             });
             setProofEntry(entry);
             setCameraOpen(false);

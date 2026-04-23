@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as JournalRouteImport } from './routes/journal'
+import { Route as CastRouteImport } from './routes/cast'
 import { Route as IndexRouteImport } from './routes/index'
 
 const ProfileRoute = ProfileRouteImport.update({
@@ -23,6 +24,11 @@ const JournalRoute = JournalRouteImport.update({
   path: '/journal',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CastRoute = CastRouteImport.update({
+  id: '/cast',
+  path: '/cast',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -31,30 +37,34 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/cast': typeof CastRoute
   '/journal': typeof JournalRoute
   '/profile': typeof ProfileRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/cast': typeof CastRoute
   '/journal': typeof JournalRoute
   '/profile': typeof ProfileRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/cast': typeof CastRoute
   '/journal': typeof JournalRoute
   '/profile': typeof ProfileRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/journal' | '/profile'
+  fullPaths: '/' | '/cast' | '/journal' | '/profile'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/journal' | '/profile'
-  id: '__root__' | '/' | '/journal' | '/profile'
+  to: '/' | '/cast' | '/journal' | '/profile'
+  id: '__root__' | '/' | '/cast' | '/journal' | '/profile'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CastRoute: typeof CastRoute
   JournalRoute: typeof JournalRoute
   ProfileRoute: typeof ProfileRoute
 }
@@ -75,6 +85,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JournalRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cast': {
+      id: '/cast'
+      path: '/cast'
+      fullPath: '/cast'
+      preLoaderRoute: typeof CastRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -87,6 +104,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CastRoute: CastRoute,
   JournalRoute: JournalRoute,
   ProfileRoute: ProfileRoute,
 }
