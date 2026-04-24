@@ -308,6 +308,14 @@ function Index() {
         </button>
       </section>
 
+      {/* Today's bonus prompts */}
+      <DailyExtras
+        onCoinAward={(amt) => {
+          setCoinFlash(amt);
+          setTimeout(() => setCoinFlash(null), 2500);
+        }}
+      />
+
       {/* Walking-in-progress preview banner */}
       {walk.phase === "walking" && (
         <section className="mt-4 parchment-card p-4">
