@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowRight, Camera, Check, Coins, Compass, Footprints, MapPin, RefreshCw, Sparkles, X } from "lucide-react";
 import { useWalkTracker } from "@/hooks/use-walk-tracker";
 import { QuestCamera } from "@/components/quest-camera";
@@ -73,7 +73,17 @@ function Index() {
 
   // Live geolocation tracking — only active during the "walking" phase.
   const tracker = useWalkTracker(walk.phase === "walking");
-  const distanceKm = tracker.distanceMeters / 1000;
+  // Trip distance persists after "Finish" so capture is allowed afterwards too.
+  const [tripMeters, setTripMeters] = useState(0);
+  useEffect(() => {
+    if (walk.phase === "walking") {
+      setTripMeters(tracker.distanceMeters);
+    }
+  }, [tracker.distanceMeters, walk.phase]);
+  useEffect(() => {
+    if (walk.phase === "idle") setTripMeters(0);
+  }, [walk.phase]);
+  const distanceKm = (walk.phase === "walking" ? tracker.distanceMeters : tripMeters) / 1000;
   const questDone = proofEntry !== null;
 
   return (
@@ -323,6 +333,7 @@ function Index() {
       {cameraOpen && (
         <QuestCamera
           questTitle={quest.title}
+          walkedMeters={walk.phase === "walking" ? tracker.distanceMeters : tripMeters}
           onClose={() => setCameraOpen(false)}
           onCapture={async ({ sketchDataUrl, category, title, funFact }) => {
             const result = await journal.addEntry({
