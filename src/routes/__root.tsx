@@ -1,4 +1,4 @@
-import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { Outlet, Link, createRootRoute, HeadContent, Scripts, useNavigate } from "@tanstack/react-router";
 import { Home, BookOpen, User, Users, ShoppingBag } from "lucide-react";
 
 import appCss from "../styles.css?url";
@@ -90,11 +90,15 @@ function RootComponent() {
 
 function CharacterOnboardingGate() {
   const { character, loading } = useCharacter();
+  const navigate = useNavigate();
   if (loading || character) return null;
   return (
     <CharacterCreator
       onClose={() => {
         /* non-dismissible on first run */
+      }}
+      onSaved={() => {
+        navigate({ to: "/" });
       }}
       dismissible={false}
     />
