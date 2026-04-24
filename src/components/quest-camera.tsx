@@ -1,9 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import { Camera, RefreshCw, Check, X, AlertCircle, Sparkles, Loader2 } from "lucide-react";
+import { Camera, RefreshCw, Check, X, AlertCircle, Sparkles, Loader2, Footprints } from "lucide-react";
 import { CATEGORIES, type CategoryId, pickFunFact } from "@/lib/journal-categories";
 
 type Props = {
   questTitle: string;
+  /** How far (meters) the player has walked this trip. Used to gate capture. */
+  walkedMeters: number;
+  /** Minimum required distance to unlock the shutter. */
+  requiredMeters?: number;
   onClose: () => void;
   onCapture: (result: {
     sketchDataUrl: string;
@@ -95,7 +99,13 @@ function applySketchFilter(ctx: CanvasRenderingContext2D, w: number, h: number) 
   ctx.restore();
 }
 
-export function QuestCamera({ questTitle, onClose, onCapture }: Props) {
+export function QuestCamera({
+  questTitle,
+  walkedMeters,
+  requiredMeters = 100,
+  onClose,
+  onCapture,
+}: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -109,6 +119,8 @@ export function QuestCamera({ questTitle, onClose, onCapture }: Props) {
   const [funFact, setFunFact] = useState("");
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+
+  const hasWalkedEnough = walkedMeters >= requiredMeters;
 
   useEffect(() => {
     let cancelled = false;
@@ -156,6 +168,7 @@ export function QuestCamera({ questTitle, onClose, onCapture }: Props) {
   }, []);
 
   const snap = () => {
+    if (!hasWalkedEnough) return;
     const video = videoRef.current;
     const canvas = canvasRef.current;
     if (!video || !canvas) return;
