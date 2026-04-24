@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Coins, Flame, Footprints, Pencil, Shirt, Sparkles, Trophy } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useCharacter, DEFAULT_DRESSUP } from "@/hooks/use-character";
 import { CharacterCreator } from "@/components/character-creator";
 import { DressupAvatar } from "@/components/dressup-avatar";
@@ -28,6 +28,7 @@ const ACCENT_SWATCHES: Record<string, string> = {
 };
 
 function ProfilePage() {
+  const navigate = useNavigate();
   const { character, loading, updateAppearance } = useCharacter();
   const [editing, setEditing] = useState(false);
   const [skinPick, setSkinPick] = useState(false);
@@ -214,6 +215,7 @@ function ProfilePage() {
         <CharacterCreator
           initial={character}
           onClose={() => setEditing(false)}
+          onSaved={() => navigate({ to: "/" })}
         />
       )}
     </div>
