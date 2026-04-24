@@ -156,6 +156,22 @@ export function useCharacter() {
     [character],
   );
 
+  const awardCoins = useCallback(
+    async (amount: number) => {
+      if (!character || amount <= 0) return character?.coins ?? 0;
+      const deviceId = getDeviceId();
+      const { data, error } = await supabase.rpc("award_coins", {
+        _device_id: deviceId,
+        _amount: amount,
+      });
+      if (error) throw error;
+      const newBalance = typeof data === "number" ? data : character.coins + amount;
+      setCharacter({ ...character, coins: newBalance });
+      return newBalance;
+    },
+    [character],
+  );
+
   return {
     character,
     ownedItems,
@@ -166,5 +182,6 @@ export function useCharacter() {
     purchase,
     equipItem,
     updateAppearance,
+    awardCoins,
   };
 }

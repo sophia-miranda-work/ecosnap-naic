@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowRight, Camera, Check, Coins, Compass, Footprints, MapPin, RefreshCw, Sparkles, X } from "lucide-react";
 import { useWalkTracker } from "@/hooks/use-walk-tracker";
 import { QuestCamera } from "@/components/quest-camera";
@@ -7,6 +7,7 @@ import { useJournal, type JournalEntry } from "@/hooks/use-journal";
 import { useCharacter } from "@/hooks/use-character";
 import { pickDailyGiver, pickGreeting, getQuestIntro } from "@/lib/quest-givers";
 import { Link } from "@tanstack/react-router";
+import { DailyExtras } from "@/components/daily-extras";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -36,6 +37,62 @@ const QUEST_POOL = [
   { emoji: "🪨", title: "Find a stone you'd keep", hint: "One that fits nicely in your palm." },
   { emoji: "☁️", title: "Watch the clouds for one minute", hint: "Lie back. Let your eyes wander." },
   { emoji: "🔵", title: "Spot something blue in nature", hint: "Petals, feathers, dragonfly wings." },
+  // Sounds & senses
+  { emoji: "🍂", title: "Listen to the wind in the leaves", hint: "Stand under a big tree and close your eyes." },
+  { emoji: "👃", title: "Find a smell that reminds you of childhood", hint: "Cut grass, jam, woodsmoke — anything." },
+  { emoji: "💧", title: "Listen for water — a stream, a drip, a wave", hint: "Follow the sound, don't rush it." },
+  { emoji: "❄️", title: "Touch something cold in nature", hint: "A river stone or a metal railing in the shade." },
+  { emoji: "🌿", title: "Find something soft to touch (a moss, a petal)", hint: "On the north side of trees, often." },
+  // Sky & weather
+  { emoji: "☁️", title: "Spot a cloud shaped like an animal", hint: "Lie back and let your imagination roam." },
+  { emoji: "🌞", title: "Find the brightest spot of sunlight", hint: "Through a clearing or between buildings." },
+  { emoji: "🌅", title: "Watch a sunrise or sunset", hint: "Find a wide horizon and a few minutes." },
+  { emoji: "🌙", title: "Spot the moon in daytime", hint: "Hides in the morning sky most weeks." },
+  { emoji: "🌡️", title: "Notice the temperature on your skin", hint: "Sun, shade, breeze — all different." },
+  { emoji: "🧘", title: "Stand still for one whole minute outside", hint: "Time it. The world will arrive." },
+  // Plants & ground
+  { emoji: "🟢", title: "Find three different shades of green", hint: "Compare a leaf, moss, and grass." },
+  { emoji: "🌳", title: "Find a plant taller than you", hint: "Look up; trees often qualify." },
+  { emoji: "🌱", title: "Find a plant smaller than your fingernail", hint: "Crouch down and squint." },
+  { emoji: "🌲", title: "Find a fallen branch shaped like a letter", hint: "Y, V, and L are everywhere." },
+  { emoji: "🌷", title: "Smell a flower without picking it", hint: "Lean in slowly so you don't spook the bees." },
+  { emoji: "🌰", title: "Find a seed (acorn, helicopter, dandelion)", hint: "Beneath their parent plants." },
+  { emoji: "💐", title: "Spot a flower you don't know the name of", hint: "Mystery is half the fun." },
+  { emoji: "🟫", title: "Find ground covered in moss or lichen", hint: "Damp, shaded patches and old stones." },
+  // Animals & insects
+  { emoji: "🐜", title: "Spot an ant carrying something", hint: "Cracks in pavement and tree bases." },
+  { emoji: "🐝", title: "Spot a bee on a flower", hint: "Sunny patches of wildflowers are best." },
+  { emoji: "🐌", title: "Spot a snail or slug trail", hint: "After rain, on smooth surfaces." },
+  { emoji: "🦗", title: "Hear an insect (cricket, cicada, buzz)", hint: "Tall grass and warm afternoons." },
+  { emoji: "🪲", title: "Spot a worm or beetle on the ground", hint: "Lift a small flat stone and replace it gently." },
+  { emoji: "🕊️", title: "Watch a bird in flight for 10 seconds", hint: "Stand still; let your eyes follow." },
+  { emoji: "🐿️", title: "Spot a squirrel or rodent", hint: "Quick movement in trees or hedges." },
+  // Numbers & shapes
+  { emoji: "5️⃣", title: "Count five birds in one place", hint: "Parks and ponds work best." },
+  { emoji: "❤️", title: "Find something heart-shaped in nature", hint: "Leaves and pebbles, often." },
+  { emoji: "🌀", title: "Find a perfect spiral (shell, fern, flower)", hint: "Unfurling ferns are the easiest." },
+  { emoji: "📏", title: "Find a stick exactly as long as your arm", hint: "Measure with a stretched-out arm." },
+  { emoji: "🦋", title: "Spot a symmetric leaf or wing", hint: "Hold it up and check both sides." },
+  // Colors
+  { emoji: "🔴", title: "Find something red in nature", hint: "Berries, autumn leaves, ladybugs." },
+  { emoji: "🟣", title: "Find something purple in nature", hint: "Crocus, lavender, butterfly wings." },
+  { emoji: "⚪", title: "Find something white in nature", hint: "Petals, pebbles, or a feather." },
+  { emoji: "🌈", title: "Spot a rainbow of mushrooms or bark colors", hint: "Different trees in a row." },
+  // Reflection & rituals
+  { emoji: "🌬️", title: "Take three deep breaths outside", hint: "Through the nose, slow and easy." },
+  { emoji: "🌳", title: "Compliment a tree out loud", hint: "Whisper if you're shy. The tree won't mind." },
+  { emoji: "👋", title: "Wave at a stranger or pet a friendly dog", hint: "A small smile is enough." },
+  { emoji: "🗑️", title: "Pick up one piece of litter", hint: "Glove or stick if you'd rather." },
+  { emoji: "🪑", title: "Find a quiet bench or rock to sit on", hint: "Stay long enough to settle." },
+  { emoji: "🌌", title: "Find an opening in the trees and look up", hint: "Through a clearing or a gap above the path." },
+  // Weather & seasons
+  { emoji: "💧", title: "Find a puddle and look at the reflection", hint: "Sky, branches, your own nose." },
+  { emoji: "❄️", title: "Catch a snowflake or raindrop on your hand", hint: "Open palm, patient stance." },
+  { emoji: "🧊", title: "Spot a patch of frost or dew", hint: "Best in early morning, on grass or windows." },
+  { emoji: "🌬️", title: "Find seeds blowing in the wind", hint: "Dandelions, maple keys, milkweed." },
+  { emoji: "🪵", title: "Find a tree with peeling or interesting bark", hint: "Birch, plane, eucalyptus, sycamore." },
+  { emoji: "🐦", title: "Spot two birds interacting", hint: "Squabbling, courting, or flying together." },
+  { emoji: "🤫", title: "Find a place where you can hear nothing man-made", hint: "Walk a few minutes from the road." },
 ] as const;
 
 const MOODS = [
@@ -73,7 +130,17 @@ function Index() {
 
   // Live geolocation tracking — only active during the "walking" phase.
   const tracker = useWalkTracker(walk.phase === "walking");
-  const distanceKm = tracker.distanceMeters / 1000;
+  // Trip distance persists after "Finish" so capture is allowed afterwards too.
+  const [tripMeters, setTripMeters] = useState(0);
+  useEffect(() => {
+    if (walk.phase === "walking") {
+      setTripMeters(tracker.distanceMeters);
+    }
+  }, [tracker.distanceMeters, walk.phase]);
+  useEffect(() => {
+    if (walk.phase === "idle") setTripMeters(0);
+  }, [walk.phase]);
+  const distanceKm = (walk.phase === "walking" ? tracker.distanceMeters : tripMeters) / 1000;
   const questDone = proofEntry !== null;
 
   return (
@@ -241,6 +308,14 @@ function Index() {
         </button>
       </section>
 
+      {/* Today's bonus prompts */}
+      <DailyExtras
+        onCoinAward={(amt) => {
+          setCoinFlash(amt);
+          setTimeout(() => setCoinFlash(null), 2500);
+        }}
+      />
+
       {/* Walking-in-progress preview banner */}
       {walk.phase === "walking" && (
         <section className="mt-4 parchment-card p-4">
@@ -323,6 +398,7 @@ function Index() {
       {cameraOpen && (
         <QuestCamera
           questTitle={quest.title}
+          walkedMeters={walk.phase === "walking" ? tracker.distanceMeters : tripMeters}
           onClose={() => setCameraOpen(false)}
           onCapture={async ({ sketchDataUrl, category, title, funFact }) => {
             const result = await journal.addEntry({
