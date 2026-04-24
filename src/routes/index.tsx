@@ -5,7 +5,7 @@ import { useWalkTracker } from "@/hooks/use-walk-tracker";
 import { QuestCamera } from "@/components/quest-camera";
 import { useJournal, type JournalEntry } from "@/hooks/use-journal";
 import { useCharacter } from "@/hooks/use-character";
-import { pickDailyGiver, pickGreeting, QUEST_INTROS } from "@/lib/quest-givers";
+import { pickDailyGiver, pickGreeting, getQuestIntro } from "@/lib/quest-givers";
 import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
@@ -26,6 +26,16 @@ const QUEST_POOL = [
   { emoji: "🐦", title: "Spot a yellow bird", hint: "Listen first; they often sing before they show." },
   { emoji: "🪶", title: "Find a fallen feather", hint: "Edges of paths and under tall trees." },
   { emoji: "🍄", title: "Discover a mushroom", hint: "Damp shaded spots after recent rain." },
+  { emoji: "🎶", title: "Hear three different birdsongs", hint: "Stand still for a minute; the choir starts up." },
+  { emoji: "⚪", title: "Find something perfectly round", hint: "River pebbles, berries, beads of dew." },
+  { emoji: "🕸️", title: "Spot a spider's web", hint: "Best in early light when the dew clings." },
+  { emoji: "🌳", title: "Touch the bark of three different trees", hint: "Smooth, rough, papery — all count." },
+  { emoji: "🌲", title: "Find a pinecone", hint: "Beneath the tall conifers along the path." },
+  { emoji: "👃", title: "Smell three different plants", hint: "Crush a leaf gently between your fingers." },
+  { emoji: "🦋", title: "Spot a butterfly or moth", hint: "Sunny patches of wildflowers are best." },
+  { emoji: "🪨", title: "Find a stone you'd keep", hint: "One that fits nicely in your palm." },
+  { emoji: "☁️", title: "Watch the clouds for one minute", hint: "Lie back. Let your eyes wander." },
+  { emoji: "🔵", title: "Spot something blue in nature", hint: "Petals, feathers, dragonfly wings." },
 ] as const;
 
 const MOODS = [
@@ -51,7 +61,7 @@ function Index() {
   // Today's quest-giver (rotates daily across our small cast).
   const giver = pickDailyGiver();
   const greeting = pickGreeting(giver);
-  const questIntro = QUEST_INTROS[quest.title];
+  const questIntro = getQuestIntro(quest.title, giver.id);
 
   const [walk, setWalk] = useState<WalkState>({ phase: "idle" });
   const [cameraOpen, setCameraOpen] = useState(false);
