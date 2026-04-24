@@ -288,6 +288,20 @@ export function QuestCamera({
           <div className="pointer-events-none absolute inset-4 rounded-2xl border-2 border-dashed border-background/40" />
         )}
 
+        {/* Anti-cheat lock: must walk before capturing */}
+        {!preview && status === "ready" && !hasWalkedEnough && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-foreground/85 p-6 text-center text-background">
+            <Footprints className="h-10 w-10 text-accent" />
+            <p className="text-base font-bold leading-snug">
+              Sorry — you need to show real items!
+            </p>
+            <p className="max-w-[260px] text-xs leading-relaxed opacity-80">
+              Take a short walk outside first, then come back to capture your
+              find. ({Math.round(walkedMeters)} m of {requiredMeters} m so far.)
+            </p>
+          </div>
+        )}
+
         {/* Step 2: Categorize overlay */}
         {preview && step === "categorize" && (
           <div className="absolute inset-0 flex flex-col bg-foreground/85 p-5 text-background">
