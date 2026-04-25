@@ -130,7 +130,6 @@ function BottomTabs() {
     { to: "/", label: "Home", icon: Home },
     { to: "/journal", label: "Journal", icon: BookOpen },
     { to: "/shop", label: "Shop", icon: ShoppingBag },
-    { to: "/cast", label: "Cast", icon: Users },
     { to: "/profile", label: "Profile", icon: User },
   ] as const;
 
