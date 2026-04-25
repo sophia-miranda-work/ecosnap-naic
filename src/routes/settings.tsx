@@ -9,7 +9,7 @@ import {
   Volume2,
 } from "lucide-react";
 import { useSettings } from "@/hooks/use-settings";
-import { ADVENTURE_STYLES, type AdventureStyle } from "@/lib/settings";
+import { ADVENTURE_STYLES, type AdventureStyle, type TtsVoice } from "@/lib/settings";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
@@ -153,6 +153,23 @@ function SettingsPage() {
           }}
           icon={<Sparkles className="h-4 w-4" />}
         />
+        {settings.readToMe && (
+          <SegmentedRow
+            label="Narrator voice"
+            help="Pick the voice flavor used to read quests aloud."
+            value={settings.ttsVoice}
+            options={[
+              { value: "warm", label: "Warm" },
+              { value: "bright", label: "Bright" },
+              { value: "calm", label: "Calm" },
+              { value: "storyteller", label: "Storyteller" },
+            ]}
+            onChange={(v) => {
+              update({ ttsVoice: v as TtsVoice });
+              setTimeout(() => speak("Hello, explorer! How does this voice sound?"), 100);
+            }}
+          />
+        )}
         <ToggleRow
           label="Voice note quests"
           help="Replace the camera with a microphone — describe what you found out loud."
