@@ -1,5 +1,5 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts, useNavigate } from "@tanstack/react-router";
-import { Home, BookOpen, User, Users, ShoppingBag } from "lucide-react";
+import { Home, BookOpen, User, ShoppingBag } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import { useCharacter } from "@/hooks/use-character";
@@ -130,7 +130,6 @@ function BottomTabs() {
     { to: "/", label: "Home", icon: Home },
     { to: "/journal", label: "Journal", icon: BookOpen },
     { to: "/shop", label: "Shop", icon: ShoppingBag },
-    { to: "/cast", label: "Cast", icon: Users },
     { to: "/profile", label: "Profile", icon: User },
   ] as const;
 
