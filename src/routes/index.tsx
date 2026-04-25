@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, Camera, Check, Coins, Compass, Footprints, MapPin, RefreshCw, Sparkles, X } from "lucide-react";
 import { useWalkTracker } from "@/hooks/use-walk-tracker";
 import { QuestCamera } from "@/components/quest-camera";
@@ -9,6 +9,10 @@ import { pickDailyGiver, pickGreeting, getQuestIntro } from "@/lib/quest-givers"
 import { Link } from "@tanstack/react-router";
 import { DailyExtras } from "@/components/daily-extras";
 import { VitaminDCard } from "@/components/vitamin-d-card";
+import { useSettings } from "@/hooks/use-settings";
+import { requiredMetersFor } from "@/lib/settings";
+import { WINDOW_QUEST_POOL } from "@/lib/window-quests";
+import { TtsButton } from "@/components/tts-button";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -111,9 +115,17 @@ type WalkState =
   | { phase: "done"; startMood: string; endMood: string };
 
 function Index() {
+  const { settings, playChime } = useSettings();
+  const isObserver = settings.style === "observer";
+
   // Mock: stable quest for the day (later: pick by date seed + persist).
   const [questIndex, setQuestIndex] = useState(0);
-  const quest = QUEST_POOL[questIndex];
+  const activePool = useMemo(
+    () => (isObserver ? WINDOW_QUEST_POOL : QUEST_POOL),
+    [isObserver],
+  );
+  const safeIndex = questIndex % activePool.length;
+  const quest = activePool[safeIndex];
   const streak = 7;
 
   // Today's quest-giver (rotates daily across our small cast).
@@ -143,6 +155,21 @@ function Index() {
   }, [walk.phase]);
   const distanceKm = (walk.phase === "walking" ? tracker.distanceMeters : tripMeters) / 1000;
   const questDone = proofEntry !== null;
+  const requiredMeters = requiredMetersFor(settings.style);
+  const observerGoalKm = settings.observerGoalMeters / 1000;
+  const observerProgress =
+    settings.observerGoalMeters > 0
+      ? Math.min(1, (walk.phase === "walking" ? tracker.distanceMeters : tripMeters) / settings.observerGoalMeters)
+      : 1;
+
+  const ttsBlurb = useMemo(() => {
+    const lines = [
+      `${giver.name}, ${giver.role}, says: ${greeting}`,
+      questIntro ? `${questIntro}` : "",
+      `Today's quest: ${quest.title}. ${quest.hint}`,
+    ].filter(Boolean);
+    return lines.join(" ");
+  }, [giver, greeting, questIntro, quest]);
 
   return (
     <div className="px-5 pt-8">
@@ -178,6 +205,11 @@ function Index() {
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground/80">
               <Compass className="h-3.5 w-3.5" />
               {giver.name} · {giver.role}
+              {isObserver && (
+                <span className="ml-1 rounded-full bg-primary-foreground/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider">
+                  Window quest
+                </span>
+              )}
             </div>
             <Link
               to="/cast"
@@ -215,6 +247,15 @@ function Index() {
               {quest.title}
             </h2>
             <p className="mt-1 text-sm text-primary-foreground/80">{quest.hint}</p>
+
+            {settings.readToMe && (
+              <div className="mt-3">
+                <TtsButton
+                  text={ttsBlurb}
+                  className="inline-flex items-center gap-1 rounded-full bg-primary-foreground/15 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-primary-foreground hover:bg-primary-foreground/25"
+                />
+              </div>
+            )}
 
             <div className="mt-4 flex items-center justify-between gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-foreground px-3 py-1.5 text-xs font-bold text-primary shadow-sm">
@@ -261,9 +302,16 @@ function Index() {
             </p>
             <p className="text-sm font-bold text-foreground line-clamp-1">{proofEntry.title}</p>
             {proofEntry.fun_fact && (
-              <p className="mt-0.5 text-[11px] text-muted-foreground line-clamp-2">
-                ✨ {proofEntry.fun_fact}
-              </p>
+              <>
+                <p className="mt-0.5 text-[11px] text-muted-foreground line-clamp-2">
+                  ✨ {proofEntry.fun_fact}
+                </p>
+                {settings.readToMe && (
+                  <div className="mt-1">
+                    <TtsButton text={proofEntry.fun_fact} label="Read fact" />
+                  </div>
+                )}
+              </>
             )}
           </div>
           <button
@@ -281,9 +329,23 @@ function Index() {
         <div className="parchment-card p-4">
           <Footprints className="h-5 w-5 text-primary" />
           <p className="mt-3 text-2xl font-bold text-foreground">{distanceKm.toFixed(2)} km</p>
-          <p className="text-xs text-muted-foreground">
-            {walk.phase === "walking" ? "tracking live" : "walked this trip"}
-          </p>
+          {isObserver && settings.observerGoalMeters > 0 ? (
+            <>
+              <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                <div
+                  className="h-full bg-primary"
+                  style={{ width: `${Math.round(observerProgress * 100)}%` }}
+                />
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                of {observerGoalKm.toFixed(2)} km goal
+              </p>
+            </>
+          ) : (
+            <p className="text-xs text-muted-foreground">
+              {walk.phase === "walking" ? "tracking live" : "walked this trip"}
+            </p>
+          )}
         </div>
         <div className="parchment-card p-4">
           <Sparkles className="h-5 w-5 text-accent" />
@@ -403,6 +465,7 @@ function Index() {
         <QuestCamera
           questTitle={quest.title}
           walkedMeters={walk.phase === "walking" ? tracker.distanceMeters : tripMeters}
+          requiredMeters={requiredMeters}
           onClose={() => setCameraOpen(false)}
           onCapture={async ({ sketchDataUrl, category, title, funFact }) => {
             const result = await journal.addEntry({
@@ -415,8 +478,10 @@ function Index() {
               questGiverLine: questIntro ?? greeting,
             });
             setProofEntry(result.entry);
+            playChime("success");
             if (result.coinsAwarded > 0) {
               setCoinFlash(result.coinsAwarded);
+              playChime("coin");
               setTimeout(() => setCoinFlash(null), 3000);
             }
             setCameraOpen(false);
