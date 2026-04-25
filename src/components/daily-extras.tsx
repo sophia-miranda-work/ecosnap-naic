@@ -22,6 +22,8 @@ import {
 import { useCharacter } from "@/hooks/use-character";
 import { useWeatherQuest } from "@/hooks/use-weather-quest";
 import type { WeatherKind } from "@/lib/weather";
+import { useSettings } from "@/hooks/use-settings";
+import { ambienceLabel } from "@/lib/ambience";
 
 type DailyState = {
   date: string;
@@ -81,6 +83,7 @@ export function DailyExtras({
   indoor?: boolean;
 }) {
   const { character, awardCoins } = useCharacter();
+  const { settings, startAmbience, stopAmbience, currentAmbienceKind } = useSettings();
   const today = todayKey();
   const tasks = useMemo(() => pickDailyTasks(new Date(), indoor), [indoor]);
   const reflection = useMemo(() => pickDailyReflection(new Date(), indoor), [indoor]);
@@ -124,6 +127,8 @@ export function DailyExtras({
       await awardCoins(REFLECTION_BONUS);
       setState((s) => ({ ...s, reflectionAwarded: true }));
       onCoinAward?.(REFLECTION_BONUS);
+      // Reflection saved — let the ambience fade out gracefully.
+      stopAmbience();
     } catch {
       // ignore
     } finally {
@@ -260,12 +265,19 @@ export function DailyExtras({
         <textarea
           value={state.reflection}
           onChange={(e) => setState((s) => ({ ...s, reflection: e.target.value }))}
+          onFocus={() => startAmbience()}
+          onBlur={() => stopAmbience()}
           maxLength={240}
           rows={2}
           placeholder="A line or two — just for you."
           className="mt-2 w-full resize-none rounded-xl border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
           disabled={state.reflectionAwarded}
         />
+        {settings.natureSounds && !state.reflectionAwarded && (
+          <p className="mt-1 text-[10px] italic text-muted-foreground">
+            🌿 Tap the box to hear today's {ambienceLabel(currentAmbienceKind).toLowerCase()}.
+          </p>
+        )}
         <div className="mt-2 flex items-center justify-between">
           <span className="text-[10px] text-muted-foreground">
             {state.reflection.length}/240
