@@ -292,6 +292,9 @@ function Index() {
         </div>
       </section>
 
+      {/* Daily vitamin D recommendation — surfaced near the top so it's easy to find */}
+      <VitaminDCard />
+
       {/* Start walk CTA */}
       <section className="mt-6">
         <button
@@ -316,9 +319,6 @@ function Index() {
           setTimeout(() => setCoinFlash(null), 2500);
         }}
       />
-
-      {/* Daily vitamin D recommendation */}
-      <VitaminDCard />
 
       {/* Walking-in-progress preview banner */}
       {walk.phase === "walking" && (
