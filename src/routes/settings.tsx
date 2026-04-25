@@ -3,6 +3,7 @@ import { useState } from "react";
 import {
   ArrowLeft,
   Camera,
+  Leaf,
   Mic,
   Settings as SettingsIcon,
   Sparkles,
@@ -10,6 +11,7 @@ import {
 } from "lucide-react";
 import { useSettings } from "@/hooks/use-settings";
 import { ADVENTURE_STYLES, type AdventureStyle, type TtsVoice } from "@/lib/settings";
+import { ambienceLabel } from "@/lib/ambience";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
@@ -25,7 +27,16 @@ export const Route = createFileRoute("/settings")({
 
 function SettingsPage() {
   const navigate = useNavigate();
-  const { settings, update, setStyle, playChime, speak } = useSettings();
+  const {
+    settings,
+    update,
+    setStyle,
+    playChime,
+    speak,
+    startAmbience,
+    stopAmbience,
+    currentAmbienceKind,
+  } = useSettings();
   const [observerGoal, setObserverGoal] = useState<number>(
     settings.observerGoalMeters || 0,
   );
@@ -138,6 +149,22 @@ function SettingsPage() {
             if (v) setTimeout(() => playChime("success"), 50);
           }}
           icon={<Volume2 className="h-4 w-4" />}
+        />
+        <ToggleRow
+          label="Nature sounds while reflecting"
+          help={`Soft, time-of-day ambience plays while you write your daily reflection. Right now: ${ambienceLabel(currentAmbienceKind)}.`}
+          checked={settings.natureSounds}
+          onChange={(v) => {
+            update({ natureSounds: v });
+            if (v) {
+              // Preview for a few seconds so the user hears what it sounds like.
+              setTimeout(() => startAmbience(), 50);
+              setTimeout(() => stopAmbience(), 6000);
+            } else {
+              stopAmbience();
+            }
+          }}
+          icon={<Leaf className="h-4 w-4" />}
         />
       </Section>
 

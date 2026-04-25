@@ -143,11 +143,14 @@ function writeCache(c: CachedWeather) {
  * requested silently — if the user denies it, no bonus appears.
  */
 export function useWeatherQuest() {
-  const [state, setState] = useState<WeatherState>(() => {
+  // Always start "idle" so SSR and the first client render match. We hydrate
+  // from localStorage in a layout effect right after mount.
+  const [state, setState] = useState<WeatherState>({ status: "idle" });
+
+  useEffect(() => {
     const cached = readCache();
-    if (cached) return { status: "ready", kind: cached.kind };
-    return { status: "idle" };
-  });
+    if (cached) setState({ status: "ready", kind: cached.kind });
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
