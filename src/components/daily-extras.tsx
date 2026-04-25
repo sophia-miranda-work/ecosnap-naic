@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Check, Coins, Sparkles, NotebookPen } from "lucide-react";
 import {
   pickDailyTasks,
@@ -40,7 +40,13 @@ function writeState(state: DailyState) {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
-export function DailyExtras({ onCoinAward }: { onCoinAward?: (amount: number) => void }) {
+export function DailyExtras({
+  onCoinAward,
+  featured,
+}: {
+  onCoinAward?: (amount: number) => void;
+  featured?: ReactNode;
+}) {
   const { character, awardCoins } = useCharacter();
   const today = todayKey();
   const tasks = useMemo(() => pickDailyTasks(), []);
@@ -109,6 +115,8 @@ export function DailyExtras({ onCoinAward }: { onCoinAward?: (amount: number) =>
           </span>
         )}
       </div>
+
+      {featured}
 
       <ul className="mt-3 space-y-2">
         {tasks.map((t) => {
