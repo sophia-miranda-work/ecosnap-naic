@@ -42,13 +42,15 @@ function writeState(state: DailyState) {
 
 export function DailyExtras({
   onCoinAward,
+  indoor = false,
 }: {
   onCoinAward?: (amount: number) => void;
+  indoor?: boolean;
 }) {
   const { character, awardCoins } = useCharacter();
   const today = todayKey();
-  const tasks = useMemo(() => pickDailyTasks(), []);
-  const reflection = useMemo(() => pickDailyReflection(), []);
+  const tasks = useMemo(() => pickDailyTasks(new Date(), indoor), [indoor]);
+  const reflection = useMemo(() => pickDailyReflection(new Date(), indoor), [indoor]);
 
   const [state, setState] = useState<DailyState>(() => ({
     date: today,
@@ -103,7 +105,9 @@ export function DailyExtras({
         <div>
           <h2 className="text-lg font-bold text-foreground">Today's extras</h2>
           <p className="text-xs text-muted-foreground">
-            Tiny bonus moments from the woods. Tap when done.
+            {indoor
+              ? "Tiny bonus moments from right where you are. Tap when done."
+              : "Tiny bonus moments from the woods. Tap when done."}
           </p>
         </div>
         {allDone && (

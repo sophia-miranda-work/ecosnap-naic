@@ -324,7 +324,8 @@ function Index() {
         </section>
       )}
 
-      {/* Walk stats */}
+      {/* Walk stats — hidden in Observer mode (no distance tracking) */}
+      {!isObserver && (
       <section className="mt-4 grid grid-cols-2 gap-3">
         <div className="parchment-card p-4">
           <Footprints className="h-5 w-5 text-primary" />
@@ -353,8 +354,10 @@ function Index() {
           <p className="text-xs text-muted-foreground">quests today</p>
         </div>
       </section>
+      )}
 
-      {/* Start walk CTA */}
+      {/* Start walk CTA — hidden in Observer mode */}
+      {!isObserver && (
       <section className="mt-6">
         <button
           type="button"
@@ -370,12 +373,14 @@ function Index() {
           <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
         </button>
       </section>
+      )}
 
-      {/* Daily vitamin D widget — directly under Start your walk */}
-      <VitaminDCard />
+      {/* Daily vitamin D widget — hidden in Observer mode */}
+      {!isObserver && <VitaminDCard />}
 
       {/* Today's bonus prompts */}
       <DailyExtras
+        indoor={isObserver}
         onCoinAward={(amt) => {
           setCoinFlash(amt);
           setTimeout(() => setCoinFlash(null), 2500);

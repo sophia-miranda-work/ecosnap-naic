@@ -20,6 +20,22 @@ export const MINI_TASKS: MiniTask[] = [
   { id: "leaf-pocket", emoji: "🍃", label: "Carry a leaf with you a while", coins: 2 },
 ];
 
+/** Indoor / window-friendly bonus tasks for The Observer mode. */
+export const INDOOR_MINI_TASKS: MiniTask[] = [
+  { id: "in-deep-breaths", emoji: "🌬️", label: "Take 3 slow deep breaths by a window", coins: 3 },
+  { id: "in-stretch", emoji: "🤸", label: "Stretch your arms toward the ceiling", coins: 2 },
+  { id: "in-water", emoji: "💧", label: "Sip a full glass of water", coins: 2 },
+  { id: "in-sunlight", emoji: "🌞", label: "Sit in a patch of sunlight for a minute", coins: 3 },
+  { id: "in-listen", emoji: "👂", label: "Close your eyes and listen for 30 seconds", coins: 3 },
+  { id: "in-cloud", emoji: "☁️", label: "Watch the sky from your window", coins: 2 },
+  { id: "in-plant", emoji: "🪴", label: "Say hi to a houseplant (or imagine one)", coins: 2 },
+  { id: "in-tidy", emoji: "🧺", label: "Tidy one tiny corner near you", coins: 3 },
+  { id: "in-hand-warm", emoji: "🤲", label: "Rub palms together until warm", coins: 2 },
+  { id: "in-shoulders", emoji: "💆", label: "Roll your shoulders back five times", coins: 2 },
+  { id: "in-window-color", emoji: "🌈", label: "Spot 3 colors out the window", coins: 3 },
+  { id: "in-tea", emoji: "🍵", label: "Make a warm drink and savor a sip", coins: 3 },
+];
+
 export const REFLECTIONS: Reflection[] = [
   { id: "noticed", prompt: "What's one thing you noticed today?" },
   { id: "grateful", prompt: "Name one small thing you're grateful for." },
@@ -33,6 +49,20 @@ export const REFLECTIONS: Reflection[] = [
   { id: "wonder", prompt: "What's something that made you pause?" },
 ];
 
+/** Indoor reflections for Observer mode. */
+export const INDOOR_REFLECTIONS: Reflection[] = [
+  { id: "in-noticed", prompt: "What's one small thing you noticed in your room today?" },
+  { id: "in-grateful", prompt: "Name one cozy thing you're grateful for right now." },
+  { id: "in-window", prompt: "What did you see out your window today?" },
+  { id: "in-sound", prompt: "Describe a sound from inside or just outside." },
+  { id: "in-feeling", prompt: "How does your body feel right now?" },
+  { id: "in-light", prompt: "What does the light look like in your space?" },
+  { id: "in-tiny", prompt: "What's the tiniest detail near you right now?" },
+  { id: "in-kind", prompt: "How could you be kind to yourself today?" },
+  { id: "in-comfort", prompt: "What's the most comforting thing within reach?" },
+  { id: "in-wonder", prompt: "What made you smile, even a little?" },
+];
+
 export const REFLECTION_BONUS = 5;
 
 function seedFromDate(date = new Date()): number {
@@ -40,25 +70,27 @@ function seedFromDate(date = new Date()): number {
 }
 
 /** Picks 3 distinct mini-tasks for today, deterministic by date. */
-export function pickDailyTasks(date = new Date()): MiniTask[] {
+export function pickDailyTasks(date = new Date(), indoor = false): MiniTask[] {
   const seed = seedFromDate(date);
+  const pool = indoor ? INDOOR_MINI_TASKS : MINI_TASKS;
   const out: MiniTask[] = [];
   const used = new Set<number>();
   let i = 0;
-  while (out.length < 3 && used.size < MINI_TASKS.length) {
-    const idx = (seed + i * 7) % MINI_TASKS.length;
+  while (out.length < 3 && used.size < pool.length) {
+    const idx = (seed + i * 7) % pool.length;
     if (!used.has(idx)) {
       used.add(idx);
-      out.push(MINI_TASKS[idx]);
+      out.push(pool[idx]);
     }
     i++;
   }
   return out;
 }
 
-export function pickDailyReflection(date = new Date()): Reflection {
+export function pickDailyReflection(date = new Date(), indoor = false): Reflection {
   const seed = seedFromDate(date);
-  return REFLECTIONS[seed % REFLECTIONS.length];
+  const pool = indoor ? INDOOR_REFLECTIONS : REFLECTIONS;
+  return pool[seed % pool.length];
 }
 
 export function todayKey(date = new Date()): string {
