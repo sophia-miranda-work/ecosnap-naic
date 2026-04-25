@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Check, Coins, Sparkles, NotebookPen } from "lucide-react";
+import { Check, Coins, Sparkles, NotebookPen, CloudRain } from "lucide-react";
 import {
   pickDailyTasks,
   pickDailyReflection,
@@ -8,30 +8,32 @@ import {
   type MiniTask,
 } from "@/lib/daily-extras";
 import { useCharacter } from "@/hooks/use-character";
+import { useRainyWeather, pickRainyQuest } from "@/hooks/use-rainy-quest";
 
 type DailyState = {
   date: string;
   done: string[]; // mini-task ids
   reflection: string;
   reflectionAwarded: boolean;
+  rainyDone?: boolean;
 };
 
 const STORAGE_KEY = "daily-extras-v1";
 
 function readState(today: string): DailyState {
   if (typeof window === "undefined") {
-    return { date: today, done: [], reflection: "", reflectionAwarded: false };
+    return { date: today, done: [], reflection: "", reflectionAwarded: false, rainyDone: false };
   }
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { date: today, done: [], reflection: "", reflectionAwarded: false };
+    if (!raw) return { date: today, done: [], reflection: "", reflectionAwarded: false, rainyDone: false };
     const parsed = JSON.parse(raw) as DailyState;
     if (parsed.date !== today) {
-      return { date: today, done: [], reflection: "", reflectionAwarded: false };
+      return { date: today, done: [], reflection: "", reflectionAwarded: false, rainyDone: false };
     }
-    return parsed;
+    return { rainyDone: false, ...parsed };
   } catch {
-    return { date: today, done: [], reflection: "", reflectionAwarded: false };
+    return { date: today, done: [], reflection: "", reflectionAwarded: false, rainyDone: false };
   }
 }
 
@@ -51,6 +53,8 @@ export function DailyExtras({
   const today = todayKey();
   const tasks = useMemo(() => pickDailyTasks(new Date(), indoor), [indoor]);
   const reflection = useMemo(() => pickDailyReflection(new Date(), indoor), [indoor]);
+  const { isRaining } = useRainyWeather();
+  const rainyQuest = useMemo(() => pickRainyQuest(new Date()), []);
 
   const [state, setState] = useState<DailyState>(() => ({
     date: today,
@@ -97,6 +101,20 @@ export function DailyExtras({
     }
   }
 
+  async function completeRainyQuest() {
+    if (!character || state.rainyDone || busy) return;
+    setBusy("rainy");
+    try {
+      await awardCoins(rainyQuest.coins);
+      setState((s) => ({ ...s, rainyDone: true }));
+      onCoinAward?.(rainyQuest.coins);
+    } catch {
+      /* silent */
+    } finally {
+      setBusy(null);
+    }
+  }
+
   const allDone = tasks.every((t) => state.done.includes(t.id));
 
   return (
@@ -117,6 +135,43 @@ export function DailyExtras({
           </span>
         )}
       </div>
+
+      {/* Rainy-day bonus quest from Mossback */}
+      {isRaining && (
+        <button
+          type="button"
+          onClick={completeRainyQuest}
+          disabled={state.rainyDone || busy === "rainy" || !character}
+          className={`mt-3 block w-full overflow-hidden rounded-2xl border-2 border-primary/40 bg-gradient-to-br from-primary/15 via-card to-card p-4 text-left transition-transform active:scale-[0.99] ${
+            state.rainyDone ? "opacity-70" : ""
+          } disabled:cursor-not-allowed`}
+        >
+          <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-primary">
+            <CloudRain className="h-3.5 w-3.5" />
+            Rainy-day bonus · from Mossback 🐸
+          </div>
+          <div className="mt-2 flex items-start gap-3">
+            <span
+              className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-primary/15 text-3xl"
+              aria-hidden
+            >
+              {state.rainyDone ? <Check className="h-6 w-6 text-primary" /> : rainyQuest.emoji}
+            </span>
+            <div className="flex-1">
+              <p className="text-base font-bold leading-snug text-foreground">
+                {rainyQuest.label}
+              </p>
+              <p className="mt-0.5 text-xs italic text-muted-foreground">
+                "{rainyQuest.flavor}"
+              </p>
+            </div>
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-foreground px-2.5 py-1 text-[10px] font-bold text-background">
+              <Coins className="h-3 w-3 text-accent" />
+              {state.rainyDone ? "Done" : `+${rainyQuest.coins}`}
+            </span>
+          </div>
+        </button>
+      )}
 
       <ul className="mt-3 space-y-2">
         {tasks.map((t) => {
