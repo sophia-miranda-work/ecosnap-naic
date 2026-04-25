@@ -163,3 +163,49 @@ export function useSettings(): Ctx {
   }
   return ctx;
 }
+
+/** Per-flavor pitch / rate tuning. Browser voices are limited, so we shape
+ *  what we can to give each option a distinct character. */
+function voiceTuning(flavor: TtsVoice): { rate: number; pitch: number } {
+  switch (flavor) {
+    case "bright":
+      return { rate: 1.05, pitch: 1.25 };
+    case "calm":
+      return { rate: 0.85, pitch: 0.85 };
+    case "storyteller":
+      return { rate: 0.9, pitch: 1.1 };
+    case "warm":
+    default:
+      return { rate: 0.95, pitch: 1.0 };
+  }
+}
+
+/** Pick the best matching voice for the chosen flavor.
+ *  Falls back gracefully if no voices are loaded yet. */
+function pickVoice(flavor: TtsVoice): SpeechSynthesisVoice | null {
+  if (typeof window === "undefined" || !("speechSynthesis" in window)) return null;
+  const voices = window.speechSynthesis.getVoices();
+  if (!voices.length) return null;
+  const en = voices.filter((v) => v.lang?.toLowerCase().startsWith("en"));
+  const pool = en.length ? en : voices;
+
+  // Prefer high-quality / natural voices when available.
+  const natural = pool.filter((v) =>
+    /natural|neural|premium|enhanced|google|samantha|karen|moira|tessa|daniel|fiona/i.test(v.name),
+  );
+
+  const preference: Record<TtsVoice, RegExp> = {
+    warm: /samantha|karen|google us english|english united states|jenny|aria/i,
+    bright: /female|google uk english female|kathy|zira|moira|fiona/i,
+    calm: /male|daniel|google uk english male|alex|david|fred/i,
+    storyteller: /google uk english|moira|tessa|daniel|fiona|karen/i,
+  };
+
+  const want = preference[flavor];
+  return (
+    (natural.length ? natural : pool).find((v) => want.test(v.name)) ??
+    natural[0] ??
+    pool[0] ??
+    null
+  );
+}
