@@ -82,25 +82,46 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       if (!AC) return;
       try {
         const ctx = new AC();
+        // Browsers often start the context suspended until a user gesture.
+        // These chimes only fire after a tap/click, so resume() is safe.
+        if (ctx.state === "suspended") void ctx.resume();
         const now = ctx.currentTime;
+        // Bell-like notes: coin = bright two-note "ding-ding",
+        // success = warm three-note arpeggio.
         const notes =
-          variant === "coin" ? [988, 1318] : [659, 880, 1175]; // E5,A5,D6 / B5,E6
+          variant === "coin"
+            ? [1046.5, 1567.98] // C6, G6
+            : [783.99, 1046.5, 1567.98]; // G5, C6, G6
+        // Master bus with a gentle limiter-ish curve so it's loud but clean.
+        const master = ctx.createGain();
+        master.gain.value = 0.55;
+        master.connect(ctx.destination);
         notes.forEach((freq, i) => {
-          const o = ctx.createOscillator();
-          const g = ctx.createGain();
-          o.frequency.value = freq;
-          o.type = "sine";
-          const start = now + i * 0.09;
-          const end = start + 0.18;
-          g.gain.setValueAtTime(0, start);
-          g.gain.linearRampToValueAtTime(0.18, start + 0.02);
-          g.gain.exponentialRampToValueAtTime(0.001, end);
-          o.connect(g);
-          g.connect(ctx.destination);
-          o.start(start);
-          o.stop(end + 0.02);
+          const start = now + i * 0.11;
+          const end = start + 0.9; // long bell tail
+          // Layer a sine fundamental + triangle harmonic + bright 2x partial
+          // for a real "chime" timbre instead of a thin beep.
+          const layers: Array<{ type: OscillatorType; mult: number; gain: number }> = [
+            { type: "sine", mult: 1, gain: 0.6 },
+            { type: "triangle", mult: 2, gain: 0.18 },
+            { type: "sine", mult: 3.01, gain: 0.08 },
+          ];
+          layers.forEach(({ type, mult, gain }) => {
+            const o = ctx.createOscillator();
+            const g = ctx.createGain();
+            o.type = type;
+            o.frequency.value = freq * mult;
+            g.gain.setValueAtTime(0, start);
+            g.gain.linearRampToValueAtTime(gain, start + 0.01);
+            g.gain.exponentialRampToValueAtTime(0.0008, end);
+            o.connect(g);
+            g.connect(master);
+            o.start(start);
+            o.stop(end + 0.05);
+          });
         });
-        setTimeout(() => ctx.close().catch(() => {}), 800);
+        const totalDur = 200 + notes.length * 110 + 1000;
+        setTimeout(() => ctx.close().catch(() => {}), totalDur);
       } catch {
         /* ignore */
       }
