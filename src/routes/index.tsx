@@ -5,6 +5,7 @@ import { useWalkTracker } from "@/hooks/use-walk-tracker";
 import { QuestCamera } from "@/components/quest-camera";
 import { useJournal, type JournalEntry } from "@/hooks/use-journal";
 import { useCharacter } from "@/hooks/use-character";
+import { useStreak } from "@/hooks/use-streak";
 import { pickDailyGiver, pickGreeting, getQuestIntro } from "@/lib/quest-givers";
 import { Link } from "@tanstack/react-router";
 import { DailyExtras } from "@/components/daily-extras";
@@ -126,7 +127,7 @@ function Index() {
   );
   const safeIndex = questIndex % activePool.length;
   const quest = activePool[safeIndex];
-  const streak = 7;
+  const { streak, welcomeBack, recordCompletion } = useStreak();
 
   // Today's quest-giver (rotates daily across our small cast).
   const giver = pickDailyGiver();
@@ -140,6 +141,7 @@ function Index() {
   const journal = useJournal();
   const { character } = useCharacter();
   const explorerName = character?.name?.split(" ")[0] ?? "Explorer";
+  const greetingHeadline = welcomeBack ? "Welcome back," : "Good morning,";
 
   // Live geolocation tracking — only active during the "walking" phase.
   const tracker = useWalkTracker(walk.phase === "walking");
@@ -197,7 +199,7 @@ function Index() {
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
             {todayLabel}
           </p>
-          <h1 className="mt-1 text-3xl font-bold text-foreground">Good morning,<br/>{explorerName}</h1>
+          <h1 className="mt-1 text-3xl font-bold text-foreground">{greetingHeadline}<br/>{explorerName}</h1>
         </div>
         <div className="parchment-card flex flex-col items-center px-3 py-2 text-center">
           <span className="text-2xl leading-none" aria-hidden>🌸</span>
@@ -504,6 +506,7 @@ function Index() {
             });
             setProofEntry(result.entry);
             playChime("success");
+            recordCompletion();
             if (result.coinsAwarded > 0) {
               setCoinFlash(result.coinsAwarded);
               playChime("coin");
