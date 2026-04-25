@@ -12,6 +12,7 @@ import {
   saveSettings,
   type AdventureStyle,
   type Settings,
+  type TtsVoice,
 } from "@/lib/settings";
 
 type Ctx = {
