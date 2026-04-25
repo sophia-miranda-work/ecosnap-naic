@@ -506,6 +506,7 @@ function Index() {
             });
             setProofEntry(result.entry);
             playChime("success");
+            recordCompletion();
             if (result.coinsAwarded > 0) {
               setCoinFlash(result.coinsAwarded);
               playChime("coin");
