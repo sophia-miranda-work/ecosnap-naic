@@ -195,9 +195,9 @@ function Index() {
               >
                 {giver.avatar}
               </div>
-              <div className="glass-bubble relative flex-1 rounded-2xl rounded-tl-sm p-3 text-foreground">
+              <div className="relative flex-1 rounded-2xl rounded-tl-sm bg-primary-foreground/95 p-3 text-foreground shadow-sm">
                 <span
-                  className="glass-bubble-tail absolute -left-1.5 top-3 h-3 w-3 rotate-45"
+                  className="absolute -left-1.5 top-3 h-3 w-3 rotate-45 bg-primary-foreground/95"
                   aria-hidden
                 />
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
