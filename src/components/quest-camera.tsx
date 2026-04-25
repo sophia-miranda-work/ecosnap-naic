@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { Camera, RefreshCw, Check, X, AlertCircle, Sparkles, Loader2, Footprints, Wand2, PartyPopper } from "lucide-react";
+import { Camera, RefreshCw, Check, X, AlertCircle, Sparkles, Loader2, Footprints, Wand2, PartyPopper, Mic, Square } from "lucide-react";
 import { CATEGORIES, type CategoryId, pickFunFact } from "@/lib/journal-categories";
 import { identifyNature, type IdentifyNatureResult } from "@/server/identify-nature";
+import { useSettings } from "@/hooks/use-settings";
+import { TtsButton } from "@/components/tts-button";
 
 type Props = {
   questTitle: string;
@@ -107,6 +109,20 @@ export function QuestCamera({
   onClose,
   onCapture,
 }: Props) {
+  const { settings } = useSettings();
+  // When voice-note quests are on, we render a totally different UI.
+  if (settings.voiceNoteQuests) {
+    return (
+      <VoiceNoteQuest
+        questTitle={questTitle}
+        walkedMeters={walkedMeters}
+        requiredMeters={requiredMeters}
+        onClose={onClose}
+        onCapture={onCapture}
+      />
+    );
+  }
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -320,10 +336,16 @@ export function QuestCamera({
 
         {/* Celebrate overlay — AI identified the find */}
         {preview && step === "celebrate" && identification && category && (
-          <div className="absolute inset-0 flex flex-col bg-foreground/90 p-5 text-background">
+          <div
+            className={`absolute inset-0 flex flex-col p-5 text-background ${
+              settings.celebrationStyle === "sparkly"
+                ? "bg-gradient-to-br from-primary/40 via-foreground/85 to-accent/40"
+                : "bg-foreground/90"
+            }`}
+          >
             <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] opacity-70">
               <PartyPopper className="h-3 w-3 text-accent" />
-              Nice find!
+              {settings.celebrationStyle === "sparkly" ? "Nice find! ✨" : "Identified"}
             </div>
             <p className="mt-2 text-4xl" aria-hidden>
               {CATEGORIES.find((c) => c.id === category)?.emoji}
@@ -334,6 +356,14 @@ export function QuestCamera({
             </p>
             {funFact && (
               <p className="mt-3 text-sm leading-relaxed opacity-90">{funFact}</p>
+            )}
+            {settings.readToMe && (
+              <div className="mt-2">
+                <TtsButton
+                  text={`${identification.congratsMessage || `You found a ${identification.name}.`} ${funFact}`}
+                  className="inline-flex items-center gap-1 rounded-full bg-background/20 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-background hover:bg-background/30"
+                />
+              </div>
             )}
             <p className="mt-3 text-[10px] uppercase tracking-wider opacity-60">
               Identified as {identification.name} ·{" "}
@@ -452,9 +482,22 @@ export function QuestCamera({
         )}
       </div>
 
+      {/* Auto-snap accessibility banner: tap anywhere on the big banner. */}
+      {settings.autoSnap && step === "capture" && status === "ready" && hasWalkedEnough && !preview && (
+        <button
+          type="button"
+          onClick={snap}
+          className="mx-4 mb-3 mt-2 flex items-center justify-center gap-2 rounded-2xl bg-primary py-6 text-lg font-bold text-primary-foreground shadow-lg active:scale-[0.98]"
+          aria-label="Tap anywhere to take photo"
+        >
+          <Camera className="h-6 w-6" />
+          Tap anywhere to snap
+        </button>
+      )}
+
       {/* Footer controls */}
       <div className="flex items-center justify-around px-6 pb-8 pt-5">
-        {step === "capture" && (
+        {step === "capture" && !settings.autoSnap && (
           <>
             <div className="w-12" />
             <button
