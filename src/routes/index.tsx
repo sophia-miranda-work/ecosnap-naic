@@ -309,9 +309,11 @@ function Index() {
         </button>
       </section>
 
+      {/* Daily vitamin D widget — directly under Start your walk */}
+      <VitaminDCard />
+
       {/* Today's bonus prompts */}
       <DailyExtras
-        featured={<VitaminDCard />}
         onCoinAward={(amt) => {
           setCoinFlash(amt);
           setTimeout(() => setCoinFlash(null), 2500);
