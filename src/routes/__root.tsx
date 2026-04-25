@@ -1,5 +1,5 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts, useNavigate } from "@tanstack/react-router";
-import { Home, BookOpen, User, Users, ShoppingBag } from "lucide-react";
+import { Home, BookOpen, User, ShoppingBag } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import { useCharacter } from "@/hooks/use-character";
