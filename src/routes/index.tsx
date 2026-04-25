@@ -171,13 +171,20 @@ function Index() {
     return lines.join(" ");
   }, [giver, greeting, questIntro, quest]);
 
+  const todayLabel = useMemo(() => {
+    const d = new Date();
+    const day = d.toLocaleDateString(undefined, { weekday: "long" });
+    const month = d.toLocaleDateString(undefined, { month: "short" });
+    return `${day} · ${month} ${d.getDate()}`.toUpperCase();
+  }, []);
+
   return (
     <div className="px-5 pt-8">
       {/* Greeting + streak */}
       <header className="flex items-start justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-            THURSDAY · APR 23
+            {todayLabel}
           </p>
           <h1 className="mt-1 text-3xl font-bold text-foreground">Good morning,<br/>{explorerName}</h1>
         </div>
