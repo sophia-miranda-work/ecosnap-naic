@@ -115,7 +115,7 @@ type WalkState =
   | { phase: "done"; startMood: string; endMood: string };
 
 function Index() {
-  const { settings, playChime } = useSettings();
+  const { settings, playChime, speak } = useSettings();
   const isObserver = settings.style === "observer";
 
   // Mock: stable quest for the day (later: pick by date seed + persist).
@@ -170,6 +170,17 @@ function Index() {
     ].filter(Boolean);
     return lines.join(" ");
   }, [giver, greeting, questIntro, quest]);
+
+  // Auto-read the quest aloud when "Read to me" is on. Triggers on first
+  // mount once the blurb is ready, and again whenever the blurb changes
+  // (e.g. day rolls over, mode switches). A small delay lets browser
+  // SpeechSynthesis voices finish loading.
+  useEffect(() => {
+    if (!settings.readToMe) return;
+    if (!ttsBlurb) return;
+    const id = window.setTimeout(() => speak(ttsBlurb), 350);
+    return () => window.clearTimeout(id);
+  }, [settings.readToMe, settings.ttsVoice, ttsBlurb, speak]);
 
   const todayLabel = useMemo(() => {
     const d = new Date();
