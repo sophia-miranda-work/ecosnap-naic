@@ -11,6 +11,8 @@ export type Settings = {
   celebrationStyle: "sparkly" | "simple";
   /** Plays a chime on quest complete / coin earn. */
   soundEffects: boolean;
+  /** Soft nature ambience (birdsong / ocean / crickets) while reflecting. */
+  natureSounds: boolean;
   /** Show "Read to me" buttons on quest text, NPC dialogue, fun facts. */
   readToMe: boolean;
   /** Which narrator voice flavor to use for read-aloud. */
@@ -26,6 +28,7 @@ export const DEFAULT_SETTINGS: Settings = {
   observerGoalMeters: 0,
   celebrationStyle: "sparkly",
   soundEffects: true,
+  natureSounds: false,
   readToMe: false,
   ttsVoice: "warm",
   voiceNoteQuests: false,
