@@ -15,6 +15,7 @@ import {
   type Settings,
   type TtsVoice,
 } from "@/lib/settings";
+import { AmbiencePlayer, pickAmbienceForHour, type AmbienceKind } from "@/lib/ambience";
 
 type Ctx = {
   settings: Settings;
@@ -30,6 +31,12 @@ type Ctx = {
   speak: (text: string) => void;
   /** Stop any in-progress speech. */
   stopSpeaking: () => void;
+  /** Start time-of-day nature ambience (no-op if natureSounds is off). */
+  startAmbience: () => void;
+  /** Fade out and stop any nature ambience. */
+  stopAmbience: () => void;
+  /** What ambience would play right now (for UI labels). */
+  currentAmbienceKind: AmbienceKind;
 };
 
 const SettingsContext = createContext<Ctx | null>(null);
@@ -42,6 +49,10 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   // start it suspended until a user gesture, so we lazily create it on first
   // use and call resume() inside that gesture.
   const audioCtxRef = useRef<AudioContext | null>(null);
+  const ambiencePlayerRef = useRef<AmbiencePlayer | null>(null);
+  if (typeof window !== "undefined" && !ambiencePlayerRef.current) {
+    ambiencePlayerRef.current = new AmbiencePlayer(() => audioCtxRef.current);
+  }
 
   // Globally unlock audio on the first user interaction. This guarantees
   // that any later chime play call has a running context, even if the
@@ -210,6 +221,61 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const ensureAudioContext = useCallback(() => {
+    if (typeof window === "undefined") return null;
+    const AC: typeof AudioContext | undefined =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext?: typeof AudioContext })
+        .webkitAudioContext;
+    if (!AC) return null;
+    if (!audioCtxRef.current) {
+      try {
+        audioCtxRef.current = new AC();
+      } catch {
+        return null;
+      }
+    }
+    return audioCtxRef.current;
+  }, []);
+
+  const startAmbience = useCallback(() => {
+    if (!settings.natureSounds) return;
+    const ctx = ensureAudioContext();
+    if (!ctx) return;
+    if (ctx.state === "suspended") void ctx.resume();
+    const kind = pickAmbienceForHour(new Date().getHours());
+    ambiencePlayerRef.current?.start(kind, 0.32);
+  }, [settings.natureSounds, ensureAudioContext]);
+
+  const stopAmbience = useCallback(() => {
+    ambiencePlayerRef.current?.stop(0.7);
+  }, []);
+
+  // If the user toggles nature sounds off mid-play, stop immediately.
+  useEffect(() => {
+    if (!settings.natureSounds) {
+      ambiencePlayerRef.current?.stop(0.4);
+    }
+  }, [settings.natureSounds]);
+
+  // Stop ambience if the tab becomes hidden, restart on return only if
+  // the consumer (e.g. textarea focus) calls startAmbience again.
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const onVis = () => {
+      if (document.hidden) ambiencePlayerRef.current?.stop(0.3);
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, []);
+
+  const currentAmbienceKind: AmbienceKind = useMemo(
+    () => pickAmbienceForHour(new Date().getHours()),
+    // Recompute on each settings change is enough — reflection sessions are short.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [settings.natureSounds, ready],
+  );
+
   const value = useMemo<Ctx>(
     () => ({
       settings,
@@ -221,8 +287,24 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       playChime,
       speak,
       stopSpeaking,
+      startAmbience,
+      stopAmbience,
+      currentAmbienceKind,
     }),
-    [settings, ready, update, setStyle, reset, reduceMotion, playChime, speak, stopSpeaking],
+    [
+      settings,
+      ready,
+      update,
+      setStyle,
+      reset,
+      reduceMotion,
+      playChime,
+      speak,
+      stopSpeaking,
+      startAmbience,
+      stopAmbience,
+      currentAmbienceKind,
+    ],
   );
 
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;
