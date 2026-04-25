@@ -8,6 +8,7 @@ import { useCharacter } from "@/hooks/use-character";
 import { pickDailyGiver, pickGreeting, getQuestIntro } from "@/lib/quest-givers";
 import { Link } from "@tanstack/react-router";
 import { DailyExtras } from "@/components/daily-extras";
+import { VitaminDCard } from "@/components/vitamin-d-card";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -315,6 +316,9 @@ function Index() {
           setTimeout(() => setCoinFlash(null), 2500);
         }}
       />
+
+      {/* Daily vitamin D recommendation */}
+      <VitaminDCard />
 
       {/* Walking-in-progress preview banner */}
       {walk.phase === "walking" && (

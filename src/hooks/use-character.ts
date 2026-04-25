@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getDeviceId } from "@/lib/device-id";
 import type { ShopSlot } from "@/lib/shop";
+import type { AgeGroup, Clothing, SkinType } from "@/lib/vitamin-d";
 
 export type Dressup = {
   skin: string;
@@ -35,6 +36,9 @@ export type Character = {
   dressup: Dressup;
   created_at: string;
   updated_at: string;
+  skin_type: SkinType | null;
+  age_group: AgeGroup | null;
+  clothing: Clothing | null;
 };
 
 export type CharacterDraft = {
@@ -61,7 +65,9 @@ export function useCharacter() {
     const deviceId = getDeviceId();
     const { data, error } = await supabase
       .from("characters")
-      .select("id, name, bio, avatar, accent, coins, dressup, created_at, updated_at")
+      .select(
+        "id, name, bio, avatar, accent, coins, dressup, created_at, updated_at, skin_type, age_group, clothing",
+      )
       .eq("device_id", deviceId)
       .maybeSingle();
     if (error) {
@@ -72,6 +78,9 @@ export function useCharacter() {
       const c: Character = {
         ...data,
         dressup: normalizeDressup(data.dressup),
+        skin_type: (data.skin_type as SkinType | null) ?? null,
+        age_group: (data.age_group as AgeGroup | null) ?? null,
+        clothing: (data.clothing as Clothing | null) ?? null,
       };
       setCharacter(c);
       const items = await supabase
@@ -102,10 +111,18 @@ export function useCharacter() {
     const { data, error } = await supabase
       .from("characters")
       .upsert(payload, { onConflict: "device_id" })
-      .select("id, name, bio, avatar, accent, coins, dressup, created_at, updated_at")
+      .select(
+        "id, name, bio, avatar, accent, coins, dressup, created_at, updated_at, skin_type, age_group, clothing",
+      )
       .single();
     if (error) throw error;
-    const c: Character = { ...data, dressup: normalizeDressup(data.dressup) };
+    const c: Character = {
+      ...data,
+      dressup: normalizeDressup(data.dressup),
+      skin_type: (data.skin_type as SkinType | null) ?? null,
+      age_group: (data.age_group as AgeGroup | null) ?? null,
+      clothing: (data.clothing as Clothing | null) ?? null,
+    };
     setCharacter(c);
     return c;
   }, []);
@@ -172,6 +189,28 @@ export function useCharacter() {
     [character],
   );
 
+  const saveSunProfile = useCallback(
+    async (profile: { skin: SkinType; age: AgeGroup; clothing: Clothing }) => {
+      if (!character) return;
+      const { error } = await supabase
+        .from("characters")
+        .update({
+          skin_type: profile.skin,
+          age_group: profile.age,
+          clothing: profile.clothing,
+        })
+        .eq("id", character.id);
+      if (error) throw error;
+      setCharacter({
+        ...character,
+        skin_type: profile.skin,
+        age_group: profile.age,
+        clothing: profile.clothing,
+      });
+    },
+    [character],
+  );
+
   return {
     character,
     ownedItems,
@@ -183,5 +222,6 @@ export function useCharacter() {
     equipItem,
     updateAppearance,
     awardCoins,
+    saveSunProfile,
   };
 }

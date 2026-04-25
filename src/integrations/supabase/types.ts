@@ -46,38 +46,47 @@ export type Database = {
       characters: {
         Row: {
           accent: string
+          age_group: string | null
           avatar: string
           bio: string | null
+          clothing: string | null
           coins: number
           created_at: string
           device_id: string
           dressup: Json
           id: string
           name: string
+          skin_type: number | null
           updated_at: string
         }
         Insert: {
           accent?: string
+          age_group?: string | null
           avatar?: string
           bio?: string | null
+          clothing?: string | null
           coins?: number
           created_at?: string
           device_id: string
           dressup?: Json
           id?: string
           name: string
+          skin_type?: number | null
           updated_at?: string
         }
         Update: {
           accent?: string
+          age_group?: string | null
           avatar?: string
           bio?: string | null
+          clothing?: string | null
           coins?: number
           created_at?: string
           device_id?: string
           dressup?: Json
           id?: string
           name?: string
+          skin_type?: number | null
           updated_at?: string
         }
         Relationships: []
