@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import {
@@ -36,6 +37,54 @@ const SettingsContext = createContext<Ctx | null>(null);
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [ready, setReady] = useState(false);
+
+  // One shared AudioContext for the whole app. Browsers (esp. iOS Safari)
+  // start it suspended until a user gesture, so we lazily create it on first
+  // use and call resume() inside that gesture.
+  const audioCtxRef = useRef<AudioContext | null>(null);
+
+  // Globally unlock audio on the first user interaction. This guarantees
+  // that any later chime play call has a running context, even if the
+  // specific gesture that triggered it is "indirect" (e.g. async).
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const unlock = () => {
+      const AC: typeof AudioContext | undefined =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext?: typeof AudioContext })
+          .webkitAudioContext;
+      if (!AC) return;
+      if (!audioCtxRef.current) {
+        try {
+          audioCtxRef.current = new AC();
+        } catch {
+          return;
+        }
+      }
+      const ctx = audioCtxRef.current;
+      if (!ctx) return;
+      if (ctx.state === "suspended") void ctx.resume();
+      // Play a 1-sample silent buffer — the canonical iOS unlock trick.
+      try {
+        const buffer = ctx.createBuffer(1, 1, 22050);
+        const src = ctx.createBufferSource();
+        src.buffer = buffer;
+        src.connect(ctx.destination);
+        src.start(0);
+      } catch {
+        /* ignore */
+      }
+    };
+    const opts = { once: true, passive: true } as AddEventListenerOptions;
+    window.addEventListener("pointerdown", unlock, opts);
+    window.addEventListener("touchstart", unlock, opts);
+    window.addEventListener("keydown", unlock, opts);
+    return () => {
+      window.removeEventListener("pointerdown", unlock);
+      window.removeEventListener("touchstart", unlock);
+      window.removeEventListener("keydown", unlock);
+    };
+  }, []);
 
   // Load once on mount (client only).
   useEffect(() => {
@@ -81,9 +130,12 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
           .webkitAudioContext;
       if (!AC) return;
       try {
-        const ctx = new AC();
-        // Browsers often start the context suspended until a user gesture.
-        // These chimes only fire after a tap/click, so resume() is safe.
+        // Reuse the shared (already-unlocked) context if we have one;
+        // otherwise create a new one inside this gesture.
+        if (!audioCtxRef.current) {
+          audioCtxRef.current = new AC();
+        }
+        const ctx = audioCtxRef.current;
         if (ctx.state === "suspended") void ctx.resume();
         const now = ctx.currentTime;
         // Bell-like notes: coin = bright two-note "ding-ding",
@@ -94,7 +146,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
             : [783.99, 1046.5, 1567.98]; // G5, C6, G6
         // Master bus with a gentle limiter-ish curve so it's loud but clean.
         const master = ctx.createGain();
-        master.gain.value = 0.55;
+        master.gain.value = 0.85;
         master.connect(ctx.destination);
         notes.forEach((freq, i) => {
           const start = now + i * 0.11;
@@ -120,8 +172,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
             o.stop(end + 0.05);
           });
         });
-        const totalDur = 200 + notes.length * 110 + 1000;
-        setTimeout(() => ctx.close().catch(() => {}), totalDur);
+        // NOTE: do NOT close the shared context — we reuse it for later chimes.
       } catch {
         /* ignore */
       }
