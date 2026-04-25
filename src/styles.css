@@ -253,3 +253,9 @@
   transition-duration: 0.05s !important;
 }
 
+/* Force white text on the quest banner in Focused Voyager mode for contrast. */
+:root[data-voyager="true"] .quest-card,
+:root[data-voyager="true"] .quest-card * {
+  color: oklch(1 0 0) !important;
+}
+
