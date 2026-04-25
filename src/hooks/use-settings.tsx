@@ -115,14 +115,18 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       try {
         window.speechSynthesis.cancel();
         const utter = new SpeechSynthesisUtterance(text);
-        utter.rate = 0.95;
-        utter.pitch = 1;
+        const tuning = voiceTuning(settings.ttsVoice);
+        utter.rate = tuning.rate;
+        utter.pitch = tuning.pitch;
+        const voice = pickVoice(settings.ttsVoice);
+        if (voice) utter.voice = voice;
+        utter.lang = voice?.lang ?? "en-US";
         window.speechSynthesis.speak(utter);
       } catch {
         /* ignore */
       }
     },
-    [settings.readToMe],
+    [settings.readToMe, settings.ttsVoice],
   );
 
   const stopSpeaking = useCallback(() => {
