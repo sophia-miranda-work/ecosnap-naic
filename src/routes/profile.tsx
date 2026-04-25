@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Coins, Flame, Footprints, Pencil, Shirt, Sparkles, Trophy } from "lucide-react";
+import { Coins, Flame, Footprints, Pencil, Settings as SettingsIcon, Shirt, Sparkles, Trophy } from "lucide-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useCharacter, DEFAULT_DRESSUP } from "@/hooks/use-character";
 import { CharacterCreator } from "@/components/character-creator";
@@ -209,6 +209,27 @@ function ProfilePage() {
             </div>
           ))}
         </div>
+      </section>
+
+      {/* Settings entry */}
+      <section className="mt-8">
+        <Link
+          to="/settings"
+          className="flex w-full items-center justify-between rounded-2xl border border-border bg-card px-5 py-4 text-foreground shadow-sm transition-colors hover:bg-muted"
+        >
+          <span className="flex items-center gap-3">
+            <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary/15 text-primary">
+              <SettingsIcon className="h-5 w-5" />
+            </span>
+            <span>
+              <span className="block text-sm font-bold">Settings</span>
+              <span className="block text-xs text-muted-foreground">
+                Adventure style, accessibility, sound
+              </span>
+            </span>
+          </span>
+          <span aria-hidden className="text-xl text-muted-foreground">›</span>
+        </Link>
       </section>
 
       {editing && (

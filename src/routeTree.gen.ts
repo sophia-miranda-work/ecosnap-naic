@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ShopRouteImport } from './routes/shop'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as JournalRouteImport } from './routes/journal'
 import { Route as CastRouteImport } from './routes/cast'
@@ -18,6 +19,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const ShopRoute = ShopRouteImport.update({
   id: '/shop',
   path: '/shop',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileRoute = ProfileRouteImport.update({
@@ -46,6 +52,7 @@ export interface FileRoutesByFullPath {
   '/cast': typeof CastRoute
   '/journal': typeof JournalRoute
   '/profile': typeof ProfileRoute
+  '/settings': typeof SettingsRoute
   '/shop': typeof ShopRoute
 }
 export interface FileRoutesByTo {
@@ -53,6 +60,7 @@ export interface FileRoutesByTo {
   '/cast': typeof CastRoute
   '/journal': typeof JournalRoute
   '/profile': typeof ProfileRoute
+  '/settings': typeof SettingsRoute
   '/shop': typeof ShopRoute
 }
 export interface FileRoutesById {
@@ -61,14 +69,22 @@ export interface FileRoutesById {
   '/cast': typeof CastRoute
   '/journal': typeof JournalRoute
   '/profile': typeof ProfileRoute
+  '/settings': typeof SettingsRoute
   '/shop': typeof ShopRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/cast' | '/journal' | '/profile' | '/shop'
+  fullPaths: '/' | '/cast' | '/journal' | '/profile' | '/settings' | '/shop'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/cast' | '/journal' | '/profile' | '/shop'
-  id: '__root__' | '/' | '/cast' | '/journal' | '/profile' | '/shop'
+  to: '/' | '/cast' | '/journal' | '/profile' | '/settings' | '/shop'
+  id:
+    | '__root__'
+    | '/'
+    | '/cast'
+    | '/journal'
+    | '/profile'
+    | '/settings'
+    | '/shop'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -76,6 +92,7 @@ export interface RootRouteChildren {
   CastRoute: typeof CastRoute
   JournalRoute: typeof JournalRoute
   ProfileRoute: typeof ProfileRoute
+  SettingsRoute: typeof SettingsRoute
   ShopRoute: typeof ShopRoute
 }
 
@@ -86,6 +103,13 @@ declare module '@tanstack/react-router' {
       path: '/shop'
       fullPath: '/shop'
       preLoaderRoute: typeof ShopRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -124,6 +148,7 @@ const rootRouteChildren: RootRouteChildren = {
   CastRoute: CastRoute,
   JournalRoute: JournalRoute,
   ProfileRoute: ProfileRoute,
+  SettingsRoute: SettingsRoute,
   ShopRoute: ShopRoute,
 }
 export const routeTree = rootRouteImport
