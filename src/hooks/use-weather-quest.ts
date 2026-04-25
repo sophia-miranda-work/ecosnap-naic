@@ -26,6 +26,7 @@ export type WeatherGiver = {
 const GIVERS: Record<WeatherKind, WeatherGiver> = {
   rainy: { id: "mossback", name: "Mossback", avatar: "🐸", bonusLabel: "Rainy-day bonus" },
   sunny: { id: "clover", name: "Clover", avatar: "🐰", bonusLabel: "Sunny-day bonus" },
+  scorching: { id: "clover", name: "Clover", avatar: "🐰", bonusLabel: "Stay-cool bonus" },
   "partly-cloudy": { id: "pip", name: "Pip", avatar: "🦊", bonusLabel: "Sun & cloud bonus" },
   cloudy: { id: "professor-hoot", name: "Professor Hoot", avatar: "🦉", bonusLabel: "Cloudy-day bonus" },
   foggy: { id: "willow", name: "Willow", avatar: "🧙‍♀️", bonusLabel: "Foggy-day bonus" },
@@ -50,6 +51,15 @@ const POOLS: Record<WeatherKind, WeatherQuest[]> = {
     { id: "shadow-step", emoji: "👣", label: "Walk only on shadows for 20 steps", flavor: "Mind the cracks. Mind the puddles too.", coins: 6 },
     { id: "sun-flower", emoji: "🌻", label: "Find a flower facing the sun", flavor: "They know which way home is.", coins: 5 },
     { id: "sun-color", emoji: "🟡", label: "Spot 3 yellow things outdoors", flavor: "Pollen counts. So do dandelions.", coins: 5 },
+  ],
+  scorching: [
+    { id: "hot-water", emoji: "💧", label: "Drink a tall glass of cool water", flavor: "Clover says: it's far too hot out there. Hydrate first.", coins: 6 },
+    { id: "hot-shade-window", emoji: "🪟", label: "Watch the heat shimmer from a shaded window", flavor: "The garden looks like it's wobbling. Stay where it's cool.", coins: 5 },
+    { id: "hot-cool-cloth", emoji: "🧊", label: "Cool your wrists with a damp cloth", flavor: "An old bunny trick — pulses cool fast.", coins: 5 },
+    { id: "hot-fan-breeze", emoji: "🌬️", label: "Sit in front of a fan or breeze for a minute", flavor: "Close your eyes. Pretend it's a meadow wind.", coins: 5 },
+    { id: "hot-icy-snack", emoji: "🍧", label: "Have something icy or frozen", flavor: "Ice cube, sorbet, frozen fruit — Clover-approved.", coins: 6 },
+    { id: "hot-houseplant", emoji: "🪴", label: "Mist a houseplant (or imagine one happy)", flavor: "They're hot too. A little spritz goes a long way.", coins: 5 },
+    { id: "hot-stretch", emoji: "🧘", label: "Do 5 slow indoor stretches in the shade", flavor: "Save the walk for sunset. Move gently for now.", coins: 5 },
   ],
   "partly-cloudy": [
     { id: "cloud-race", emoji: "🏁", label: "Pick two clouds and race them across the sky", flavor: "Pip's favorite spectator sport.", coins: 5 },

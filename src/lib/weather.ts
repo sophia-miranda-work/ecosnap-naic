@@ -13,6 +13,7 @@ export type WeatherKind =
   | "snowy"
   | "foggy"
   | "sunny"
+  | "scorching"
   | "partly-cloudy"
   | "cloudy";
 
@@ -25,6 +26,8 @@ export type CurrentWeather = {
   cloudCover: number;
   /** Whether the sun is currently above the horizon at this location. */
   isDay: boolean;
+  /** Air temperature in °C, if reported. */
+  temperatureC: number;
   /** Convenience boolean — is some form of rain falling now? */
   isRaining: boolean;
   /** High-level weather classification. */
@@ -47,19 +50,26 @@ const SNOW_CODES = new Set<number>([71, 73, 75, 77, 85, 86]);
 /** WMO codes that mean fog / depositing rime fog. */
 const FOG_CODES = new Set<number>([45, 48]);
 
+/** Threshold above which we steer the user indoors instead of out. */
+const SCORCHING_TEMP_C = 35;
+
 function classify(args: {
   weatherCode: number;
   precipitation: number;
   cloudCover: number;
   isDay: boolean;
+  temperatureC: number;
 }): WeatherKind {
-  const { weatherCode, precipitation, cloudCover, isDay } = args;
+  const { weatherCode, precipitation, cloudCover, isDay, temperatureC } = args;
   if (precipitation > 0 || RAIN_CODES.has(weatherCode)) return "rainy";
   if (SNOW_CODES.has(weatherCode)) return "snowy";
   if (FOG_CODES.has(weatherCode)) return "foggy";
   // WMO 0=clear, 1=mainly clear, 2=partly cloudy, 3=overcast.
-  if (weatherCode === 0 || (weatherCode === 1 && cloudCover < 30)) {
-    return isDay ? "sunny" : "cloudy"; // no "sunny" at night — fall back
+  const mostlyClear = weatherCode === 0 || (weatherCode === 1 && cloudCover < 30);
+  if (mostlyClear) {
+    if (!isDay) return "cloudy"; // no "sunny" at night — fall back
+    if (temperatureC >= SCORCHING_TEMP_C) return "scorching";
+    return "sunny";
   }
   if (weatherCode === 3 || cloudCover >= 80) return "cloudy";
   return "partly-cloudy";
@@ -70,7 +80,7 @@ export async function fetchCurrentWeather(
   lon: number,
   signal?: AbortSignal,
 ): Promise<CurrentWeather> {
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=precipitation,weather_code,cloud_cover,is_day&timezone=auto`;
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=precipitation,weather_code,cloud_cover,is_day,temperature_2m&timezone=auto`;
   const res = await fetch(url, { signal });
   if (!res.ok) throw new Error(`Weather fetch failed (${res.status})`);
   const json = (await res.json()) as {
@@ -79,15 +89,17 @@ export async function fetchCurrentWeather(
       weather_code?: number;
       cloud_cover?: number;
       is_day?: number;
+      temperature_2m?: number;
     };
   };
   const precipitation = json.current?.precipitation ?? 0;
   const weatherCode = json.current?.weather_code ?? 0;
   const cloudCover = json.current?.cloud_cover ?? 0;
   const isDay = (json.current?.is_day ?? 1) === 1;
+  const temperatureC = json.current?.temperature_2m ?? 20;
   const isRaining = precipitation > 0 || RAIN_CODES.has(weatherCode);
-  const kind = classify({ weatherCode, precipitation, cloudCover, isDay });
-  return { precipitation, weatherCode, cloudCover, isDay, isRaining, kind };
+  const kind = classify({ weatherCode, precipitation, cloudCover, isDay, temperatureC });
+  return { precipitation, weatherCode, cloudCover, isDay, temperatureC, isRaining, kind };
 }
 
 export { getCurrentCoords };

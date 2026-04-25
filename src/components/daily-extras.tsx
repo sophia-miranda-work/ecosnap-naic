@@ -7,6 +7,7 @@ import {
   CloudSnow,
   CloudSun,
   Coins,
+  Flame,
   NotebookPen,
   Sparkles,
   Sun,
@@ -35,6 +36,7 @@ const STORAGE_KEY = "daily-extras-v1";
 
 const KIND_ICON: Record<WeatherKind, typeof Sun> = {
   sunny: Sun,
+  scorching: Flame,
   "partly-cloudy": CloudSun,
   cloudy: Cloud,
   rainy: CloudRain,
