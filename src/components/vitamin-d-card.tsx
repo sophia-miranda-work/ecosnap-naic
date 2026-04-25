@@ -206,7 +206,7 @@ export function VitaminDCard() {
           <span className="grid h-10 w-10 place-items-center rounded-full bg-accent/20 text-accent shadow-sm">
             <Sun className="h-6 w-6 animate-pulse" />
           </span>
-          <h3 className="text-base font-bold text-foreground">Daily vitamin D ☀️</h3>
+          <h3 className="text-base font-bold text-foreground">Vitamin D Tracker</h3>
         </div>
         <button
           type="button"
