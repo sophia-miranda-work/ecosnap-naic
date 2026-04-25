@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { Camera, RefreshCw, Check, X, AlertCircle, Sparkles, Loader2, Footprints } from "lucide-react";
+import { Camera, RefreshCw, Check, X, AlertCircle, Sparkles, Loader2, Footprints, Wand2, PartyPopper } from "lucide-react";
 import { CATEGORIES, type CategoryId, pickFunFact } from "@/lib/journal-categories";
+import { identifyNature, type IdentifyNatureResult } from "@/server/identify-nature";
 
 type Props = {
   questTitle: string;
@@ -112,8 +113,11 @@ export function QuestCamera({
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
-  // Post-capture flow: pick a category, then see the fun fact, then save.
-  const [step, setStep] = useState<"capture" | "categorize" | "fact">("capture");
+  // Post-capture flow: identify with AI → celebrate → fact (or fall back to manual categorize).
+  const [step, setStep] = useState<"capture" | "identifying" | "celebrate" | "categorize" | "fact">(
+    "capture",
+  );
+  const [identification, setIdentification] = useState<IdentifyNatureResult | null>(null);
   const [category, setCategory] = useState<CategoryId | null>(null);
   const [title, setTitle] = useState("");
   const [funFact, setFunFact] = useState("");
@@ -167,7 +171,7 @@ export function QuestCamera({
     };
   }, []);
 
-  const snap = () => {
+  const snap = async () => {
     if (!hasWalkedEnough) return;
     const video = videoRef.current;
     const canvas = canvasRef.current;
@@ -182,15 +186,35 @@ export function QuestCamera({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     ctx.drawImage(video, 0, 0, w, h);
+    // Capture an unfiltered photo first — the AI identifies from this clean
+    // version, while the journal stores the cozy sketch version below.
+    const rawDataUrl = canvas.toDataURL("image/jpeg", 0.8);
     applySketchFilter(ctx, w, h);
     setPreview(canvas.toDataURL("image/jpeg", 0.85));
-    setStep("categorize");
     setTitle(questTitle);
+    setStep("identifying");
+    try {
+      const result = await identifyNature({ data: { imageDataUrl: rawDataUrl } });
+      setIdentification(result);
+      if (result.identified && result.confidence >= 0.5 && result.name) {
+        setCategory(result.category as CategoryId);
+        setTitle(result.name);
+        setFunFact(result.funFact || pickFunFact(result.category as CategoryId));
+        setStep("celebrate");
+      } else {
+        // Low confidence → friendly fallback to manual categorize step.
+        setStep("categorize");
+      }
+    } catch (e) {
+      console.error("Identification failed, falling back to manual:", e);
+      setStep("categorize");
+    }
   };
 
   const retake = () => {
     setPreview(null);
     setStep("capture");
+    setIdentification(null);
     setCategory(null);
     setFunFact("");
     setSaveError(null);
@@ -283,6 +307,63 @@ export function QuestCamera({
           </div>
         )}
 
+        {/* Identifying overlay */}
+        {preview && step === "identifying" && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-foreground/85 p-6 text-center text-background">
+            <Wand2 className="h-10 w-10 animate-pulse text-accent" />
+            <p className="text-base font-bold">Looking closely…</p>
+            <p className="max-w-[260px] text-xs leading-relaxed opacity-80">
+              Asking the field guide what you found.
+            </p>
+          </div>
+        )}
+
+        {/* Celebrate overlay — AI identified the find */}
+        {preview && step === "celebrate" && identification && category && (
+          <div className="absolute inset-0 flex flex-col bg-foreground/90 p-5 text-background">
+            <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] opacity-70">
+              <PartyPopper className="h-3 w-3 text-accent" />
+              Nice find!
+            </div>
+            <p className="mt-2 text-4xl" aria-hidden>
+              {CATEGORIES.find((c) => c.id === category)?.emoji}
+            </p>
+            <p className="mt-2 text-xl font-bold leading-snug">
+              {identification.congratsMessage ||
+                `Congrats, you've found a ${identification.name}!`}
+            </p>
+            {funFact && (
+              <p className="mt-3 text-sm leading-relaxed opacity-90">{funFact}</p>
+            )}
+            <p className="mt-3 text-[10px] uppercase tracking-wider opacity-60">
+              Identified as {identification.name} ·{" "}
+              {Math.round(identification.confidence * 100)}% sure
+            </p>
+            <button
+              type="button"
+              onClick={() => setStep("categorize")}
+              className="mt-4 inline-flex w-fit items-center gap-1.5 rounded-full bg-background/15 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider hover:bg-background/25"
+            >
+              Not quite right? Pick category
+            </button>
+
+            <div className="mt-auto">
+              <label className="block text-[10px] font-semibold uppercase tracking-[0.2em] opacity-70">
+                Sketch title
+              </label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                maxLength={60}
+                className="mt-1 w-full rounded-xl border border-background/20 bg-background/10 px-3 py-2 text-sm text-background placeholder:text-background/50 focus:outline-none focus:ring-2 focus:ring-primary/60"
+                placeholder="Give it a name…"
+              />
+              {saveError && <p className="mt-2 text-xs text-bloom">{saveError}</p>}
+            </div>
+          </div>
+        )}
+
         {/* Framing guides */}
         {!preview && status === "ready" && (
           <div className="pointer-events-none absolute inset-4 rounded-2xl border-2 border-dashed border-background/40" />
@@ -306,7 +387,9 @@ export function QuestCamera({
         {preview && step === "categorize" && (
           <div className="absolute inset-0 flex flex-col bg-foreground/85 p-5 text-background">
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] opacity-70">
-              What did you find?
+              {identification && !identification.identified
+                ? "Hmm — couldn't quite tell. Name it yourself!"
+                : "What did you find?"}
             </p>
             <p className="mt-1 text-base font-bold">Pick a category for your sketch</p>
             <div className="mt-4 grid flex-1 grid-cols-3 content-start gap-2 overflow-y-auto">
@@ -384,6 +467,47 @@ export function QuestCamera({
               <span className="h-14 w-14 rounded-full bg-background" />
             </button>
             <div className="w-12" />
+          </>
+        )}
+        {step === "identifying" && (
+          <div className="flex items-center gap-2 text-background/80">
+            <Loader2 className="h-5 w-5 animate-spin" />
+            <span className="text-xs uppercase tracking-wider">Identifying…</span>
+          </div>
+        )}
+        {step === "celebrate" && (
+          <>
+            <button
+              type="button"
+              onClick={retake}
+              disabled={saving}
+              className="flex flex-col items-center gap-1 text-background"
+            >
+              <span className="grid h-14 w-14 place-items-center rounded-full bg-background/15">
+                <RefreshCw className="h-5 w-5" />
+              </span>
+              <span className="text-[10px] font-semibold uppercase tracking-wider">
+                Retake
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={confirm}
+              disabled={saving}
+              className="flex flex-col items-center gap-1 text-background"
+            >
+              <span className="grid h-16 w-16 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg disabled:opacity-60">
+                {saving ? (
+                  <Loader2 className="h-7 w-7 animate-spin" />
+                ) : (
+                  <Check className="h-7 w-7" />
+                )}
+              </span>
+              <span className="text-[10px] font-semibold uppercase tracking-wider">
+                {saving ? "Saving…" : "Save sketch"}
+              </span>
+            </button>
+            <div className="w-14" />
           </>
         )}
         {step === "categorize" && (
