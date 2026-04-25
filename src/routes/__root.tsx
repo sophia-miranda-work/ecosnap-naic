@@ -4,6 +4,8 @@ import { Home, BookOpen, User, Users, ShoppingBag } from "lucide-react";
 import appCss from "../styles.css?url";
 import { useCharacter } from "@/hooks/use-character";
 import { CharacterCreator } from "@/components/character-creator";
+import { SettingsProvider, useSettings } from "@/hooks/use-settings";
+import { AdventureStylePicker } from "@/components/adventure-style-picker";
 
 function NotFoundComponent() {
   return (
@@ -76,33 +78,51 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   return (
-    <div className="min-h-[100dvh] flex justify-center bg-background">
-      <div className="relative w-full max-w-[480px] min-h-[100dvh] flex flex-col">
-        <main className="flex-1 pb-28">
-          <Outlet />
-        </main>
-        <BottomTabs />
-        <CharacterOnboardingGate />
+    <SettingsProvider>
+      <div className="min-h-[100dvh] flex justify-center bg-background">
+        <div className="relative w-full max-w-[480px] min-h-[100dvh] flex flex-col">
+          <main className="flex-1 pb-28">
+            <Outlet />
+          </main>
+          <BottomTabs />
+          <OnboardingGates />
+        </div>
       </div>
-    </div>
+    </SettingsProvider>
   );
 }
 
-function CharacterOnboardingGate() {
+function OnboardingGates() {
   const { character, loading } = useCharacter();
+  const { settings, ready: settingsReady } = useSettings();
   const navigate = useNavigate();
-  if (loading || character) return null;
-  return (
-    <CharacterCreator
-      onClose={() => {
-        /* non-dismissible on first run */
-      }}
-      onSaved={() => {
-        navigate({ to: "/" });
-      }}
-      dismissible={false}
-    />
-  );
+  if (loading || !settingsReady) return null;
+  // Step 1: create the character.
+  if (!character) {
+    return (
+      <CharacterCreator
+        onClose={() => {
+          /* non-dismissible on first run */
+        }}
+        onSaved={() => {
+          /* stay so AdventureStylePicker shows next */
+        }}
+        dismissible={false}
+      />
+    );
+  }
+  // Step 2: pick an adventure style.
+  if (!settings.style) {
+    return (
+      <AdventureStylePicker
+        dismissible={false}
+        onSaved={() => {
+          navigate({ to: "/" });
+        }}
+      />
+    );
+  }
+  return null;
 }
 
 function BottomTabs() {
