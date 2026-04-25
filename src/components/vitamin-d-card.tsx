@@ -74,8 +74,10 @@ export function VitaminDCard() {
   if (!hasProfile || editing) {
     return (
       <section className="parchment-card mt-4 p-5">
-        <div className="flex items-center gap-2">
-          <Sun className="h-5 w-5 text-accent" />
+        <div className="flex items-center gap-3">
+          <span className="grid h-10 w-10 place-items-center rounded-full bg-accent/20 text-accent">
+            <Sun className="h-6 w-6" />
+          </span>
           <h3 className="text-base font-bold text-foreground">Sun check setup</h3>
         </div>
         <p className="mt-1 text-xs text-muted-foreground">
@@ -200,9 +202,11 @@ export function VitaminDCard() {
   return (
     <section className="parchment-card mt-4 p-5">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Sun className="h-5 w-5 text-accent" />
-          <h3 className="text-base font-bold text-foreground">Daily vitamin D</h3>
+        <div className="flex items-center gap-3">
+          <span className="grid h-10 w-10 place-items-center rounded-full bg-accent/20 text-accent shadow-sm">
+            <Sun className="h-6 w-6 animate-pulse" />
+          </span>
+          <h3 className="text-base font-bold text-foreground">Daily vitamin D ☀️</h3>
         </div>
         <button
           type="button"
