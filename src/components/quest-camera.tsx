@@ -102,7 +102,20 @@ function applySketchFilter(ctx: CanvasRenderingContext2D, w: number, h: number) 
   ctx.restore();
 }
 
-export function QuestCamera({
+/**
+ * Top-level dispatcher: picks camera or voice-note flow based on settings.
+ * Hooks live in each child component, so each variant is unmounted cleanly
+ * when the user toggles the setting.
+ */
+export function QuestCamera(props: Props) {
+  const { settings } = useSettings();
+  if (settings.voiceNoteQuests) {
+    return <VoiceNoteQuest {...props} />;
+  }
+  return <CameraQuest {...props} />;
+}
+
+function CameraQuest({
   questTitle,
   walkedMeters,
   requiredMeters = 100,
@@ -110,19 +123,6 @@ export function QuestCamera({
   onCapture,
 }: Props) {
   const { settings } = useSettings();
-  // When voice-note quests are on, we render a totally different UI.
-  if (settings.voiceNoteQuests) {
-    return (
-      <VoiceNoteQuest
-        questTitle={questTitle}
-        walkedMeters={walkedMeters}
-        requiredMeters={requiredMeters}
-        onClose={onClose}
-        onCapture={onCapture}
-      />
-    );
-  }
-
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
