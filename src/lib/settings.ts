@@ -1,5 +1,7 @@
 export type AdventureStyle = "wanderer" | "observer" | "voyager";
 
+export type TtsVoice = "warm" | "bright" | "calm" | "storyteller";
+
 export type Settings = {
   /** Chosen adventure style. `null` until onboarding completes. */
   style: AdventureStyle | null;
@@ -11,6 +13,8 @@ export type Settings = {
   soundEffects: boolean;
   /** Show "Read to me" buttons on quest text, NPC dialogue, fun facts. */
   readToMe: boolean;
+  /** Which narrator voice flavor to use for read-aloud. */
+  ttsVoice: TtsVoice;
   /** Replace camera with voice-note recording for quests. */
   voiceNoteQuests: boolean;
   /** Big tap-anywhere shutter banner on the camera. */
@@ -23,6 +27,7 @@ export const DEFAULT_SETTINGS: Settings = {
   celebrationStyle: "sparkly",
   soundEffects: true,
   readToMe: false,
+  ttsVoice: "warm",
   voiceNoteQuests: false,
   autoSnap: false,
 };
