@@ -130,6 +130,30 @@ export type Database = {
         }
         Relationships: []
       }
+      quest_claims: {
+        Row: {
+          claimed_at: string
+          device_id: string
+          id: string
+          period_key: string
+          quest_id: string
+        }
+        Insert: {
+          claimed_at?: string
+          device_id: string
+          id?: string
+          period_key: string
+          quest_id: string
+        }
+        Update: {
+          claimed_at?: string
+          device_id?: string
+          id?: string
+          period_key?: string
+          quest_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
