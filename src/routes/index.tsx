@@ -352,16 +352,16 @@ function Index() {
         <div className="parchment-card p-4">
           <Footprints className="h-5 w-5 text-primary" />
           <p className="mt-3 text-2xl font-bold text-foreground">{distanceKm.toFixed(2)} km</p>
-          {isObserver && settings.observerGoalMeters > 0 ? (
+          {settings.observerGoalMeters > 0 ? (
             <>
               <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-muted">
                 <div
                   className="h-full bg-primary"
-                  style={{ width: `${Math.round(observerProgress * 100)}%` }}
+                  style={{ width: `${Math.round(goalProgress * 100)}%` }}
                 />
               </div>
               <p className="mt-1 text-xs text-muted-foreground">
-                of {observerGoalKm.toFixed(2)} km goal
+                of {goalKm.toFixed(2)} km goal
               </p>
             </>
           ) : (
