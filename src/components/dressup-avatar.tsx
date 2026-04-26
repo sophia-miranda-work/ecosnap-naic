@@ -1,5 +1,143 @@
-import { type Dressup } from "@/hooks/use-character";
+import { type Dressup, type Hairstyle } from "@/hooks/use-character";
 import { getItemById } from "@/lib/shop";
+
+/** Lighten a hex color by `amount` (0-1) toward white — for hair highlights. */
+function lighten(hex: string, amount = 0.25): string {
+  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex.replace("#", ""));
+  if (!m) return hex;
+  const mix = (c: number) => Math.round(c + (255 - c) * amount);
+  const r = mix(parseInt(m[1], 16));
+  const g = mix(parseInt(m[2], 16));
+  const b = mix(parseInt(m[3], 16));
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
+/**
+ * Render the chosen hairstyle. Each style is a soft, rounded silhouette with
+ * a subtle highlight stripe so the hair feels less flat than a plain block.
+ */
+function HairLayer({ style, color }: { style: Hairstyle; color: string }) {
+  if (style === "bald") return null;
+  const hi = lighten(color, 0.28);
+
+  switch (style) {
+    case "short":
+      return (
+        <g>
+          {/* Soft round cap with a swept fringe */}
+          <path
+            d="M30,40 Q28,20 50,19 Q72,20 70,40 Q68,30 60,28 Q58,34 50,33 Q40,34 36,30 Q32,33 30,40 Z"
+            fill={color}
+          />
+          {/* Side-swept fringe */}
+          <path
+            d="M36,30 Q44,26 56,28 Q60,32 52,34 Q44,34 36,30 Z"
+            fill={color}
+          />
+          {/* Highlight */}
+          <path
+            d="M40,24 Q48,20 56,22 Q52,25 46,26 Z"
+            fill={hi}
+            opacity="0.6"
+          />
+        </g>
+      );
+
+    case "long":
+      return (
+        <g>
+          {/* Long flowing hair down past the shoulders */}
+          <path
+            d="M28,42 Q26,18 50,18 Q74,18 72,42 L72,80 Q70,84 64,82 L64,40 Q60,32 50,32 Q40,32 36,40 L36,82 Q30,84 28,80 Z"
+            fill={color}
+          />
+          {/* Forelock */}
+          <path
+            d="M36,30 Q46,24 58,28 Q60,34 50,34 Q42,34 36,30 Z"
+            fill={color}
+          />
+          {/* Highlight stripe */}
+          <path
+            d="M32,36 Q34,26 40,22 Q38,30 35,40 Z"
+            fill={hi}
+            opacity="0.55"
+          />
+        </g>
+      );
+
+    case "bun":
+      return (
+        <g>
+          {/* Slicked-back base */}
+          <path
+            d="M32,40 Q30,22 50,21 Q70,22 68,40 Q66,32 58,30 Q52,34 50,34 Q42,33 36,32 Q33,34 32,40 Z"
+            fill={color}
+          />
+          {/* The bun itself */}
+          <ellipse cx="50" cy="16" rx="9" ry="8" fill={color} />
+          <ellipse cx="47" cy="14" rx="3" ry="2.5" fill={hi} opacity="0.6" />
+          {/* Tiny hair tie */}
+          <rect x="46.5" y="22.5" width="7" height="2.5" rx="1.2" fill={hi} opacity="0.7" />
+        </g>
+      );
+
+    case "curly":
+      return (
+        <g>
+          {/* Cloud-like cluster of overlapping circles */}
+          <circle cx="38" cy="28" r="7" fill={color} />
+          <circle cx="46" cy="22" r="8" fill={color} />
+          <circle cx="54" cy="22" r="8" fill={color} />
+          <circle cx="62" cy="28" r="7" fill={color} />
+          <circle cx="33" cy="34" r="5.5" fill={color} />
+          <circle cx="67" cy="34" r="5.5" fill={color} />
+          <circle cx="50" cy="20" r="6" fill={color} />
+          {/* Highlights */}
+          <circle cx="44" cy="20" r="2" fill={hi} opacity="0.6" />
+          <circle cx="56" cy="20" r="2" fill={hi} opacity="0.6" />
+        </g>
+      );
+
+    case "ponytail":
+      return (
+        <g>
+          {/* Ponytail (drawn first so head sits in front of it on the side) */}
+          <path
+            d="M66,34 Q80,42 78,62 Q74,66 70,62 Q72,48 64,42 Z"
+            fill={color}
+          />
+          {/* Cap with sweep toward the tie */}
+          <path
+            d="M30,40 Q28,20 50,19 Q72,20 70,40 Q68,30 58,28 Q52,34 46,32 Q38,34 34,32 Q31,34 30,40 Z"
+            fill={color}
+          />
+          {/* Hair tie */}
+          <circle cx="66" cy="34" r="2.5" fill={hi} opacity="0.85" />
+          {/* Highlight */}
+          <path d="M42,22 Q50,18 58,22 Q52,25 46,25 Z" fill={hi} opacity="0.55" />
+        </g>
+      );
+
+    case "pigtails":
+      return (
+        <g>
+          {/* Two pigtails behind the head */}
+          <path d="M28,38 Q18,52 22,68 Q28,70 30,64 Q30,52 34,42 Z" fill={color} />
+          <path d="M72,38 Q82,52 78,68 Q72,70 70,64 Q70,52 66,42 Z" fill={color} />
+          {/* Cap with center part */}
+          <path
+            d="M30,40 Q28,20 50,19 Q72,20 70,40 Q66,30 58,30 Q54,34 50,34 Q46,34 42,30 Q34,30 30,40 Z"
+            fill={color}
+          />
+          {/* Center part highlight */}
+          <path d="M49,22 L51,22 L51,32 L49,32 Z" fill={hi} opacity="0.7" />
+          {/* Pigtail ties */}
+          <circle cx="26" cy="42" r="2.2" fill={hi} opacity="0.85" />
+          <circle cx="74" cy="42" r="2.2" fill={hi} opacity="0.85" />
+        </g>
+      );
+  }
+}
 
 /**
  * SVG paper-doll. Cozy, friendly, deliberately simple — clothes are
@@ -61,33 +199,7 @@ export function DressupAvatar({
       <circle cx="50" cy="40" r="18" fill={dressup.skin} />
 
       {/* Hair */}
-      {dressup.hairstyle !== "bald" && (
-        <>
-          {dressup.hairstyle === "short" && (
-            <path
-              d="M32,38 Q32,22 50,22 Q68,22 68,38 L66,32 Q60,28 50,28 Q40,28 34,32 Z"
-              fill={dressup.hair}
-            />
-          )}
-          {dressup.hairstyle === "long" && (
-            <>
-              <path
-                d="M30,40 Q30,20 50,20 Q70,20 70,40 L70,68 L62,64 L62,38 Q56,32 50,32 Q44,32 38,38 L38,64 L30,68 Z"
-                fill={dressup.hair}
-              />
-            </>
-          )}
-          {dressup.hairstyle === "bun" && (
-            <>
-              <path
-                d="M32,38 Q32,22 50,22 Q68,22 68,38 L66,32 Q60,28 50,28 Q40,28 34,32 Z"
-                fill={dressup.hair}
-              />
-              <circle cx="50" cy="18" r="7" fill={dressup.hair} />
-            </>
-          )}
-        </>
-      )}
+      <HairLayer style={dressup.hairstyle} color={dressup.hair} />
 
       {/* Face */}
       <circle cx="44" cy="40" r="1.5" fill="#2a1a14" />
