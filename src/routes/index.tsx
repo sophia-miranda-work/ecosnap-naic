@@ -418,10 +418,9 @@ function Index() {
         </section>
       )}
 
-      {/* Walk stats + Start CTA — shown when this style tracks distance, or
-          when the user has set a custom walking goal (Observers can opt in).
-          For Wanderer, these render at the bottom of the page instead. */}
-      {!isWanderer && (!isObserver || settings.observerGoalMeters > 0) && (
+      {/* Walk stats + Start CTA — Wanderer shows at the top (original spot).
+          Observers with a custom goal see them at the bottom under reflections. */}
+      {isWanderer && (
         <WalkStatsAndCta
           distanceKm={distanceKm}
           goalMeters={settings.observerGoalMeters}
@@ -445,8 +444,9 @@ function Index() {
         }}
       />
 
-      {/* Wanderer: walk stats + Start CTA live at the bottom of the page. */}
-      {isWanderer && (
+      {/* Observer (with custom goal): walk stats + Start CTA at the bottom,
+          right under Today's reflection. */}
+      {isObserver && settings.observerGoalMeters > 0 && (
         <WalkStatsAndCta
           distanceKm={distanceKm}
           goalMeters={settings.observerGoalMeters}
