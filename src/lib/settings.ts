@@ -5,7 +5,8 @@ export type TtsVoice = "warm" | "bright" | "calm" | "storyteller";
 export type Settings = {
   /** Chosen adventure style. `null` until onboarding completes. */
   style: AdventureStyle | null;
-  /** For Observer mode: custom daily walking goal in meters (any value, even 0). */
+  /** Custom daily walking goal in meters (any value, even 0). When > 0,
+   *  overrides the per-style default required distance. */
   observerGoalMeters: number;
   /** Confetti vs simple success message. */
   celebrationStyle: "sparkly" | "simple";
@@ -70,10 +71,21 @@ export const ADVENTURE_STYLES: Array<{
   },
 ];
 
-/** Per-style minimum walking distance (meters) before the camera unlocks. */
-export function requiredMetersFor(style: AdventureStyle | null): number {
+/** Per-style default walking distance (meters) before the camera unlocks.
+ *  Used as the fallback when the user hasn't set a custom goal. */
+export function defaultMetersFor(style: AdventureStyle | null): number {
   if (style === "observer") return 0;
   return 100;
+}
+
+/** Effective required walking distance: user's custom goal if set,
+ *  otherwise the per-style default. */
+export function requiredMetersFor(
+  style: AdventureStyle | null,
+  customGoalMeters: number = 0,
+): number {
+  if (customGoalMeters > 0) return customGoalMeters;
+  return defaultMetersFor(style);
 }
 
 export function loadSettings(): Settings {
