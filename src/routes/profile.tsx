@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Coins, Flame, Footprints, Pencil, Settings as SettingsIcon, Shirt, Sparkles, Trophy } from "lucide-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useCharacter, DEFAULT_DRESSUP } from "@/hooks/use-character";
+import { SHOP_ITEMS, type ShopSlot } from "@/lib/shop";
 import { CharacterCreator } from "@/components/character-creator";
 import { DressupAvatar } from "@/components/dressup-avatar";
 
@@ -29,7 +30,7 @@ const ACCENT_SWATCHES: Record<string, string> = {
 
 function ProfilePage() {
   const navigate = useNavigate();
-  const { character, loading, updateAppearance } = useCharacter();
+  const { character, loading, updateAppearance, ownedItems, equipItem } = useCharacter();
   const [editing, setEditing] = useState(false);
   const [skinPick, setSkinPick] = useState(false);
 
@@ -55,6 +56,17 @@ function ProfilePage() {
     { id: "bun", label: "Bun" },
     { id: "bald", label: "Bald" },
   ];
+
+  const ownedSet = new Set(ownedItems);
+  const wardrobe = SHOP_ITEMS.filter((i) => ownedSet.has(i.id));
+  const SLOT_ORDER: ShopSlot[] = ["hat", "top", "bottom", "shoes", "accessory"];
+  const SLOT_LABELS: Record<ShopSlot, string> = {
+    hat: "Hats",
+    top: "Tops",
+    bottom: "Bottoms",
+    shoes: "Shoes",
+    accessory: "Accessories",
+  };
 
   return (
     <div className="px-5 pt-8">
