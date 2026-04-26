@@ -4,10 +4,19 @@ import { getDeviceId } from "@/lib/device-id";
 import type { ShopSlot } from "@/lib/shop";
 import type { AgeGroup, Clothing, SkinType } from "@/lib/vitamin-d";
 
+export type Hairstyle =
+  | "short"
+  | "long"
+  | "bun"
+  | "curly"
+  | "ponytail"
+  | "pigtails"
+  | "bald";
+
 export type Dressup = {
   skin: string;
   hair: string;
-  hairstyle: "short" | "long" | "bun" | "bald";
+  hairstyle: Hairstyle;
   hat: string | null;
   top: string | null;
   bottom: string | null;
