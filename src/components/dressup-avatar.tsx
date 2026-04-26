@@ -101,9 +101,9 @@ function HairLayer({ style, color }: { style: Hairstyle; color: string }) {
     case "ponytail":
       return (
         <g>
-          {/* Ponytail (drawn first so head sits in front of it on the side) */}
+          {/* Ponytail trailing from the back of the head */}
           <path
-            d="M66,34 Q80,42 78,62 Q74,66 70,62 Q72,48 64,42 Z"
+            d="M64,36 Q78,46 74,64 Q70,68 66,64 Q70,52 60,42 Z"
             fill={color}
           />
           {/* Cap with sweep toward the tie */}
@@ -112,7 +112,7 @@ function HairLayer({ style, color }: { style: Hairstyle; color: string }) {
             fill={color}
           />
           {/* Hair tie */}
-          <circle cx="66" cy="34" r="2.5" fill={hi} opacity="0.85" />
+          <circle cx="65" cy="38" r="2.5" fill={hi} opacity="0.85" />
           {/* Highlight */}
           <path d="M42,22 Q50,18 58,22 Q52,25 46,25 Z" fill={hi} opacity="0.55" />
         </g>
@@ -121,9 +121,9 @@ function HairLayer({ style, color }: { style: Hairstyle; color: string }) {
     case "pigtails":
       return (
         <g>
-          {/* Two pigtails behind the head */}
-          <path d="M28,38 Q18,52 22,68 Q28,70 30,64 Q30,52 34,42 Z" fill={color} />
-          <path d="M72,38 Q82,52 78,68 Q72,70 70,64 Q70,52 66,42 Z" fill={color} />
+          {/* Two pigtails attached to the sides of the head */}
+          <path d="M34,44 Q22,54 26,68 Q32,70 34,64 Q34,54 38,46 Z" fill={color} />
+          <path d="M66,44 Q78,54 74,68 Q68,70 66,64 Q66,54 62,46 Z" fill={color} />
           {/* Cap with center part */}
           <path
             d="M30,40 Q28,20 50,19 Q72,20 70,40 Q66,30 58,30 Q54,34 50,34 Q46,34 42,30 Q34,30 30,40 Z"
@@ -132,8 +132,8 @@ function HairLayer({ style, color }: { style: Hairstyle; color: string }) {
           {/* Center part highlight */}
           <path d="M49,22 L51,22 L51,32 L49,32 Z" fill={hi} opacity="0.7" />
           {/* Pigtail ties */}
-          <circle cx="26" cy="42" r="2.2" fill={hi} opacity="0.85" />
-          <circle cx="74" cy="42" r="2.2" fill={hi} opacity="0.85" />
+          <circle cx="34" cy="46" r="2.2" fill={hi} opacity="0.85" />
+          <circle cx="66" cy="46" r="2.2" fill={hi} opacity="0.85" />
         </g>
       );
   }
