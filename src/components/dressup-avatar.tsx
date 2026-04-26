@@ -1,6 +1,36 @@
 import { type Dressup, type Hairstyle } from "@/hooks/use-character";
 import { getItemById } from "@/lib/shop";
 
+/**
+ * Single source of truth for where the head sits in the SVG viewBox.
+ * Every hair piece is positioned relative to these constants so that if the
+ * head moves or resizes, the hair (especially side-attached pieces like
+ * ponytails and pigtails) follows automatically.
+ *
+ * Coordinate system: the SVG viewBox is 100x140. The head is a circle
+ * centered at (HEAD_CX, HEAD_CY) with radius HEAD_R.
+ */
+const HEAD_CX = 50;
+const HEAD_CY = 40;
+const HEAD_R = 18;
+
+/**
+ * Anchor points on the head silhouette where hair pieces attach. Computed
+ * from HEAD_* so they stay consistent under any change to the head.
+ *
+ *   - SIDE_LEFT / SIDE_RIGHT: just inside the head edge at ear height,
+ *     where pigtails sprout.
+ *   - BACK_RIGHT: high on the back-right of the head, where a ponytail
+ *     gathers before trailing down.
+ *   - CROWN: the very top of the head, used by hats / center parts.
+ */
+const ANCHORS = {
+  sideLeft: { x: HEAD_CX - HEAD_R * 0.85, y: HEAD_CY - HEAD_R * 0.1 }, // (~34.7, ~38.2)
+  sideRight: { x: HEAD_CX + HEAD_R * 0.85, y: HEAD_CY - HEAD_R * 0.1 }, // (~65.3, ~38.2)
+  backRight: { x: HEAD_CX + HEAD_R * 0.55, y: HEAD_CY - HEAD_R * 0.35 }, // (~59.9, ~33.7)
+  crown: { x: HEAD_CX, y: HEAD_CY - HEAD_R }, // (50, 22)
+} as const;
+
 /** Lighten a hex color by `amount` (0-1) toward white — for hair highlights. */
 function lighten(hex: string, amount = 0.25): string {
   const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex.replace("#", ""));
@@ -106,14 +136,27 @@ function HairLayer({ style, color }: { style: Hairstyle; color: string }) {
             d="M30,40 Q28,20 50,19 Q72,20 70,40 Q68,30 58,28 Q52,34 46,32 Q38,34 34,32 Q31,34 30,40 Z"
             fill={color}
           />
-          {/* Ponytail: starts inside the head silhouette (around x=60, y=34)
-              and trails down/back so the base visually merges with the cap. */}
-          <path
-            d="M58,32 Q72,38 76,52 Q78,64 72,68 Q68,68 68,62 Q70,52 64,44 Q60,38 56,36 Z"
-            fill={color}
-          />
-          {/* Hair tie */}
-          <circle cx="62" cy="36" r="2.4" fill={hi} opacity="0.85" />
+          {/* Ponytail anchored at ANCHORS.backRight: the base is drawn AT the
+              anchor (inside the head silhouette) and the tail trails down/back
+              from there. All offsets below are relative to (ax, ay). */}
+          {(() => {
+            const { x: ax, y: ay } = ANCHORS.backRight;
+            return (
+              <>
+                <path
+                  d={`M${ax - 2},${ay - 1}
+                      Q${ax + 12},${ay + 4} ${ax + 16},${ay + 18}
+                      Q${ax + 18},${ay + 30} ${ax + 12},${ay + 34}
+                      Q${ax + 8},${ay + 34} ${ax + 8},${ay + 28}
+                      Q${ax + 10},${ay + 18} ${ax + 4},${ay + 10}
+                      Q${ax},${ay + 4} ${ax - 4},${ay + 2} Z`}
+                  fill={color}
+                />
+                {/* Hair tie sits exactly on the anchor */}
+                <circle cx={ax + 2} cy={ay + 2} r="2.4" fill={hi} opacity="0.85" />
+              </>
+            );
+          })()}
           {/* Highlight */}
           <path d="M42,22 Q50,18 58,22 Q52,25 46,25 Z" fill={hi} opacity="0.55" />
         </g>
@@ -127,22 +170,48 @@ function HairLayer({ style, color }: { style: Hairstyle; color: string }) {
             d="M30,40 Q28,20 50,19 Q72,20 70,40 Q66,30 58,30 Q54,34 50,34 Q46,34 42,30 Q34,30 30,40 Z"
             fill={color}
           />
-          {/* Left pigtail: base sits inside the head circle near (34,40),
-              then sweeps out and down past the jaw. */}
-          <path
-            d="M34,38 Q24,46 22,60 Q22,68 28,68 Q32,66 30,60 Q30,52 36,44 Z"
-            fill={color}
-          />
-          {/* Right pigtail — mirrored. */}
-          <path
-            d="M66,38 Q76,46 78,60 Q78,68 72,68 Q68,66 70,60 Q70,52 64,44 Z"
-            fill={color}
-          />
+          {/* Pigtails anchored at ANCHORS.sideLeft / sideRight. Each pigtail
+              path starts AT the anchor (inside the head) and sweeps outward
+              and downward, so any change to head position/size keeps them
+              attached. */}
+          {(() => {
+            const L = ANCHORS.sideLeft;
+            const R = ANCHORS.sideRight;
+            return (
+              <>
+                {/* Left pigtail */}
+                <path
+                  d={`M${L.x},${L.y}
+                      Q${L.x - 10},${L.y + 8} ${L.x - 12},${L.y + 22}
+                      Q${L.x - 12},${L.y + 30} ${L.x - 6},${L.y + 30}
+                      Q${L.x - 2},${L.y + 28} ${L.x - 4},${L.y + 22}
+                      Q${L.x - 4},${L.y + 14} ${L.x + 2},${L.y + 6} Z`}
+                  fill={color}
+                />
+                {/* Right pigtail (mirrored across the head center) */}
+                <path
+                  d={`M${R.x},${R.y}
+                      Q${R.x + 10},${R.y + 8} ${R.x + 12},${R.y + 22}
+                      Q${R.x + 12},${R.y + 30} ${R.x + 6},${R.y + 30}
+                      Q${R.x + 2},${R.y + 28} ${R.x + 4},${R.y + 22}
+                      Q${R.x + 4},${R.y + 14} ${R.x - 2},${R.y + 6} Z`}
+                  fill={color}
+                />
+                {/* Pigtail ties sit on the anchors */}
+                <circle cx={L.x - 2} cy={L.y + 6} r="2.2" fill={hi} opacity="0.85" />
+                <circle cx={R.x + 2} cy={R.y + 6} r="2.2" fill={hi} opacity="0.85" />
+              </>
+            );
+          })()}
           {/* Center part highlight */}
-          <path d="M49,22 L51,22 L51,32 L49,32 Z" fill={hi} opacity="0.7" />
-          {/* Pigtail ties */}
-          <circle cx="32" cy="44" r="2.2" fill={hi} opacity="0.85" />
-          <circle cx="68" cy="44" r="2.2" fill={hi} opacity="0.85" />
+          <path
+            d={`M${HEAD_CX - 1},${HEAD_CY - HEAD_R + 4}
+                L${HEAD_CX + 1},${HEAD_CY - HEAD_R + 4}
+                L${HEAD_CX + 1},${HEAD_CY - HEAD_R + 14}
+                L${HEAD_CX - 1},${HEAD_CY - HEAD_R + 14} Z`}
+            fill={hi}
+            opacity="0.7"
+          />
         </g>
       );
   }
@@ -205,7 +274,7 @@ export function DressupAvatar({
       <rect x="46" y="54" width="8" height="8" fill={dressup.skin} />
 
       {/* Head */}
-      <circle cx="50" cy="40" r="18" fill={dressup.skin} />
+      <circle cx={HEAD_CX} cy={HEAD_CY} r={HEAD_R} fill={dressup.skin} />
 
       {/* Hair */}
       <HairLayer style={dressup.hairstyle} color={dressup.hair} />
