@@ -101,18 +101,19 @@ function HairLayer({ style, color }: { style: Hairstyle; color: string }) {
     case "ponytail":
       return (
         <g>
-          {/* Ponytail trailing from the back of the head */}
-          <path
-            d="M64,36 Q78,46 74,64 Q70,68 66,64 Q70,52 60,42 Z"
-            fill={color}
-          />
-          {/* Cap with sweep toward the tie */}
+          {/* Cap with sweep toward the tie — drawn first so the tail overlaps it */}
           <path
             d="M30,40 Q28,20 50,19 Q72,20 70,40 Q68,30 58,28 Q52,34 46,32 Q38,34 34,32 Q31,34 30,40 Z"
             fill={color}
           />
+          {/* Ponytail: starts inside the head silhouette (around x=60, y=34)
+              and trails down/back so the base visually merges with the cap. */}
+          <path
+            d="M58,32 Q72,38 76,52 Q78,64 72,68 Q68,68 68,62 Q70,52 64,44 Q60,38 56,36 Z"
+            fill={color}
+          />
           {/* Hair tie */}
-          <circle cx="65" cy="38" r="2.5" fill={hi} opacity="0.85" />
+          <circle cx="62" cy="36" r="2.4" fill={hi} opacity="0.85" />
           {/* Highlight */}
           <path d="M42,22 Q50,18 58,22 Q52,25 46,25 Z" fill={hi} opacity="0.55" />
         </g>
@@ -121,19 +122,27 @@ function HairLayer({ style, color }: { style: Hairstyle; color: string }) {
     case "pigtails":
       return (
         <g>
-          {/* Two pigtails attached to the sides of the head */}
-          <path d="M34,44 Q22,54 26,68 Q32,70 34,64 Q34,54 38,46 Z" fill={color} />
-          <path d="M66,44 Q78,54 74,68 Q68,70 66,64 Q66,54 62,46 Z" fill={color} />
-          {/* Cap with center part */}
+          {/* Cap with center part — drawn first so pigtail bases tuck under it */}
           <path
             d="M30,40 Q28,20 50,19 Q72,20 70,40 Q66,30 58,30 Q54,34 50,34 Q46,34 42,30 Q34,30 30,40 Z"
+            fill={color}
+          />
+          {/* Left pigtail: base sits inside the head circle near (34,40),
+              then sweeps out and down past the jaw. */}
+          <path
+            d="M34,38 Q24,46 22,60 Q22,68 28,68 Q32,66 30,60 Q30,52 36,44 Z"
+            fill={color}
+          />
+          {/* Right pigtail — mirrored. */}
+          <path
+            d="M66,38 Q76,46 78,60 Q78,68 72,68 Q68,66 70,60 Q70,52 64,44 Z"
             fill={color}
           />
           {/* Center part highlight */}
           <path d="M49,22 L51,22 L51,32 L49,32 Z" fill={hi} opacity="0.7" />
           {/* Pigtail ties */}
-          <circle cx="34" cy="46" r="2.2" fill={hi} opacity="0.85" />
-          <circle cx="66" cy="46" r="2.2" fill={hi} opacity="0.85" />
+          <circle cx="32" cy="44" r="2.2" fill={hi} opacity="0.85" />
+          <circle cx="68" cy="44" r="2.2" fill={hi} opacity="0.85" />
         </g>
       );
   }
