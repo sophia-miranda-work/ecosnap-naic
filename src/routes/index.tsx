@@ -118,6 +118,7 @@ type WalkState =
 function Index() {
   const { settings, playChime, speak } = useSettings();
   const isObserver = settings.style === "observer";
+  const isWanderer = settings.style === "wanderer";
 
   // Mock: stable quest for the day (later: pick by date seed + persist).
   const [questIndex, setQuestIndex] = useState(0);
