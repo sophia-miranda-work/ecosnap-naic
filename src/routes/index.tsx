@@ -157,9 +157,9 @@ function Index() {
   }, [walk.phase]);
   const distanceKm = (walk.phase === "walking" ? tracker.distanceMeters : tripMeters) / 1000;
   const questDone = proofEntry !== null;
-  const requiredMeters = requiredMetersFor(settings.style);
-  const observerGoalKm = settings.observerGoalMeters / 1000;
-  const observerProgress =
+  const requiredMeters = requiredMetersFor(settings.style, settings.observerGoalMeters);
+  const goalKm = settings.observerGoalMeters / 1000;
+  const goalProgress =
     settings.observerGoalMeters > 0
       ? Math.min(1, (walk.phase === "walking" ? tracker.distanceMeters : tripMeters) / settings.observerGoalMeters)
       : 1;
@@ -346,22 +346,23 @@ function Index() {
         </section>
       )}
 
-      {/* Walk stats — hidden in Observer mode (no distance tracking) */}
-      {!isObserver && (
+      {/* Walk stats — shown when this style tracks distance, or when the
+          user has set a custom walking goal (even Observers can opt in). */}
+      {(!isObserver || settings.observerGoalMeters > 0) && (
       <section className="mt-4 grid grid-cols-2 gap-3">
         <div className="parchment-card p-4">
           <Footprints className="h-5 w-5 text-primary" />
           <p className="mt-3 text-2xl font-bold text-foreground">{distanceKm.toFixed(2)} km</p>
-          {isObserver && settings.observerGoalMeters > 0 ? (
+          {settings.observerGoalMeters > 0 ? (
             <>
               <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-muted">
                 <div
                   className="h-full bg-primary"
-                  style={{ width: `${Math.round(observerProgress * 100)}%` }}
+                  style={{ width: `${Math.round(goalProgress * 100)}%` }}
                 />
               </div>
               <p className="mt-1 text-xs text-muted-foreground">
-                of {observerGoalKm.toFixed(2)} km goal
+                of {goalKm.toFixed(2)} km goal
               </p>
             </>
           ) : (
@@ -378,8 +379,8 @@ function Index() {
       </section>
       )}
 
-      {/* Start walk CTA — hidden in Observer mode */}
-      {!isObserver && (
+      {/* Start walk CTA — also available to Observers who set a goal. */}
+      {(!isObserver || settings.observerGoalMeters > 0) && (
       <section className="mt-6">
         <button
           type="button"

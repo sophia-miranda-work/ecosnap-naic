@@ -10,7 +10,12 @@ import {
   Volume2,
 } from "lucide-react";
 import { useSettings } from "@/hooks/use-settings";
-import { ADVENTURE_STYLES, type AdventureStyle, type TtsVoice } from "@/lib/settings";
+import {
+  ADVENTURE_STYLES,
+  defaultMetersFor,
+  type AdventureStyle,
+  type TtsVoice,
+} from "@/lib/settings";
 import { ambienceLabel } from "@/lib/ambience";
 
 export const Route = createFileRoute("/settings")({
@@ -93,39 +98,39 @@ function SettingsPage() {
           })}
         </div>
 
-        {settings.style === "observer" && (
-          <div className="mt-3 rounded-2xl border border-border bg-card p-4">
-            <label
-              htmlFor="observer-goal"
-              className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground"
+        <div className="mt-3 rounded-2xl border border-border bg-card p-4">
+          <label
+            htmlFor="walking-goal"
+            className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground"
+          >
+            Custom walking goal (meters)
+          </label>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Any number works — even 0. Set 0 to use this style's default
+            ({defaultMetersFor(settings.style)} m
+            {settings.style === "observer" ? " — no walking required" : ""}).
+          </p>
+          <div className="mt-2 flex gap-2">
+            <input
+              id="walking-goal"
+              type="number"
+              min={0}
+              max={20000}
+              value={observerGoal}
+              onChange={(e) =>
+                setObserverGoal(Math.max(0, Number(e.target.value) || 0))
+              }
+              className="w-full rounded-xl border border-border bg-background px-3 py-2 text-base text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
+            />
+            <button
+              type="button"
+              onClick={() => update({ observerGoalMeters: observerGoal })}
+              className="rounded-xl bg-primary px-4 text-sm font-bold text-primary-foreground"
             >
-              Custom walking goal (meters)
-            </label>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Any number works — even 0. There's no minimum.
-            </p>
-            <div className="mt-2 flex gap-2">
-              <input
-                id="observer-goal"
-                type="number"
-                min={0}
-                max={20000}
-                value={observerGoal}
-                onChange={(e) =>
-                  setObserverGoal(Math.max(0, Number(e.target.value) || 0))
-                }
-                className="w-full rounded-xl border border-border bg-background px-3 py-2 text-base text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
-              />
-              <button
-                type="button"
-                onClick={() => update({ observerGoalMeters: observerGoal })}
-                className="rounded-xl bg-primary px-4 text-sm font-bold text-primary-foreground"
-              >
-                Save
-              </button>
-            </div>
+              Save
+            </button>
           </div>
-        )}
+        </div>
       </Section>
 
       {/* Visual & Audio */}
