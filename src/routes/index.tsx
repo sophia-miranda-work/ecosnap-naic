@@ -347,56 +347,19 @@ function Index() {
         </section>
       )}
 
-      {/* Walk stats — shown when this style tracks distance, or when the
-          user has set a custom walking goal (even Observers can opt in). */}
-      {(!isObserver || settings.observerGoalMeters > 0) && (
-      <section className="mt-4 grid grid-cols-2 gap-3">
-        <div className="parchment-card p-4">
-          <Footprints className="h-5 w-5 text-primary" />
-          <p className="mt-3 text-2xl font-bold text-foreground">{distanceKm.toFixed(2)} km</p>
-          {settings.observerGoalMeters > 0 ? (
-            <>
-              <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                <div
-                  className="h-full bg-primary"
-                  style={{ width: `${Math.round(goalProgress * 100)}%` }}
-                />
-              </div>
-              <p className="mt-1 text-xs text-muted-foreground">
-                of {goalKm.toFixed(2)} km goal
-              </p>
-            </>
-          ) : (
-            <p className="text-xs text-muted-foreground">
-              {walk.phase === "walking" ? "tracking live" : "walked this trip"}
-            </p>
-          )}
-        </div>
-        <div className="parchment-card p-4">
-          <Sparkles className="h-5 w-5 text-accent" />
-          <p className="mt-3 text-2xl font-bold text-foreground">{questDone ? "1" : "0"} / 1</p>
-          <p className="text-xs text-muted-foreground">quests today</p>
-        </div>
-      </section>
-      )}
-
-      {/* Start walk CTA — also available to Observers who set a goal. */}
-      {(!isObserver || settings.observerGoalMeters > 0) && (
-      <section className="mt-6">
-        <button
-          type="button"
-          onClick={() => setWalk({ phase: "premood" })}
-          className="group flex w-full items-center justify-between rounded-2xl bg-foreground px-6 py-4 text-background shadow-[0_8px_24px_-12px_oklch(0.3_0.05_60_/_0.4)] transition-transform active:scale-[0.98]"
-        >
-          <span className="text-left">
-            <span className="block text-xs font-semibold uppercase tracking-[0.2em] opacity-70">
-              Ready when you are
-            </span>
-            <span className="block text-lg font-bold">Start your walk</span>
-          </span>
-          <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-        </button>
-      </section>
+      {/* Walk stats + Start CTA — shown when this style tracks distance, or
+          when the user has set a custom walking goal (Observers can opt in).
+          For Wanderer, these render at the bottom of the page instead. */}
+      {!isWanderer && (!isObserver || settings.observerGoalMeters > 0) && (
+        <WalkStatsAndCta
+          distanceKm={distanceKm}
+          goalMeters={settings.observerGoalMeters}
+          goalKm={goalKm}
+          goalProgress={goalProgress}
+          isWalking={walk.phase === "walking"}
+          questDone={questDone}
+          onStart={() => setWalk({ phase: "premood" })}
+        />
       )}
 
       {/* Daily vitamin D widget — hidden in Observer mode */}
