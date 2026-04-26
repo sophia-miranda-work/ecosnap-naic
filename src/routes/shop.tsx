@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Coins, Check, Sparkles, Lock } from "lucide-react";
+import { Coins, Check, Sparkles, Lock, ShoppingBag } from "lucide-react";
 import { useCharacter } from "@/hooks/use-character";
 import { SHOP_ITEMS, type ShopItem } from "@/lib/shop";
 import { QUEST_GIVERS, getGiverById } from "@/lib/quest-givers";
@@ -184,28 +184,34 @@ function ShopPage() {
               </p>
 
               {owned ? (
-                <button
-                  type="button"
-                  onClick={() => handleEquip(item)}
-                  disabled={isBusy}
-                  className={`mt-2 inline-flex items-center justify-center gap-1.5 rounded-xl px-2 py-1.5 text-xs font-bold transition-colors ${
-                    isEquipped
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted text-foreground hover:bg-muted/70"
-                  } disabled:opacity-50`}
-                >
-                  {isEquipped ? (
-                    <>
-                      <Check className="h-3 w-3" />
-                      Wearing
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="h-3 w-3" />
-                      Wear it
-                    </>
-                  )}
-                </button>
+                <div className="mt-2 space-y-1.5">
+                  <span className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-primary/15 px-2 py-1.5 text-xs font-bold text-primary">
+                    <ShoppingBag className="h-3 w-3" />
+                    Bought
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => handleEquip(item)}
+                    disabled={isBusy}
+                    className={`inline-flex w-full items-center justify-center gap-1.5 rounded-xl px-2 py-1.5 text-xs font-bold transition-colors ${
+                      isEquipped
+                        ? "bg-foreground text-background"
+                        : "bg-muted text-foreground hover:bg-muted/70"
+                    } disabled:opacity-50`}
+                  >
+                    {isEquipped ? (
+                      <>
+                        <Check className="h-3 w-3" />
+                        Wearing
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-3 w-3" />
+                        Wear it
+                      </>
+                    )}
+                  </button>
+                </div>
               ) : (
                 <button
                   type="button"
