@@ -14,6 +14,7 @@ import { useSettings } from "@/hooks/use-settings";
 import { requiredMetersFor } from "@/lib/settings";
 import { WINDOW_QUEST_POOL } from "@/lib/window-quests";
 import { TtsButton } from "@/components/tts-button";
+import { StreakTreeModal } from "@/components/streak-tree";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -200,6 +201,7 @@ function Index() {
   const safeIndex = questIndex % activePool.length;
   const quest = activePool[safeIndex];
   const { streak, welcomeBack, recordCompletion } = useStreak();
+  const [streakOpen, setStreakOpen] = useState(false);
 
   // Today's quest-giver (rotates daily across our small cast).
   const giver = pickDailyGiver();
@@ -273,13 +275,18 @@ function Index() {
           </p>
           <h1 className="mt-1 text-3xl font-bold text-foreground">{greetingHeadline}<br/>{explorerName}</h1>
         </div>
-        <div className="parchment-card flex flex-col items-center px-3 py-2 text-center">
+        <button
+          type="button"
+          onClick={() => setStreakOpen(true)}
+          aria-label={`View your streak tree (${streak} day${streak === 1 ? "" : "s"})`}
+          className="parchment-card flex flex-col items-center px-3 py-2 text-center transition-transform hover:scale-105 active:scale-95"
+        >
           <span className="text-2xl leading-none" aria-hidden>🌸</span>
           <span className="mt-1 text-lg font-bold leading-none text-foreground">{streak}</span>
           <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
             day streak
           </span>
-        </div>
+        </button>
       </header>
 
       {/* Daily Quest card */}
@@ -580,6 +587,13 @@ function Index() {
           </div>
         </div>
       )}
+
+      {/* Streak tree modal */}
+      <StreakTreeModal
+        streak={streak}
+        open={streakOpen}
+        onClose={() => setStreakOpen(false)}
+      />
     </div>
   );
 }
