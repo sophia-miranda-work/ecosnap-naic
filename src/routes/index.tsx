@@ -587,6 +587,13 @@ function Index() {
           </div>
         </div>
       )}
+
+      {/* Streak tree modal */}
+      <StreakTreeModal
+        streak={streak}
+        open={streakOpen}
+        onClose={() => setStreakOpen(false)}
+      />
     </div>
   );
 }
