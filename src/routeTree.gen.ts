@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as QuestsRouteImport } from './routes/quests'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as JournalRouteImport } from './routes/journal'
 import { Route as CastRouteImport } from './routes/cast'
@@ -24,6 +25,11 @@ const ShopRoute = ShopRouteImport.update({
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuestsRoute = QuestsRouteImport.update({
+  id: '/quests',
+  path: '/quests',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileRoute = ProfileRouteImport.update({
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/cast': typeof CastRoute
   '/journal': typeof JournalRoute
   '/profile': typeof ProfileRoute
+  '/quests': typeof QuestsRoute
   '/settings': typeof SettingsRoute
   '/shop': typeof ShopRoute
 }
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/cast': typeof CastRoute
   '/journal': typeof JournalRoute
   '/profile': typeof ProfileRoute
+  '/quests': typeof QuestsRoute
   '/settings': typeof SettingsRoute
   '/shop': typeof ShopRoute
 }
@@ -69,20 +77,36 @@ export interface FileRoutesById {
   '/cast': typeof CastRoute
   '/journal': typeof JournalRoute
   '/profile': typeof ProfileRoute
+  '/quests': typeof QuestsRoute
   '/settings': typeof SettingsRoute
   '/shop': typeof ShopRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/cast' | '/journal' | '/profile' | '/settings' | '/shop'
+  fullPaths:
+    | '/'
+    | '/cast'
+    | '/journal'
+    | '/profile'
+    | '/quests'
+    | '/settings'
+    | '/shop'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/cast' | '/journal' | '/profile' | '/settings' | '/shop'
+  to:
+    | '/'
+    | '/cast'
+    | '/journal'
+    | '/profile'
+    | '/quests'
+    | '/settings'
+    | '/shop'
   id:
     | '__root__'
     | '/'
     | '/cast'
     | '/journal'
     | '/profile'
+    | '/quests'
     | '/settings'
     | '/shop'
   fileRoutesById: FileRoutesById
@@ -92,6 +116,7 @@ export interface RootRouteChildren {
   CastRoute: typeof CastRoute
   JournalRoute: typeof JournalRoute
   ProfileRoute: typeof ProfileRoute
+  QuestsRoute: typeof QuestsRoute
   SettingsRoute: typeof SettingsRoute
   ShopRoute: typeof ShopRoute
 }
@@ -110,6 +135,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quests': {
+      id: '/quests'
+      path: '/quests'
+      fullPath: '/quests'
+      preLoaderRoute: typeof QuestsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -148,6 +180,7 @@ const rootRouteChildren: RootRouteChildren = {
   CastRoute: CastRoute,
   JournalRoute: JournalRoute,
   ProfileRoute: ProfileRoute,
+  QuestsRoute: QuestsRoute,
   SettingsRoute: SettingsRoute,
   ShopRoute: ShopRoute,
 }
