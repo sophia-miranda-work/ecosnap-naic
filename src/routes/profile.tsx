@@ -197,6 +197,83 @@ function ProfilePage() {
         )}
       </section>
 
+      {/* Wardrobe — owned clothing items */}
+      <section className="parchment-card mt-4 p-5">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+              Closet
+            </p>
+            <h2 className="text-lg font-bold text-foreground">Your wardrobe</h2>
+          </div>
+          <span className="rounded-full bg-muted px-2.5 py-1 text-xs font-bold text-foreground">
+            {wardrobe.length} {wardrobe.length === 1 ? "piece" : "pieces"}
+          </span>
+        </div>
+
+        {wardrobe.length === 0 ? (
+          <div className="mt-3 rounded-xl border border-dashed border-border bg-muted/40 p-4 text-center">
+            <p className="text-sm text-muted-foreground">
+              Your closet is empty. Visit{" "}
+              <Link to="/shop" className="font-semibold text-primary underline-offset-2 hover:underline">
+                Björn's shop
+              </Link>{" "}
+              to pick up something cozy.
+            </p>
+          </div>
+        ) : (
+          <div className="mt-3 space-y-4">
+            {SLOT_ORDER.map((slot) => {
+              const items = wardrobe.filter((i) => i.slot === slot);
+              if (items.length === 0) return null;
+              const equippedId = dressup[slot];
+              return (
+                <div key={slot}>
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    {SLOT_LABELS[slot]}
+                  </p>
+                  <ul className="mt-1.5 grid grid-cols-4 gap-2">
+                    {items.map((item) => {
+                      const isEquipped = equippedId === item.id;
+                      return (
+                        <li key={item.id}>
+                          <button
+                            type="button"
+                            onClick={() => equipItem(slot, isEquipped ? null : item.id)}
+                            aria-pressed={isEquipped}
+                            title={isEquipped ? `Take off ${item.name}` : `Wear ${item.name}`}
+                            className={`flex w-full flex-col items-center gap-1 rounded-xl border p-2 text-center transition-transform active:scale-95 ${
+                              isEquipped
+                                ? "border-foreground bg-primary/15 ring-1 ring-primary"
+                                : "border-border bg-card hover:bg-muted"
+                            }`}
+                          >
+                            <span
+                              className="grid aspect-square w-full place-items-center rounded-lg text-2xl"
+                              style={{
+                                background: item.color
+                                  ? `color-mix(in oklab, ${item.color} 30%, var(--card))`
+                                  : "var(--muted)",
+                              }}
+                              aria-hidden
+                            >
+                              {item.emoji}
+                            </span>
+                            <span className="line-clamp-1 text-[10px] font-semibold text-foreground">
+                              {item.name}
+                            </span>
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
       <div className="ink-divider my-6" />
 
       <div className="grid grid-cols-2 gap-3">
