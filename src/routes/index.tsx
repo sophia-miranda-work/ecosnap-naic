@@ -157,9 +157,9 @@ function Index() {
   }, [walk.phase]);
   const distanceKm = (walk.phase === "walking" ? tracker.distanceMeters : tripMeters) / 1000;
   const questDone = proofEntry !== null;
-  const requiredMeters = requiredMetersFor(settings.style);
-  const observerGoalKm = settings.observerGoalMeters / 1000;
-  const observerProgress =
+  const requiredMeters = requiredMetersFor(settings.style, settings.observerGoalMeters);
+  const goalKm = settings.observerGoalMeters / 1000;
+  const goalProgress =
     settings.observerGoalMeters > 0
       ? Math.min(1, (walk.phase === "walking" ? tracker.distanceMeters : tripMeters) / settings.observerGoalMeters)
       : 1;
