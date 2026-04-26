@@ -298,7 +298,7 @@ export function StreakTreeModal({ streak, open, onClose }: ModalProps) {
       role="dialog"
       aria-modal="true"
       aria-label="Your streak tree"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 px-5 backdrop-blur-sm"
+      className="fixed inset-0 z-[90] flex items-center justify-center bg-foreground/40 px-5 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
