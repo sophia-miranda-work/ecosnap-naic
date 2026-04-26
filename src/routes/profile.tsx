@@ -50,10 +50,16 @@ function ProfilePage() {
 
   const SKIN_TONES = ["#f7d9bd", "#f1c9a5", "#d9a87a", "#a87651", "#7a5236", "#4a3220"];
   const HAIR_COLORS = ["#1a1410", "#3b2a1a", "#7a5236", "#b88a4a", "#d9b56b", "#c95a3a", "#5a4a8a"];
-  const HAIRSTYLES: Array<{ id: "short" | "long" | "bun" | "bald"; label: string }> = [
+  const HAIRSTYLES: Array<{
+    id: "short" | "long" | "bun" | "curly" | "ponytail" | "pigtails" | "bald";
+    label: string;
+  }> = [
     { id: "short", label: "Short" },
     { id: "long", label: "Long" },
     { id: "bun", label: "Bun" },
+    { id: "curly", label: "Curly" },
+    { id: "ponytail", label: "Ponytail" },
+    { id: "pigtails", label: "Pigtails" },
     { id: "bald", label: "Bald" },
   ];
 
