@@ -346,8 +346,9 @@ function Index() {
         </section>
       )}
 
-      {/* Walk stats — hidden in Observer mode (no distance tracking) */}
-      {!isObserver && (
+      {/* Walk stats — shown when this style tracks distance, or when the
+          user has set a custom walking goal (even Observers can opt in). */}
+      {(!isObserver || settings.observerGoalMeters > 0) && (
       <section className="mt-4 grid grid-cols-2 gap-3">
         <div className="parchment-card p-4">
           <Footprints className="h-5 w-5 text-primary" />
@@ -378,8 +379,8 @@ function Index() {
       </section>
       )}
 
-      {/* Start walk CTA — hidden in Observer mode */}
-      {!isObserver && (
+      {/* Start walk CTA — also available to Observers who set a goal. */}
+      {(!isObserver || settings.observerGoalMeters > 0) && (
       <section className="mt-6">
         <button
           type="button"
