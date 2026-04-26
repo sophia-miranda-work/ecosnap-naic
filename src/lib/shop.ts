@@ -24,7 +24,7 @@ export const SHOP_ITEMS: ShopItem[] = [
   { id: "basic-tee-moss",   name: "Moss Tee",       slot: "top",      price: 30,  emoji: "👕", color: "#5b8a3a", set: "basic", description: "A soft cotton tee the color of fresh moss." },
   { id: "basic-tee-bloom",  name: "Bloom Tee",      slot: "top",      price: 30,  emoji: "👕", color: "#d97a8a", set: "basic", description: "A warm pink tee for sunny mornings." },
   { id: "basic-jacket",     name: "Field Jacket",   slot: "top",      price: 80,  emoji: "🧥", color: "#7a6240", set: "basic", description: "Lots of pockets for pebbles and feathers." },
-  { id: "basic-sweater",    name: "Knit Sweater",   slot: "top",      price: 70,  emoji: "🧶", color: "#b08a5a", set: "basic", description: "Hand-knit, slightly itchy in the best way." },
+  { id: "basic-sweater",    name: "Knit Sweater",   slot: "top",      price: 70,  emoji: "🧶", color: "#3a6ea5", set: "basic", description: "Hand-knit, slightly itchy in the best way." },
   { id: "basic-raincoat",   name: "Yellow Raincoat",slot: "top",      price: 90,  emoji: "🧥", color: "#e0b840", set: "basic", description: "Bright as a buttercup, dry as a bone." },
   { id: "basic-flannel",    name: "Flannel Shirt",  slot: "top",      price: 55,  emoji: "👔", color: "#a04848", set: "basic", description: "Red plaid. Smells faintly of woodsmoke." },
   { id: "basic-jeans",      name: "Walking Jeans",  slot: "bottom",   price: 40,  emoji: "👖", color: "#3a4f78", set: "basic", description: "Tough denim that survives bramble paths." },
