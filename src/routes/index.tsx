@@ -115,6 +115,77 @@ type WalkState =
   | { phase: "postmood"; startMood: string }
   | { phase: "done"; startMood: string; endMood: string };
 
+function WalkStatsAndCta({
+  distanceKm,
+  goalMeters,
+  goalKm,
+  goalProgress,
+  isWalking,
+  questDone,
+  onStart,
+}: {
+  distanceKm: number;
+  goalMeters: number;
+  goalKm: number;
+  goalProgress: number;
+  isWalking: boolean;
+  questDone: boolean;
+  onStart: () => void;
+}) {
+  return (
+    <>
+      <section className="mt-4 grid grid-cols-2 gap-3">
+        <div className="parchment-card p-4">
+          <Footprints className="h-5 w-5 text-primary" />
+          <p className="mt-3 text-2xl font-bold text-foreground">
+            {distanceKm.toFixed(2)} km
+          </p>
+          {goalMeters > 0 ? (
+            <>
+              <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                <div
+                  className="h-full bg-primary"
+                  style={{ width: `${Math.round(goalProgress * 100)}%` }}
+                />
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                of {goalKm.toFixed(2)} km goal
+              </p>
+            </>
+          ) : (
+            <p className="text-xs text-muted-foreground">
+              {isWalking ? "tracking live" : "walked this trip"}
+            </p>
+          )}
+        </div>
+        <div className="parchment-card p-4">
+          <Sparkles className="h-5 w-5 text-accent" />
+          <p className="mt-3 text-2xl font-bold text-foreground">
+            {questDone ? "1" : "0"} / 1
+          </p>
+          <p className="text-xs text-muted-foreground">quests today</p>
+        </div>
+      </section>
+
+      <section className="mt-6">
+        <button
+          type="button"
+          onClick={onStart}
+          className="group flex w-full items-center justify-between rounded-2xl bg-foreground px-6 py-4 text-background shadow-[0_8px_24px_-12px_oklch(0.3_0.05_60_/_0.4)] transition-transform active:scale-[0.98]"
+        >
+          <span className="text-left">
+            <span className="block text-xs font-semibold uppercase tracking-[0.2em] opacity-70">
+              Ready when you are
+            </span>
+            <span className="block text-lg font-bold">Start your walk</span>
+          </span>
+          <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+        </button>
+      </section>
+    </>
+  );
+}
+
 function Index() {
   const { settings, playChime, speak } = useSettings();
   const isObserver = settings.style === "observer";
