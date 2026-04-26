@@ -374,6 +374,19 @@ function Index() {
         }}
       />
 
+      {/* Wanderer: walk stats + Start CTA live at the bottom of the page. */}
+      {isWanderer && (
+        <WalkStatsAndCta
+          distanceKm={distanceKm}
+          goalMeters={settings.observerGoalMeters}
+          goalKm={goalKm}
+          goalProgress={goalProgress}
+          isWalking={walk.phase === "walking"}
+          questDone={questDone}
+          onStart={() => setWalk({ phase: "premood" })}
+        />
+      )}
+
       {/* Walking-in-progress preview banner */}
       {walk.phase === "walking" && (
         <section className="mt-4 parchment-card p-4">
