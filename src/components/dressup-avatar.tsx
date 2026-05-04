@@ -1,4 +1,9 @@
-import { type Dressup, type HairStyleId, type FaceShape, type BodyShape } from "@/hooks/use-character";
+import {
+  type Dressup,
+  type HairStyleId,
+  type FaceShape,
+  type BodyShape,
+} from "@/hooks/use-character";
 import { getItemById } from "@/lib/shop";
 
 /**
@@ -25,17 +30,21 @@ function headRadii(shape: FaceShape): { rx: number; ry: number } {
   // Only soft, human-like chibi head silhouettes. Older saved square/diamond
   // values are intentionally softened so every hairstyle fully covers the head.
   switch (shape) {
-    case "oval":    return { rx: 27, ry: 31 };
-    case "heart":   return { rx: 29, ry: 30 };
+    case "oval":
+      return { rx: 27, ry: 31 };
+    case "heart":
+      return { rx: 29, ry: 30 };
     case "square":
     case "diamond":
     case "round":
-    default:        return { rx: HEAD_R_BASE, ry: HEAD_R_BASE };
+    default:
+      return { rx: HEAD_R_BASE, ry: HEAD_R_BASE };
   }
 }
 
 function headPath(_shape: FaceShape, rx: number, ry: number): string {
-  const cx = HEAD_CX, cy = HEAD_CY;
+  const cx = HEAD_CX,
+    cy = HEAD_CY;
   // One clean oval/round path keeps the avatar cute and prevents hard corners
   // from peeking out beneath hair on any saved head option.
   return `M ${cx - rx},${cy} a ${rx},${ry} 0 1,0 ${rx * 2},0 a ${rx},${ry} 0 1,0 ${-rx * 2},0`;
@@ -121,8 +130,14 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
   };
 
   const smallShine = (x = cx - 8, y = top + 9) => (
-    <path d={`M ${x},${y} C ${x + 7},${y - 4} ${x + 15},${y - 3} ${x + 22},${y + 1}`}
-          stroke={hi} strokeWidth="1.2" strokeLinecap="round" fill="none" opacity="0.42" />
+    <path
+      d={`M ${x},${y} C ${x + 7},${y - 4} ${x + 15},${y - 3} ${x + 22},${y + 1}`}
+      stroke={hi}
+      strokeWidth="1.2"
+      strokeLinecap="round"
+      fill="none"
+      opacity="0.42"
+    />
   );
 
   switch (style) {
@@ -132,9 +147,14 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
         front: (
           <g>
             {fullCap(cy + 4, 5)}
-            <path d={`M ${sideL + 3},${cy - 1} C ${sideL + 12},${cy + 4} ${sideL + 15},${cy + 13} ${sideL + 7},${cy + 18}
+            <path
+              d={`M ${sideL + 3},${cy - 1} C ${sideL + 12},${cy + 4} ${sideL + 15},${cy + 13} ${sideL + 7},${cy + 18}
                       M ${sideR - 3},${cy - 1} C ${sideR - 12},${cy + 4} ${sideR - 15},${cy + 13} ${sideR - 7},${cy + 18}`}
-                  stroke={color} strokeWidth="5" strokeLinecap="round" fill="none" />
+              stroke={color}
+              strokeWidth="5"
+              strokeLinecap="round"
+              fill="none"
+            />
             {sideBang()}
             {smallShine()}
           </g>
@@ -148,9 +168,14 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
           <g>
             {fullCap(cy + 7, 5)}
             {sideBang()}
-            <path d={`M ${sideL + 1},${cy + 2} C ${sideL + 1},${cy + 19} ${sideL + 3},${bottom + 22} ${sideL + 10},${bottom + 31}
+            <path
+              d={`M ${sideL + 1},${cy + 2} C ${sideL + 1},${cy + 19} ${sideL + 3},${bottom + 22} ${sideL + 10},${bottom + 31}
                       M ${sideR - 1},${cy + 2} C ${sideR - 1},${cy + 19} ${sideR - 3},${bottom + 22} ${sideR - 10},${bottom + 31}`}
-                  stroke={color} strokeWidth="7" strokeLinecap="round" fill="none" />
+              stroke={color}
+              strokeWidth="7"
+              strokeLinecap="round"
+              fill="none"
+            />
             {smallShine(cx - 5, top + 8)}
           </g>
         ),
@@ -163,9 +188,14 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
           <g>
             {fullCap(cy + 7, 4)}
             {bluntBangs(top + 19)}
-            <path d={`M ${sideL + 3},${cy + 5} C ${sideL + 2},${cy + 18} ${sideL + 5},${bottom + 6} ${sideL + 14},${bottom + 7}
+            <path
+              d={`M ${sideL + 3},${cy + 5} C ${sideL + 2},${cy + 18} ${sideL + 5},${bottom + 6} ${sideL + 14},${bottom + 7}
                       M ${sideR - 3},${cy + 5} C ${sideR - 2},${cy + 18} ${sideR - 5},${bottom + 6} ${sideR - 14},${bottom + 7}`}
-                  stroke={color} strokeWidth="6" strokeLinecap="round" fill="none" />
+              stroke={color}
+              strokeWidth="6"
+              strokeLinecap="round"
+              fill="none"
+            />
           </g>
         ),
       };
@@ -177,9 +207,14 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
           <g>
             {fullCap(cy + 7, 5)}
             {sideBang(true)}
-            <path d={`M ${sideL + 1},${cy + 2} C ${sideL - 4},${cy + 15} ${sideL + 9},${cy + 23} ${sideL + 4},${cy + 37}
+            <path
+              d={`M ${sideL + 1},${cy + 2} C ${sideL - 4},${cy + 15} ${sideL + 9},${cy + 23} ${sideL + 4},${cy + 37}
                       M ${sideR - 1},${cy + 2} C ${sideR + 4},${cy + 15} ${sideR - 9},${cy + 23} ${sideR - 4},${cy + 37}`}
-                  stroke={color} strokeWidth="7" strokeLinecap="round" fill="none" />
+              stroke={color}
+              strokeWidth="7"
+              strokeLinecap="round"
+              fill="none"
+            />
             {smallShine(cx - 2, top + 9)}
           </g>
         ),
@@ -190,13 +225,21 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
         back: <ellipse cx={cx} cy={cy - 5} rx={rx + 5} ry={ry - 2} fill={color} />,
         front: (
           <g>
-            <path d={`M ${sideL - 3},${cy + 4}
+            <path
+              d={`M ${sideL - 3},${cy + 4}
                       C ${sideL - 6},${top + 3} ${cx - 16},${top - 10} ${cx},${top - 8}
                       C ${cx + 16},${top - 10} ${sideR + 6},${top + 3} ${sideR + 3},${cy + 4}
                       C ${sideR - 4},${top + 16} ${sideL + 4},${top + 16} ${sideL - 3},${cy + 4} Z`}
-                  fill={color} />
+              fill={color}
+            />
             {[0, 1, 2, 3, 4, 5].map((i) => (
-              <circle key={i} cx={cx - 24 + i * 9.5} cy={top + 9 + (i % 2) * 2} r="5.8" fill={color} />
+              <circle
+                key={i}
+                cx={cx - 24 + i * 9.5}
+                cy={top + 9 + (i % 2) * 2}
+                r="5.8"
+                fill={color}
+              />
             ))}
             <circle cx={cx - 7} cy={top + 3} r="2.4" fill={hi} opacity="0.5" />
           </g>
@@ -210,7 +253,13 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
           <g>
             <ellipse cx={cx} cy={cy - 8} rx={rx + 10} ry={ry - 1} fill={color} />
             {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-              <circle key={i} cx={cx - 30 + i * 10} cy={top + 4 + Math.sin(i) * 2} r="7" fill={color} />
+              <circle
+                key={i}
+                cx={cx - 30 + i * 10}
+                cy={top + 4 + Math.sin(i) * 2}
+                r="7"
+                fill={color}
+              />
             ))}
             <circle cx={cx - 10} cy={top} r="3" fill={hi} opacity="0.5" />
           </g>
@@ -246,10 +295,16 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
           <g>
             <ellipse cx={sideL + 3} cy={cy + 1} rx="6" ry="7" fill={color} />
             <ellipse cx={sideR - 3} cy={cy + 1} rx="6" ry="7" fill={color} />
-            <path d={`M ${sideL + 2},${cy + 1} C ${sideL - 15},${cy + 9} ${sideL - 15},${cy + 32} ${sideL - 4},${cy + 41}
-                      C ${sideL + 6},${cy + 37} ${sideL + 6},${cy + 16} ${sideL + 2},${cy + 1} Z`} fill={color} />
-            <path d={`M ${sideR - 2},${cy + 1} C ${sideR + 15},${cy + 9} ${sideR + 15},${cy + 32} ${sideR + 4},${cy + 41}
-                      C ${sideR - 6},${cy + 37} ${sideR - 6},${cy + 16} ${sideR - 2},${cy + 1} Z`} fill={color} />
+            <path
+              d={`M ${sideL + 2},${cy + 1} C ${sideL - 15},${cy + 9} ${sideL - 15},${cy + 32} ${sideL - 4},${cy + 41}
+                      C ${sideL + 6},${cy + 37} ${sideL + 6},${cy + 16} ${sideL + 2},${cy + 1} Z`}
+              fill={color}
+            />
+            <path
+              d={`M ${sideR - 2},${cy + 1} C ${sideR + 15},${cy + 9} ${sideR + 15},${cy + 32} ${sideR + 4},${cy + 41}
+                      C ${sideR - 6},${cy + 37} ${sideR - 6},${cy + 16} ${sideR - 2},${cy + 1} Z`}
+              fill={color}
+            />
           </g>
         ),
         front: (
@@ -270,8 +325,13 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
             {fullCap(cy + 5, 5)}
             {bluntBangs(top + 18)}
             <ellipse cx={cx} cy={top - 5} rx="11" ry="9" fill={color} />
-            <path d={`M ${cx - 7},${top - 4} C ${cx - 2},${top - 9} ${cx + 5},${top - 8} ${cx + 8},${top - 3}`}
-                  stroke={hi} strokeWidth="1" fill="none" opacity="0.45" />
+            <path
+              d={`M ${cx - 7},${top - 4} C ${cx - 2},${top - 9} ${cx + 5},${top - 8} ${cx + 8},${top - 3}`}
+              stroke={hi}
+              strokeWidth="1"
+              fill="none"
+              opacity="0.45"
+            />
           </g>
         ),
       };
@@ -324,12 +384,36 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
       return {
         back: (
           <g>
-            <path d={`M ${sideL + 5},${cy + 3} C ${sideL - 2},${cy + 16} ${sideL + 1},${bottom + 16} ${sideL + 7},${bottom + 24}`} stroke={color} strokeWidth="7" strokeLinecap="round" fill="none" />
-            <path d={`M ${sideR - 5},${cy + 3} C ${sideR + 2},${cy + 16} ${sideR - 1},${bottom + 16} ${sideR - 7},${bottom + 24}`} stroke={color} strokeWidth="7" strokeLinecap="round" fill="none" />
+            <path
+              d={`M ${sideL + 5},${cy + 3} C ${sideL - 2},${cy + 16} ${sideL + 1},${bottom + 16} ${sideL + 7},${bottom + 24}`}
+              stroke={color}
+              strokeWidth="7"
+              strokeLinecap="round"
+              fill="none"
+            />
+            <path
+              d={`M ${sideR - 5},${cy + 3} C ${sideR + 2},${cy + 16} ${sideR - 1},${bottom + 16} ${sideR - 7},${bottom + 24}`}
+              stroke={color}
+              strokeWidth="7"
+              strokeLinecap="round"
+              fill="none"
+            />
             {[0, 1, 2].map((k) => (
               <g key={k}>
-                <ellipse cx={sideL + 5 + (k % 2 ? -1.5 : 1.5)} cy={cy + 13 + k * 10} rx="4" ry="3.2" fill={k % 2 ? sh : color} />
-                <ellipse cx={sideR - 5 + (k % 2 ? 1.5 : -1.5)} cy={cy + 13 + k * 10} rx="4" ry="3.2" fill={k % 2 ? sh : color} />
+                <ellipse
+                  cx={sideL + 5 + (k % 2 ? -1.5 : 1.5)}
+                  cy={cy + 13 + k * 10}
+                  rx="4"
+                  ry="3.2"
+                  fill={k % 2 ? sh : color}
+                />
+                <ellipse
+                  cx={sideR - 5 + (k % 2 ? 1.5 : -1.5)}
+                  cy={cy + 13 + k * 10}
+                  rx="4"
+                  ry="3.2"
+                  fill={k % 2 ? sh : color}
+                />
               </g>
             ))}
           </g>
@@ -370,8 +454,13 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
                   C ${cx + 4},${top + 7} ${cx - 4},${top + 7} ${cx - 9},${top + 11} Z`}
               fill={color}
             />
-            <path d={`M ${cx - 3},${top - 7} C ${cx},${top - 12} ${cx + 3},${top - 7} ${cx + 4},${top + 3}`}
-                  stroke={hi} strokeWidth="1" fill="none" opacity="0.5" />
+            <path
+              d={`M ${cx - 3},${top - 7} C ${cx},${top - 12} ${cx + 3},${top - 7} ${cx + 4},${top + 3}`}
+              stroke={hi}
+              strokeWidth="1"
+              fill="none"
+              opacity="0.5"
+            />
           </g>
         ),
       };
@@ -382,9 +471,11 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
         front: (
           <g>
             {fullCap(cy + 1, 4)}
-            <path d={`M ${sideL + 4},${top + 13} C ${cx - 4},${top - 2} ${sideR - 8},${top + 4} ${sideR - 3},${top + 18}
+            <path
+              d={`M ${sideL + 4},${top + 13} C ${cx - 4},${top - 2} ${sideR - 8},${top + 4} ${sideR - 3},${top + 18}
                       C ${cx + 5},${top + 18} ${cx - 8},${top + 21} ${sideL + 4},${top + 13} Z`}
-                  fill={color} />
+              fill={color}
+            />
             {smallShine(cx + 1, top + 7)}
           </g>
         ),
@@ -399,15 +490,28 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
 function bodyMetrics(shape: BodyShape) {
   // Stubby chibi proportions — small torso, very short legs.
   switch (shape) {
-    case "slim":    return { torsoW: 22, hipW: 22, shoulderW: 24, legW: 6 };
-    case "stocky":  return { torsoW: 32, hipW: 30, shoulderW: 32, legW: 9 };
+    case "slim":
+      return { torsoW: 22, hipW: 22, shoulderW: 24, legW: 6 };
+    case "stocky":
+      return { torsoW: 32, hipW: 30, shoulderW: 32, legW: 9 };
     case "average":
-    default:        return { torsoW: 26, hipW: 26, shoulderW: 28, legW: 7 };
+    default:
+      return { torsoW: 26, hipW: 26, shoulderW: 28, legW: 7 };
   }
 }
 
 // ---------------------------- ear extras ------------------------------------
-function EarExtra({ id, side, rx, ry }: { id: string | null | undefined; side: "L" | "R"; rx: number; ry: number }) {
+function EarExtra({
+  id,
+  side,
+  rx,
+  ry,
+}: {
+  id: string | null | undefined;
+  side: "L" | "R";
+  rx: number;
+  ry: number;
+}) {
   const item = getItemById(id);
   if (!item) return null;
   const cx = side === "L" ? HEAD_CX - rx : HEAD_CX + rx;
@@ -416,8 +520,12 @@ function EarExtra({ id, side, rx, ry }: { id: string | null | undefined; side: "
     return (
       <>
         {side === "R" && (
-          <path d={`M ${HEAD_CX - rx},${HEAD_CY - ry + 2} Q ${HEAD_CX},${HEAD_CY - ry - 8} ${HEAD_CX + rx},${HEAD_CY - ry + 2}`}
-                stroke={item.color ?? "#333"} strokeWidth="3.5" fill="none" />
+          <path
+            d={`M ${HEAD_CX - rx},${HEAD_CY - ry + 2} Q ${HEAD_CX},${HEAD_CY - ry - 8} ${HEAD_CX + rx},${HEAD_CY - ry + 2}`}
+            stroke={item.color ?? "#333"}
+            strokeWidth="3.5"
+            fill="none"
+          />
         )}
         <ellipse cx={cx} cy={cy} rx="7" ry="8" fill={item.color ?? "#333"} />
         <ellipse cx={cx} cy={cy} rx="3.5" ry="4.5" fill={lighten(item.color ?? "#333", 0.3)} />
@@ -435,8 +543,12 @@ function EarExtra({ id, side, rx, ry }: { id: string | null | undefined; side: "
   // hearing aid
   return (
     <>
-      <path d={`M ${cx},${cy - 3} q ${side === "L" ? -3 : 3},2 0,5`}
-            stroke={item.color ?? "#e8d8c8"} strokeWidth="2" fill="none" />
+      <path
+        d={`M ${cx},${cy - 3} q ${side === "L" ? -3 : 3},2 0,5`}
+        stroke={item.color ?? "#e8d8c8"}
+        strokeWidth="2"
+        fill="none"
+      />
       <circle cx={cx} cy={cy + 2} r="1.6" fill={item.color ?? "#e8d8c8"} />
     </>
   );
@@ -503,12 +615,38 @@ export function DressupAvatar({
       {hair.back}
 
       {/* === LEGS — short stubby === */}
-      <rect x={50 - hipW / 2 + 1} y={legTop} width={legW * 2} height={legBottom - legTop} rx="3" fill={bottomColor} />
-      <rect x={50 + hipW / 2 - 1 - legW * 2} y={legTop} width={legW * 2} height={legBottom - legTop} rx="3" fill={bottomColor} />
+      <rect
+        x={50 - hipW / 2 + 1}
+        y={legTop}
+        width={legW * 2}
+        height={legBottom - legTop}
+        rx="3"
+        fill={bottomColor}
+      />
+      <rect
+        x={50 + hipW / 2 - 1 - legW * 2}
+        y={legTop}
+        width={legW * 2}
+        height={legBottom - legTop}
+        rx="3"
+        fill={bottomColor}
+      />
 
       {/* === SHOES === */}
-      <ellipse cx={50 - hipW / 2 + 1 + legW} cy={legBottom + 2} rx={legW + 2} ry="3" fill={shoesColor} />
-      <ellipse cx={50 + hipW / 2 - 1 - legW} cy={legBottom + 2} rx={legW + 2} ry="3" fill={shoesColor} />
+      <ellipse
+        cx={50 - hipW / 2 + 1 + legW}
+        cy={legBottom + 2}
+        rx={legW + 2}
+        ry="3"
+        fill={shoesColor}
+      />
+      <ellipse
+        cx={50 + hipW / 2 - 1 - legW}
+        cy={legBottom + 2}
+        rx={legW + 2}
+        ry="3"
+        fill={shoesColor}
+      />
 
       {/* === TORSO / TOP or DRESS === */}
       {dress ? (
@@ -549,16 +687,38 @@ export function DressupAvatar({
               fill={sleeveColor}
             />
             {/* mitten hand */}
-            <circle cx={handX} cy={handY} r="3.6" fill={dressup.skin} stroke={skinDark} strokeWidth="0.5" />
+            <circle
+              cx={handX}
+              cy={handY}
+              r="3.6"
+              fill={dressup.skin}
+              stroke={skinDark}
+              strokeWidth="0.5"
+            />
             {/* simple thumb hint */}
-            <ellipse cx={handX - dir * 2.2} cy={handY - 1} rx="1.2" ry="1.6" fill={dressup.skin} stroke={skinDark} strokeWidth="0.3" />
+            <ellipse
+              cx={handX - dir * 2.2}
+              cy={handY - 1}
+              rx="1.2"
+              ry="1.6"
+              fill={dressup.skin}
+              stroke={skinDark}
+              strokeWidth="0.3"
+            />
             {/* nails (small dot on top of mitten) */}
             {dressup.nail && (
               <circle cx={handX} cy={handY + 1.5} r="1" fill={dressup.nail} opacity="0.9" />
             )}
             {/* bracelet */}
             {bracelet && (
-              <rect x={handX - 4} y={handY - 5} width="8" height="2" rx="1" fill={bracelet.color ?? "#c0a040"} />
+              <rect
+                x={handX - 4}
+                y={handY - 5}
+                width="8"
+                height="2"
+                rx="1"
+                fill={bracelet.color ?? "#c0a040"}
+              />
             )}
           </g>
         );
@@ -570,34 +730,93 @@ export function DressupAvatar({
       {/* === NECKLACE === */}
       {necklace && (
         <g>
-          <path d={`M ${50 - 8},${torsoTop + 1} Q ${50},${torsoTop + 6} ${50 + 8},${torsoTop + 1}`}
-                stroke={necklace.color ?? "#c0a040"} strokeWidth="0.8" fill="none" />
+          <path
+            d={`M ${50 - 8},${torsoTop + 1} Q ${50},${torsoTop + 6} ${50 + 8},${torsoTop + 1}`}
+            stroke={necklace.color ?? "#c0a040"}
+            strokeWidth="0.8"
+            fill="none"
+          />
           <circle cx="50" cy={torsoTop + 5} r="1.4" fill={necklace.color ?? "#c0a040"} />
         </g>
       )}
 
       {/* === EARS === */}
-      <ellipse cx={HEAD_CX - rx + 1} cy={HEAD_CY + 4} rx="2.8" ry="4.5" fill={dressup.skin} stroke={skinDark} strokeWidth="0.4" />
-      <ellipse cx={HEAD_CX + rx - 1} cy={HEAD_CY + 4} rx="2.8" ry="4.5" fill={dressup.skin} stroke={skinDark} strokeWidth="0.4" />
-      <ellipse cx={HEAD_CX - rx + 1} cy={HEAD_CY + 4.5} rx="1" ry="2" fill={skinDark} opacity="0.4" />
-      <ellipse cx={HEAD_CX + rx - 1} cy={HEAD_CY + 4.5} rx="1" ry="2" fill={skinDark} opacity="0.4" />
+      <ellipse
+        cx={HEAD_CX - rx + 1}
+        cy={HEAD_CY + 4}
+        rx="2.8"
+        ry="4.5"
+        fill={dressup.skin}
+        stroke={skinDark}
+        strokeWidth="0.4"
+      />
+      <ellipse
+        cx={HEAD_CX + rx - 1}
+        cy={HEAD_CY + 4}
+        rx="2.8"
+        ry="4.5"
+        fill={dressup.skin}
+        stroke={skinDark}
+        strokeWidth="0.4"
+      />
+      <ellipse
+        cx={HEAD_CX - rx + 1}
+        cy={HEAD_CY + 4.5}
+        rx="1"
+        ry="2"
+        fill={skinDark}
+        opacity="0.4"
+      />
+      <ellipse
+        cx={HEAD_CX + rx - 1}
+        cy={HEAD_CY + 4.5}
+        rx="1"
+        ry="2"
+        fill={skinDark}
+        opacity="0.4"
+      />
 
       {/* === EARRINGS === */}
       {earrings && (
         <>
-          <circle cx={HEAD_CX - rx + 1} cy={HEAD_CY + 8} r="1.7" fill={earrings.color ?? "#e0b840"} />
-          <circle cx={HEAD_CX + rx - 1} cy={HEAD_CY + 8} r="1.7" fill={earrings.color ?? "#e0b840"} />
+          <circle
+            cx={HEAD_CX - rx + 1}
+            cy={HEAD_CY + 8}
+            r="1.7"
+            fill={earrings.color ?? "#e0b840"}
+          />
+          <circle
+            cx={HEAD_CX + rx - 1}
+            cy={HEAD_CY + 8}
+            r="1.7"
+            fill={earrings.color ?? "#e0b840"}
+          />
         </>
       )}
 
       {/* === HEAD === */}
-      <path d={headPath(faceShape, rx, ry)} fill={dressup.skin} stroke={skinDark} strokeWidth="0.6" />
+      <path
+        d={headPath(faceShape, rx, ry)}
+        fill={dressup.skin}
+        stroke={skinDark}
+        strokeWidth="0.6"
+      />
 
       {/* ear piercing — second tiny stud */}
       {earPiercing && (
         <>
-          <circle cx={HEAD_CX - rx + 1} cy={HEAD_CY - 1} r="1" fill={earPiercing.color ?? "#a8d8f0"} />
-          <circle cx={HEAD_CX + rx - 1} cy={HEAD_CY - 1} r="1" fill={earPiercing.color ?? "#a8d8f0"} />
+          <circle
+            cx={HEAD_CX - rx + 1}
+            cy={HEAD_CY - 1}
+            r="1"
+            fill={earPiercing.color ?? "#a8d8f0"}
+          />
+          <circle
+            cx={HEAD_CX + rx - 1}
+            cy={HEAD_CY - 1}
+            r="1"
+            fill={earPiercing.color ?? "#a8d8f0"}
+          />
         </>
       )}
 
@@ -606,7 +825,13 @@ export function DressupAvatar({
 
       {/* === HAIR CLIP (small icon at temple) === */}
       {hairClip && (
-        <text x={HEAD_CX - rx * 0.5} y={HEAD_CY - ry + 8} textAnchor="middle" fontSize="9" dominantBaseline="middle">
+        <text
+          x={HEAD_CX - rx * 0.5}
+          y={HEAD_CY - ry + 8}
+          textAnchor="middle"
+          fontSize="9"
+          dominantBaseline="middle"
+        >
           {hairClip.overlayEmoji ?? hairClip.emoji}
         </text>
       )}
@@ -619,8 +844,20 @@ export function DressupAvatar({
           <>
             <circle cx={HEAD_CX - eyeOffset} cy={eyeY} r="2.2" fill="#2b1930" />
             <circle cx={HEAD_CX + eyeOffset} cy={eyeY} r="2.2" fill="#2b1930" />
-            <circle cx={HEAD_CX - eyeOffset + 0.7} cy={eyeY - 0.7} r="0.55" fill="#fff" opacity="0.8" />
-            <circle cx={HEAD_CX + eyeOffset + 0.7} cy={eyeY - 0.7} r="0.55" fill="#fff" opacity="0.8" />
+            <circle
+              cx={HEAD_CX - eyeOffset + 0.7}
+              cy={eyeY - 0.7}
+              r="0.55"
+              fill="#fff"
+              opacity="0.8"
+            />
+            <circle
+              cx={HEAD_CX + eyeOffset + 0.7}
+              cy={eyeY - 0.7}
+              r="0.55"
+              fill="#fff"
+              opacity="0.8"
+            />
           </>
         );
       })()}
@@ -629,20 +866,50 @@ export function DressupAvatar({
       <circle cx={HEAD_CX} cy={HEAD_CY + 10} r="0.5" fill={skinDark} opacity="0.5" />
 
       {/* mouth — small smile */}
-      <path d={`M ${HEAD_CX - 2.5},${HEAD_CY + 13} Q ${HEAD_CX},${HEAD_CY + 15.5} ${HEAD_CX + 2.5},${HEAD_CY + 13}`}
-            stroke={lipColor} strokeWidth="0.9" fill="none" strokeLinecap="round" />
+      <path
+        d={`M ${HEAD_CX - 2.5},${HEAD_CY + 13} Q ${HEAD_CX},${HEAD_CY + 15.5} ${HEAD_CX + 2.5},${HEAD_CY + 13}`}
+        stroke={lipColor}
+        strokeWidth="0.9"
+        fill="none"
+        strokeLinecap="round"
+      />
 
       {/* face piercing */}
-      {facePiercing && (() => {
-        const my = HEAD_CY + 13;
-        if (facePiercing.id === "prem-face-nose") {
-          return <circle cx={HEAD_CX + 2} cy={HEAD_CY + 10.5} r="0.9" fill={facePiercing.color ?? "#e0e0f0"} />;
-        }
-        if (facePiercing.id === "prem-face-eyebrow") {
-          return <rect x={HEAD_CX - rx * 0.4 - 3} y={HEAD_CY - 1} width="2.5" height="0.9" fill={facePiercing.color ?? "#a0a0b0"} />;
-        }
-        return <circle cx={HEAD_CX - 4} cy={my + 2} r="0.9" fill="none" stroke={facePiercing.color ?? "#c0c0c0"} strokeWidth="0.6" />;
-      })()}
+      {facePiercing &&
+        (() => {
+          const my = HEAD_CY + 13;
+          if (facePiercing.id === "prem-face-nose") {
+            return (
+              <circle
+                cx={HEAD_CX + 2}
+                cy={HEAD_CY + 10.5}
+                r="0.9"
+                fill={facePiercing.color ?? "#e0e0f0"}
+              />
+            );
+          }
+          if (facePiercing.id === "prem-face-eyebrow") {
+            return (
+              <rect
+                x={HEAD_CX - rx * 0.4 - 3}
+                y={HEAD_CY - 1}
+                width="2.5"
+                height="0.9"
+                fill={facePiercing.color ?? "#a0a0b0"}
+              />
+            );
+          }
+          return (
+            <circle
+              cx={HEAD_CX - 4}
+              cy={my + 2}
+              r="0.9"
+              fill="none"
+              stroke={facePiercing.color ?? "#c0c0c0"}
+              strokeWidth="0.6"
+            />
+          );
+        })()}
 
       {/* big round blush cheeks */}
       <circle cx={HEAD_CX - rx * 0.6} cy={HEAD_CY + 9} r="3" fill={blush} opacity="0.55" />
@@ -654,14 +921,26 @@ export function DressupAvatar({
 
       {/* === HAT (emoji overlay) === */}
       {hat && (
-        <text x={HEAD_CX} y={HEAD_CY - ry + 2} textAnchor="middle" fontSize="26" dominantBaseline="middle">
+        <text
+          x={HEAD_CX}
+          y={HEAD_CY - ry + 2}
+          textAnchor="middle"
+          fontSize="26"
+          dominantBaseline="middle"
+        >
           {hat.overlayEmoji ?? hat.emoji}
         </text>
       )}
 
       {/* === ACCESSORY (face overlay e.g. glasses) === */}
       {accessory && (
-        <text x={HEAD_CX} y={HEAD_CY + 4} textAnchor="middle" fontSize="16" dominantBaseline="middle">
+        <text
+          x={HEAD_CX}
+          y={HEAD_CY + 4}
+          textAnchor="middle"
+          fontSize="16"
+          dominantBaseline="middle"
+        >
           {accessory.overlayEmoji ?? accessory.emoji}
         </text>
       )}

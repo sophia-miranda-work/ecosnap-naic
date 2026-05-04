@@ -4,14 +4,7 @@ import { getDeviceId } from "@/lib/device-id";
 import type { ShopSlot } from "@/lib/shop";
 import type { AgeGroup, Clothing, SkinType } from "@/lib/vitamin-d";
 
-export type Hairstyle =
-  | "short"
-  | "long"
-  | "bun"
-  | "curly"
-  | "ponytail"
-  | "pigtails"
-  | "bald";
+export type Hairstyle = "short" | "long" | "bun" | "curly" | "ponytail" | "pigtails" | "bald";
 
 /** Extended hairstyle catalog. Older "Hairstyle" values are kept for back-compat. */
 export type HairStyleId =
@@ -42,15 +35,15 @@ export type Dressup = {
   // ---- new optional fields (defaults below) ----
   faceShape?: FaceShape;
   bodyShape?: BodyShape;
-  nail?: string | null;          // nail polish color hex, or null
-  earrings?: string | null;      // item id
+  nail?: string | null; // nail polish color hex, or null
+  earrings?: string | null; // item id
   necklace?: string | null;
   bracelet?: string | null;
   hairClip?: string | null;
   earPiercing?: string | null;
   facePiercing?: string | null;
-  ears?: string | null;          // hearing aid / earpods / headphones
-  dress?: string | null;         // covers top+bottom for dresses
+  ears?: string | null; // hearing aid / earpods / headphones
+  dress?: string | null; // covers top+bottom for dresses
 };
 
 export const DEFAULT_DRESSUP: Dressup = {
