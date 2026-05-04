@@ -102,140 +102,256 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
   const sideL = cx - rx;
   const sideR = cx + rx;
 
-  const sticker = (d: string) => (
-    <path d={d} fill={color} fillRule="evenodd" clipRule="evenodd" />
+  // Forehead hairline — hair sits above this line so the face is never
+  // covered. We never use a face cutout: the cap simply stops at the brow.
+  const browY = top + ry * 0.62;
+  const dark = darken(color, 0.18);
+  const shine = lighten(color, 0.35);
+
+  // Cap = hugs the head from temple to temple, over the crown.
+  // Dips slightly in the middle for soft bangs (no center part line).
+  const cap = (drop = browY, lift = 4, bangDip = 2) => `
+    M ${sideL - 1.5},${drop + 1}
+    C ${sideL - 3},${cy - ry * 0.2} ${sideL - 2},${top + ry * 0.18} ${cx - rx * 0.55},${top - lift * 0.4}
+    C ${cx - rx * 0.25},${top - lift} ${cx + rx * 0.25},${top - lift} ${cx + rx * 0.55},${top - lift * 0.4}
+    C ${sideR + 2},${top + ry * 0.18} ${sideR + 3},${cy - ry * 0.2} ${sideR + 1.5},${drop + 1}
+    C ${sideR - 4},${drop - bangDip - 1} ${cx + 6},${drop + bangDip} ${cx},${drop + bangDip}
+    C ${cx - 6},${drop + bangDip} ${sideL + 4},${drop - bangDip - 1} ${sideL - 1.5},${drop + 1} Z`;
+
+  // Side panels that hang along the cheeks (used for medium/long hair).
+  const sidePanel = (sideX: number, dir: 1 | -1, length: number, flare = 0) => {
+    const inX = sideX + dir * 2;
+    const tipY = cy + length;
+    return `
+      M ${sideX - dir * 1},${browY + 1}
+      C ${sideX + dir * 1.5},${cy + length * 0.3} ${sideX + dir * (1 + flare)},${cy + length * 0.7} ${sideX + dir * (2 + flare)},${tipY}
+      Q ${sideX + dir * 0.5},${tipY + 2} ${inX},${tipY - 1}
+      C ${inX - dir * 0.5},${cy + length * 0.6} ${inX - dir * 0.5},${cy + length * 0.25} ${sideX - dir * 1},${browY + 1} Z`;
+  };
+
+  // Long flowing hair behind the head (back layer).
+  const backFlow = (length: number, width: number) => `
+    M ${sideL + 2},${cy - 4}
+    C ${sideL - width},${cy + length * 0.4} ${sideL - width * 0.6},${cy + length} ${cx - width * 0.6},${cy + length + 4}
+    Q ${cx},${cy + length + 7} ${cx + width * 0.6},${cy + length + 4}
+    C ${sideR + width * 0.6},${cy + length} ${sideR + width},${cy + length * 0.4} ${sideR - 2},${cy - 4}
+    C ${sideR - 4},${top + 4} ${sideL + 4},${top + 4} ${sideL + 2},${cy - 4} Z`;
+
+  // Solid bun anchored to the cap.
+  const bun = (bx: number, by: number, r: number) => (
+    <g>
+      <ellipse cx={bx} cy={by} rx={r} ry={r * 0.92} fill={color} />
+      <ellipse cx={bx - r * 0.3} cy={by - r * 0.3} rx={r * 0.35} ry={r * 0.22} fill={shine} opacity="0.45" />
+      {/* anchor strands so it never looks floating */}
+      <path d={`M ${bx},${by + r * 0.85} Q ${bx},${by + r * 1.4} ${bx + (bx > cx ? -2 : 2)},${by + r * 1.6}`} stroke={dark} strokeWidth="1.2" fill="none" strokeLinecap="round" />
+    </g>
   );
 
-  const faceOpening = (hairline = top + 17, inset = 5.5, jaw = bottom + 0.5) => `
-    M ${sideL + inset},${hairline}
-    C ${sideL + inset + 2},${cy + 8} ${sideL + rx * 0.48},${jaw} ${cx},${jaw}
-    C ${sideR - rx * 0.48},${jaw} ${sideR - inset - 2},${cy + 8} ${sideR - inset},${hairline}
-    C ${sideR - 11},${hairline - 4} ${sideL + 11},${hairline - 4} ${sideL + inset},${hairline} Z`;
+  // Pigtail / pony tube anchored to the side or crown.
+  const tail = (ax: number, ay: number, tx: number, ty: number, w: number) => {
+    const mx = (ax + tx) / 2;
+    const my = (ay + ty) / 2;
+    return (
+      <path
+        d={`M ${ax - w / 2},${ay} Q ${mx - w * 0.4},${my} ${tx - w * 0.55},${ty}
+            Q ${tx},${ty + w * 0.6} ${tx + w * 0.55},${ty}
+            Q ${mx + w * 0.4},${my} ${ax + w / 2},${ay} Z`}
+        fill={color}
+      />
+    );
+  };
 
-  const roundedCap = (drop = cy + 8, lift = 7) => `
-    M ${sideL - 3},${drop}
-    C ${sideL - 7},${top + 7} ${sideL + 8},${top - lift} ${cx},${top - lift}
-    C ${sideR - 8},${top - lift} ${sideR + 7},${top + 7} ${sideR + 3},${drop}
-    C ${sideR - 4},${drop + 11} ${sideL + 4},${drop + 11} ${sideL - 3},${drop} Z`;
+  // Braid: stack of small ovals.
+  const braid = (ax: number, ay: number, tx: number, ty: number, w: number) => {
+    const segs = 5;
+    const els: JSX.Element[] = [];
+    for (let i = 0; i <= segs; i++) {
+      const t = i / segs;
+      const x = ax + (tx - ax) * t;
+      const y = ay + (ty - ay) * t;
+      els.push(
+        <ellipse key={i} cx={x} cy={y} rx={w * 0.55} ry={w * 0.42} fill={i % 2 ? color : darken(color, 0.1)} />,
+      );
+    }
+    els.push(
+      <path key="tie" d={`M ${tx - w * 0.5},${ty + w * 0.5} q ${w * 0.5},${w * 0.6} ${w},0`}
+        stroke={dark} strokeWidth="1.2" fill="none" strokeLinecap="round" />,
+    );
+    return <g>{els}</g>;
+  };
 
-  let d: string;
+  const path = (d: string, fill = color) => <path d={d} fill={fill} />;
+
+  let backNode: React.ReactNode = null;
+  let frontNode: React.ReactNode = null;
 
   switch (style) {
     case "soft-bob":
     case "short":
-    case "bob":
-      d = `
-        M ${sideL - 5},${cy - 4}
-        C ${sideL - 11},${cy + 12} ${sideL - 1},${bottom + 10} ${cx - 15},${bottom + 12}
-        L ${cx + 15},${bottom + 12}
-        C ${sideR + 1},${bottom + 10} ${sideR + 11},${cy + 12} ${sideR + 5},${cy - 4}
-        C ${sideR + 3},${top - 8} ${sideL - 3},${top - 8} ${sideL - 5},${cy - 4} Z
-        ${faceOpening(top + 18, 6.2, bottom + 1.5)}`;
+    case "bob": {
+      // Short rounded bob: cap + small jaw-length side panels.
+      frontNode = (
+        <g>
+          {path(cap(browY, 5, 2))}
+          {path(sidePanel(sideL, -1, ry * 0.55, 0.5))}
+          {path(sidePanel(sideR, 1, ry * 0.55, 0.5))}
+        </g>
+      );
       break;
+    }
 
     case "long-bangs":
     case "long":
     case "straight-bangs":
     case "curtain-cut":
-    case "wavy":
-      d = `
-        M ${sideL - 4},${cy - 7}
-        C ${sideL - 12},${cy + 9} ${sideL - 7},${bottom + 34} ${cx - 13},${bottom + 43}
-        Q ${cx},${bottom + 48} ${cx + 13},${bottom + 43}
-        C ${sideR + 7},${bottom + 34} ${sideR + 12},${cy + 9} ${sideR + 4},${cy - 7}
-        C ${sideR + 2},${top - 8} ${sideL - 2},${top - 8} ${sideL - 4},${cy - 7} Z
-        ${faceOpening(top + 18, 5.8, bottom + 2)}`;
+    case "wavy": {
+      backNode = path(backFlow(ry * 1.6, rx * 0.55));
+      frontNode = (
+        <g>
+          {path(cap(browY - 1, 5, 3))}
+          {path(sidePanel(sideL, -1, ry * 1.05, 1))}
+          {path(sidePanel(sideR, 1, ry * 1.05, 1))}
+        </g>
+      );
       break;
+    }
 
     case "high-pony":
-    case "ponytail":
-      d = `
-        M ${sideL - 3},${cy + 7}
-        C ${sideL - 7},${top + 6} ${sideL + 8},${top - 8} ${cx},${top - 8}
-        C ${sideR - 5},${top - 8} ${sideR + 6},${top + 1} ${sideR + 5},${cy - 4}
-        C ${sideR + 21},${cy + 2} ${sideR + 23},${cy + 25} ${sideR + 9},${cy + 43}
-        C ${sideR - 2},${cy + 37} ${sideR + 1},${cy + 17} ${sideR + 1},${cy + 8}
-        C ${sideR - 7},${cy + 18} ${sideL + 7},${cy + 18} ${sideL - 3},${cy + 7} Z
-        ${faceOpening(top + 17, 6, bottom + 0.5)}`;
+    case "ponytail": {
+      // Pony anchored to the crown; tail curves down behind the shoulder.
+      const ax = cx + rx * 0.4;
+      const ay = top + 2;
+      backNode = tail(ax, ay, sideR + rx * 0.4, cy + ry * 1.4, rx * 0.32);
+      frontNode = (
+        <g>
+          {path(cap(browY, 4, 1.5))}
+          {/* small bump where the pony attaches */}
+          <ellipse cx={ax} cy={ay + 1} rx={rx * 0.18} ry={rx * 0.13} fill={dark} />
+        </g>
+      );
       break;
+    }
 
     case "low-pigtails":
-    case "pigtails":
-      d = `
-        M ${sideL - 3},${cy + 3}
-        C ${sideL - 17},${cy + 11} ${sideL - 15},${cy + 35} ${sideL - 1},${cy + 45}
-        C ${sideL + 8},${cy + 39} ${sideL + 8},${cy + 22} ${sideL + 3},${cy + 11}
-        C ${sideL - 8},${top + 7} ${sideL + 8},${top - 7} ${cx},${top - 7}
-        C ${sideR - 8},${top - 7} ${sideR + 8},${top + 7} ${sideR - 3},${cy + 11}
-        C ${sideR - 8},${cy + 22} ${sideR - 8},${cy + 39} ${sideR + 1},${cy + 45}
-        C ${sideR + 15},${cy + 35} ${sideR + 17},${cy + 11} ${sideR + 3},${cy + 3}
-        C ${sideR + 2},${cy + 16} ${sideL - 2},${cy + 16} ${sideL - 3},${cy + 3} Z
-        ${faceOpening(top + 18, 6.2, bottom + 0.5)}`;
+    case "pigtails": {
+      // Two tails anchored at the temples, hanging below the jaw.
+      const yAnchor = cy + ry * 0.35;
+      backNode = (
+        <g>
+          {tail(sideL + 2, yAnchor, sideL - rx * 0.15, cy + ry * 1.35, rx * 0.28)}
+          {tail(sideR - 2, yAnchor, sideR + rx * 0.15, cy + ry * 1.35, rx * 0.28)}
+        </g>
+      );
+      frontNode = (
+        <g>
+          {path(cap(browY, 4, 2))}
+          {path(sidePanel(sideL, -1, ry * 0.4, 0))}
+          {path(sidePanel(sideR, 1, ry * 0.4, 0))}
+        </g>
+      );
       break;
+    }
 
     case "space-buns":
-    case "double-bun":
+    case "double-bun": {
+      const bxL = cx - rx * 0.55;
+      const bxR = cx + rx * 0.55;
+      const by = top - rx * 0.05;
+      frontNode = (
+        <g>
+          {path(cap(browY, 3, 2))}
+          {bun(bxL, by, rx * 0.32)}
+          {bun(bxR, by, rx * 0.32)}
+        </g>
+      );
+      break;
+    }
+
     case "bun":
     case "side-bun":
-    case "topknot":
-      d = `
-        M ${cx - rx * 0.7},${top + 6}
-        C ${cx - rx * 1.05},${top + 2} ${cx - rx * 0.95},${top - 14} ${cx - rx * 0.55},${top - 14}
-        C ${cx - rx * 0.25},${top - 16} ${cx - rx * 0.18},${top - 4} ${cx - rx * 0.34},${top + 2}
-        C ${cx - 8},${top - 8} ${cx + 8},${top - 8} ${cx + rx * 0.34},${top + 2}
-        C ${cx + rx * 0.18},${top - 4} ${cx + rx * 0.25},${top - 16} ${cx + rx * 0.55},${top - 14}
-        C ${cx + rx * 0.95},${top - 14} ${cx + rx * 1.05},${top + 2} ${cx + rx * 0.7},${top + 6}
-        C ${sideR + 5},${cy + 4} ${sideR + 1},${cy + 16} ${cx},${cy + 18}
-        C ${sideL - 1},${cy + 16} ${sideL - 5},${cy + 4} ${cx - rx * 0.7},${top + 6} Z
-        ${faceOpening(top + 18, 6, bottom)}`;
+    case "topknot": {
+      const bx = style === "side-bun" ? cx + rx * 0.55 : cx;
+      const by = top - rx * 0.1;
+      frontNode = (
+        <g>
+          {path(cap(browY, 3, 2))}
+          {bun(bx, by, rx * 0.38)}
+        </g>
+      );
       break;
+    }
 
     case "fluffy-curls":
     case "curly":
-    case "afro":
-      d = `
-        M ${cx - rx - 10},${cy - 3}
-        C ${cx - rx - 13},${top + 8} ${cx - rx - 2},${top - 5} ${cx - rx * 0.72},${top - 4}
-        C ${cx - rx * 0.62},${top - 15} ${cx - rx * 0.22},${top - 14} ${cx - rx * 0.12},${top - 8}
-        C ${cx + rx * 0.04},${top - 17} ${cx + rx * 0.47},${top - 13} ${cx + rx * 0.52},${top - 5}
-        C ${cx + rx + 4},${top - 7} ${cx + rx + 13},${top + 8} ${cx + rx + 10},${cy - 2}
-        C ${cx + rx + 16},${cy + 14} ${cx + rx + 1},${cy + 25} ${cx + rx * 0.55},${cy + 20}
-        C ${cx + 9},${cy + 28} ${cx - 9},${cy + 28} ${cx - rx * 0.55},${cy + 20}
-        C ${cx - rx - 1},${cy + 25} ${cx - rx - 16},${cy + 14} ${cx - rx - 10},${cy - 3} Z
-        ${faceOpening(top + 22, 7, bottom - 0.5)}`;
+    case "afro": {
+      // Cloud silhouette built from many overlapping circles around the
+      // head; guarantees no gaps and no helmet edges.
+      const puffs: JSX.Element[] = [];
+      const ringR = rx + 5;
+      const count = 16;
+      for (let i = 0; i < count; i++) {
+        const a = Math.PI + (Math.PI * i) / (count - 1);
+        const px = cx + Math.cos(a) * ringR;
+        const py = cy - 2 + Math.sin(a) * (ringR * 0.95);
+        if (py > browY + 2) continue; // don't cover the face
+        puffs.push(<circle key={`o${i}`} cx={px} cy={py} r={5.5} fill={color} />);
+      }
+      // inner ring fills the crown
+      for (let i = 0; i < 10; i++) {
+        const a = Math.PI + (Math.PI * i) / 9;
+        const px = cx + Math.cos(a) * (rx * 0.65);
+        const py = cy - 6 + Math.sin(a) * (ry * 0.6);
+        puffs.push(<circle key={`i${i}`} cx={px} cy={py} r={5} fill={color} />);
+      }
+      frontNode = <g>{puffs}</g>;
       break;
+    }
 
     case "twin-braids":
-    case "braids":
-      d = `
-        M ${sideL - 4},${cy + 4}
-        C ${sideL - 8},${top + 7} ${sideL + 8},${top - 7} ${cx},${top - 7}
-        C ${sideR - 8},${top - 7} ${sideR + 8},${top + 7} ${sideR + 4},${cy + 4}
-        C ${sideR + 11},${cy + 17} ${sideR + 7},${cy + 42} ${sideR - 1},${cy + 50}
-        C ${sideR - 10},${cy + 42} ${sideR - 8},${cy + 19} ${sideR - 4},${cy + 9}
-        C ${sideR - 10},${cy + 18} ${sideL + 10},${cy + 18} ${sideL + 4},${cy + 9}
-        C ${sideL + 8},${cy + 19} ${sideL + 10},${cy + 42} ${sideL + 1},${cy + 50}
-        C ${sideL - 7},${cy + 42} ${sideL - 11},${cy + 17} ${sideL - 4},${cy + 4} Z
-        ${faceOpening(top + 18, 6.2, bottom + 0.5)}`;
+    case "braids": {
+      const yAnchor = cy + ry * 0.4;
+      backNode = (
+        <g>
+          {braid(sideL + 1, yAnchor, sideL - rx * 0.1, cy + ry * 1.5, rx * 0.22)}
+          {braid(sideR - 1, yAnchor, sideR + rx * 0.1, cy + ry * 1.5, rx * 0.22)}
+        </g>
+      );
+      frontNode = (
+        <g>
+          {path(cap(browY, 4, 2))}
+          {path(sidePanel(sideL, -1, ry * 0.45, 0))}
+          {path(sidePanel(sideR, 1, ry * 0.45, 0))}
+        </g>
+      );
       break;
+    }
 
-    case "side-sweep":
+    case "side-sweep": {
+      // Asymmetric swept fringe across the forehead.
+      const d = `
+        M ${sideL - 1},${browY}
+        C ${sideL - 2},${top + 4} ${cx - rx * 0.2},${top - 4} ${cx + rx * 0.2},${top - 4}
+        C ${sideR + 2},${top - 1} ${sideR + 3},${cy - ry * 0.1} ${sideR + 1},${browY + 2}
+        C ${cx + rx * 0.4},${browY - 1} ${cx - rx * 0.2},${browY + 4} ${sideL + rx * 0.2},${browY + 5}
+        Q ${sideL - 1},${browY + 4} ${sideL - 1},${browY} Z`;
+      frontNode = path(d);
+      break;
+    }
+
     case "fade":
     case "undercut":
-    case "mohawk":
-      d = `
-        M ${sideL - 1},${cy + 4}
-        C ${sideL - 4},${top + 7} ${sideL + 12},${top - 9} ${cx + 5},${top - 7}
-        C ${sideR - 1},${top - 5} ${sideR + 4},${cy + 3} ${sideR - 1},${cy + 9}
-        C ${cx + 7},${cy + 4} ${cx - 11},${cy + 8} ${sideL - 1},${cy + 4} Z`;
+    case "mohawk": {
+      // Tight crown cap only.
+      frontNode = path(cap(top + ry * 0.45, 3, 0));
       break;
+    }
 
     default:
-      d = `${roundedCap(cy + 8, 7)} ${faceOpening(top + 18, 6, bottom)}`;
+      frontNode = path(cap(browY, 4, 2));
       break;
   }
 
-  return { back: null, front: sticker(d) };
+  return { back: backNode, front: frontNode };
 }
 
 function bodyMetrics(shape: BodyShape) {
