@@ -13,6 +13,23 @@ export type Hairstyle =
   | "pigtails"
   | "bald";
 
+/** Extended hairstyle catalog. Older "Hairstyle" values are kept for back-compat. */
+export type HairStyleId =
+  | Hairstyle
+  | "afro"
+  | "side-bun"
+  | "double-bun"
+  | "braids"
+  | "fade"
+  | "mohawk"
+  | "bob"
+  | "wavy"
+  | "topknot"
+  | "undercut";
+
+export type FaceShape = "round" | "oval" | "square" | "heart" | "diamond";
+export type BodyShape = "slim" | "average" | "stocky";
+
 export type Dressup = {
   skin: string;
   hair: string;
@@ -22,6 +39,18 @@ export type Dressup = {
   bottom: string | null;
   shoes: string | null;
   accessory: string | null;
+  // ---- new optional fields (defaults below) ----
+  faceShape?: FaceShape;
+  bodyShape?: BodyShape;
+  nail?: string | null;          // nail polish color hex, or null
+  earrings?: string | null;      // item id
+  necklace?: string | null;
+  bracelet?: string | null;
+  hairClip?: string | null;
+  earPiercing?: string | null;
+  facePiercing?: string | null;
+  ears?: string | null;          // hearing aid / earpods / headphones
+  dress?: string | null;         // covers top+bottom for dresses
 };
 
 export const DEFAULT_DRESSUP: Dressup = {
@@ -33,6 +62,17 @@ export const DEFAULT_DRESSUP: Dressup = {
   bottom: null,
   shoes: null,
   accessory: null,
+  faceShape: "oval",
+  bodyShape: "average",
+  nail: null,
+  earrings: null,
+  necklace: null,
+  bracelet: null,
+  hairClip: null,
+  earPiercing: null,
+  facePiercing: null,
+  ears: null,
+  dress: null,
 };
 
 export type Character = {
@@ -169,7 +209,7 @@ export function useCharacter() {
   );
 
   const updateAppearance = useCallback(
-    async (patch: Partial<Pick<Dressup, "skin" | "hair" | "hairstyle">>) => {
+    async (patch: Partial<Dressup>) => {
       if (!character) return;
       const next: Dressup = { ...character.dressup, ...patch };
       setCharacter({ ...character, dressup: next });

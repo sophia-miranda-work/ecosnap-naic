@@ -1,4 +1,17 @@
-export type ShopSlot = "hat" | "top" | "bottom" | "shoes" | "accessory";
+export type ShopSlot =
+  | "hat"
+  | "top"
+  | "bottom"
+  | "shoes"
+  | "accessory"
+  | "dress"
+  | "earrings"
+  | "necklace"
+  | "bracelet"
+  | "hairClip"
+  | "earPiercing"
+  | "facePiercing"
+  | "ears";
 
 export type ShopItem = {
   id: string;
@@ -13,8 +26,15 @@ export type ShopItem = {
   color?: string;
   /** When set, the doll renders this emoji in the slot instead of a shape. */
   overlayEmoji?: string;
-  /** Themed-set tag: which quest-giver this belongs to (or "basic"). */
-  set: "basic" | "willow" | "professor-hoot" | "pip" | "mossback" | "clover";
+  /** Themed-set tag: which quest-giver this belongs to (or "basic"/"premium"). */
+  set:
+    | "basic"
+    | "willow"
+    | "professor-hoot"
+    | "pip"
+    | "mossback"
+    | "clover"
+    | "premium";
   description: string;
 };
 
@@ -80,6 +100,37 @@ export const SHOP_ITEMS: ShopItem[] = [
   { id: "clover-skirt",     name: "Meadow Skirt",    slot: "bottom",  price: 75,  emoji: "👗", color: "#9ac84a", set: "clover", description: "Twirly and grass-stained — the good kind." },
   { id: "clover-shoes",     name: "Hop-Along Shoes", slot: "shoes",   price: 65,  emoji: "👟", color: "#f0d8e8", set: "clover", description: "So bouncy you'll forget you have feet." },
   { id: "clover-charm",     name: "Four-Leaf Charm", slot: "accessory", price: 100, emoji: "🍀", overlayEmoji: "🍀", set: "clover", description: "Clover's lucky favourite. Don't lose it." },
+
+  // -- PREMIUM: jewelry -----------------------------------------------------
+  { id: "prem-earrings-gold",   name: "Gold Hoops",        slot: "earrings",  price: 180, emoji: "👂", overlayEmoji: "✨", color: "#e0b840", set: "premium", description: "Polished gold hoops that catch the light." },
+  { id: "prem-earrings-pearl",  name: "Pearl Studs",       slot: "earrings",  price: 150, emoji: "🤍", color: "#f0e6d8", set: "premium", description: "Tiny pearls. Quietly elegant." },
+  { id: "prem-earrings-stars",  name: "Star Drops",        slot: "earrings",  price: 200, emoji: "⭐", color: "#e8c850", set: "premium", description: "Little stars that swing when you walk." },
+  { id: "prem-necklace-heart",  name: "Heart Pendant",     slot: "necklace",  price: 220, emoji: "💗", color: "#e85a8a", set: "premium", description: "A delicate gold chain with a heart charm." },
+  { id: "prem-necklace-moon",   name: "Crescent Necklace", slot: "necklace",  price: 240, emoji: "🌙", color: "#d8d8e8", set: "premium", description: "Silver crescent on a fine chain." },
+  { id: "prem-bracelet-beads",  name: "Bead Bracelet",     slot: "bracelet",  price: 120, emoji: "📿", color: "#a04848", set: "premium", description: "Hand-strung wooden beads." },
+  { id: "prem-bracelet-charm",  name: "Charm Bracelet",    slot: "bracelet",  price: 200, emoji: "🔗", color: "#c0a040", set: "premium", description: "Tiny charms that jingle softly." },
+
+  // -- PREMIUM: hair accessories --------------------------------------------
+  { id: "prem-clip-bow",        name: "Velvet Bow",        slot: "hairClip",  price: 140, emoji: "🎀", color: "#c83a5a", set: "premium", description: "A deep red bow for tucking into hair." },
+  { id: "prem-clip-flower",     name: "Flower Clip",       slot: "hairClip",  price: 130, emoji: "🌸", color: "#f0a8c0", set: "premium", description: "A blossom clip — never wilts." },
+  { id: "prem-clip-pearl",      name: "Pearl Pin",         slot: "hairClip",  price: 160, emoji: "✨", color: "#f0e6d8", set: "premium", description: "Pearl-tipped hairpin." },
+
+  // -- PREMIUM: piercings ---------------------------------------------------
+  { id: "prem-ear-stud",        name: "Tiny Ear Stud",     slot: "earPiercing", price: 80, emoji: "💎", color: "#a8d8f0", set: "premium", description: "A single small stud, second hole." },
+  { id: "prem-ear-cuff",        name: "Silver Ear Cuff",   slot: "earPiercing", price: 140, emoji: "🪙", color: "#c0c0d0", set: "premium", description: "Wraps around the upper ear." },
+  { id: "prem-face-nose",       name: "Nose Stud",         slot: "facePiercing", price: 110, emoji: "💠", color: "#e0e0f0", set: "premium", description: "A delicate sparkle at the side of the nose." },
+  { id: "prem-face-lip",        name: "Lip Ring",          slot: "facePiercing", price: 130, emoji: "⚪", color: "#c0c0c0", set: "premium", description: "A small ring on the lower lip." },
+  { id: "prem-face-eyebrow",    name: "Brow Bar",          slot: "facePiercing", price: 130, emoji: "▫️", color: "#a0a0b0", set: "premium", description: "A small bar through the brow." },
+
+  // -- PREMIUM: ear extras (hearing aids / earpods / headphones) -----------
+  { id: "prem-ears-hearing",    name: "Hearing Aid",       slot: "ears",      price: 0,   emoji: "🦻", color: "#e8d8c8", set: "basic", description: "A subtle behind-the-ear hearing aid." },
+  { id: "prem-ears-pods",       name: "Wireless Earpods",  slot: "ears",      price: 200, emoji: "🎧", color: "#f0f0f0", set: "premium", description: "Tiny wireless buds." },
+  { id: "prem-ears-headphones", name: "Big Headphones",    slot: "ears",      price: 280, emoji: "🎧", color: "#3a3a4a", set: "premium", description: "Cozy over-ear cans." },
+
+  // -- PREMIUM: dresses (one-piece) -----------------------------------------
+  { id: "prem-dress-floral",    name: "Floral Sundress",   slot: "dress",     price: 220, emoji: "👗", color: "#e89ab8", set: "premium", description: "Pink with tiny embroidered daisies." },
+  { id: "prem-dress-night",     name: "Starlight Gown",    slot: "dress",     price: 320, emoji: "👗", color: "#3a3a78", set: "premium", description: "Deep navy with a sparkle of stars." },
+  { id: "prem-dress-meadow",    name: "Meadow Dress",      slot: "dress",     price: 200, emoji: "👗", color: "#7ab050", set: "premium", description: "Soft green, twirls beautifully." },
 ];
 
 export function getItemById(id: string | null | undefined): ShopItem | undefined {
