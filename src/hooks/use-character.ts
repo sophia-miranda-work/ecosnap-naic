@@ -209,7 +209,7 @@ export function useCharacter() {
   );
 
   const updateAppearance = useCallback(
-    async (patch: Partial<Pick<Dressup, "skin" | "hair" | "hairstyle">>) => {
+    async (patch: Partial<Dressup>) => {
       if (!character) return;
       const next: Dressup = { ...character.dressup, ...patch };
       setCharacter({ ...character, dressup: next });
