@@ -780,6 +780,7 @@ export function DressupAvatar({
   const bottomColor = dress?.color ?? bottom?.color ?? "#3a4f78";
   const shoesColor = shoes?.color ?? "#5b3a1f";
   const hair = hairLayers(dressup.hairstyle as HairStyleId, dressup.hair, rx, ry);
+  const hairImage = HAIR_IMAGES[dressup.hairstyle as HairStyleId] ?? null;
 
   const neckTop = HEAD_CY + ry - 2;
   const torsoTop = neckTop + 4;
@@ -797,7 +798,7 @@ export function DressupAvatar({
       aria-label="Your dress-up avatar"
     >
       <ellipse cx="50" cy="137" rx="28" ry="2.5" fill="currentColor" opacity="0.12" />
-      {hair.back}
+      {!hairImage && hair.back}
 
       {!dress && (
         <BottomShape
