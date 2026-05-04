@@ -8,23 +8,6 @@ import {
 } from "@/hooks/use-character";
 import { getItemById } from "@/lib/shop";
 
-import dressFloralPink from "@/assets/dresses/clean/floral-pink.png";
-import dressLavenderParty from "@/assets/dresses/clean/lavender-party.png";
-import dressPinaforePink from "@/assets/dresses/clean/pinafore-pink.png";
-import dressSailorBlue from "@/assets/dresses/clean/sailor-blue.png";
-import dressSweaterMint from "@/assets/dresses/clean/sweater-mint.png";
-import dressSundressBlack from "@/assets/dresses/clean/sundress-black.png";
-
-/** Dresses backed by painted PNGs. */
-const DRESS_IMAGES: Record<string, string> = {
-  "dress-floral-pink": dressFloralPink,
-  "dress-lavender-party": dressLavenderParty,
-  "dress-pinafore-pink": dressPinaforePink,
-  "dress-sailor-blue": dressSailorBlue,
-  "dress-sweater-mint": dressSweaterMint,
-  "dress-sundress-black": dressSundressBlack,
-};
-
 /**
  * Hair PNG overlays were causing visible solid-color blocks behind the face
  * and clipped/geometric edges. We now render hair purely through the
