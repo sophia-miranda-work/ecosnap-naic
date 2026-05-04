@@ -1,4 +1,17 @@
-export type ShopSlot = "hat" | "top" | "bottom" | "shoes" | "accessory";
+export type ShopSlot =
+  | "hat"
+  | "top"
+  | "bottom"
+  | "shoes"
+  | "accessory"
+  | "dress"
+  | "earrings"
+  | "necklace"
+  | "bracelet"
+  | "hairClip"
+  | "earPiercing"
+  | "facePiercing"
+  | "ears";
 
 export type ShopItem = {
   id: string;
@@ -13,8 +26,15 @@ export type ShopItem = {
   color?: string;
   /** When set, the doll renders this emoji in the slot instead of a shape. */
   overlayEmoji?: string;
-  /** Themed-set tag: which quest-giver this belongs to (or "basic"). */
-  set: "basic" | "willow" | "professor-hoot" | "pip" | "mossback" | "clover";
+  /** Themed-set tag: which quest-giver this belongs to (or "basic"/"premium"). */
+  set:
+    | "basic"
+    | "willow"
+    | "professor-hoot"
+    | "pip"
+    | "mossback"
+    | "clover"
+    | "premium";
   description: string;
 };
 
