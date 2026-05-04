@@ -6,6 +6,7 @@ import {
   type EyebrowStyle,
   type FacialHairStyle,
 } from "@/hooks/use-character";
+import type { ReactElement } from "react";
 import { getItemById } from "@/lib/shop";
 
 export const HEAD_CX = 50;
