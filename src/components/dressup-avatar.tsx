@@ -165,7 +165,7 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
   // Braid: stack of small ovals.
   const braid = (ax: number, ay: number, tx: number, ty: number, w: number) => {
     const segs = 5;
-    const els: JSX.Element[] = [];
+    const els: ReactElement[] = [];
     for (let i = 0; i <= segs; i++) {
       const t = i / segs;
       const x = ax + (tx - ax) * t;
@@ -287,7 +287,7 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
     case "afro": {
       // Cloud silhouette built from many overlapping circles around the
       // head; guarantees no gaps and no helmet edges.
-      const puffs: JSX.Element[] = [];
+      const puffs: ReactElement[] = [];
       const ringR = rx + 5;
       const count = 16;
       for (let i = 0; i < count; i++) {
