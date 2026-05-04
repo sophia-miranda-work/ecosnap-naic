@@ -611,23 +611,16 @@ export function DressupAvatar({
         </text>
       )}
 
-      {/* === FACE: big chibi eyes === */}
+      {/* === FACE: simple cute chibi eyes === */}
       {(() => {
-        const eyeY = HEAD_CY + 4;
-        const eyeOffset = rx * 0.4;
+        const eyeY = HEAD_CY + 5;
+        const eyeOffset = rx * 0.34;
         return (
           <>
-            {/* eye whites */}
-            <ellipse cx={HEAD_CX - eyeOffset} cy={eyeY} rx="3.4" ry="4.2" fill="#fff" stroke="#1a1410" strokeWidth="0.6" />
-            <ellipse cx={HEAD_CX + eyeOffset} cy={eyeY} rx="3.4" ry="4.2" fill="#fff" stroke="#1a1410" strokeWidth="0.6" />
-            {/* big dark pupils — very chibi */}
-            <ellipse cx={HEAD_CX - eyeOffset} cy={eyeY + 0.6} rx="2.2" ry="3" fill="#1a1410" />
-            <ellipse cx={HEAD_CX + eyeOffset} cy={eyeY + 0.6} rx="2.2" ry="3" fill="#1a1410" />
-            {/* highlights — two per eye */}
-            <circle cx={HEAD_CX - eyeOffset + 0.7} cy={eyeY - 0.8} r="0.9" fill="#fff" />
-            <circle cx={HEAD_CX + eyeOffset + 0.7} cy={eyeY - 0.8} r="0.9" fill="#fff" />
-            <circle cx={HEAD_CX - eyeOffset - 0.6} cy={eyeY + 1.6} r="0.4" fill="#fff" />
-            <circle cx={HEAD_CX + eyeOffset - 0.6} cy={eyeY + 1.6} r="0.4" fill="#fff" />
+            <circle cx={HEAD_CX - eyeOffset} cy={eyeY} r="2.2" fill="#2b1930" />
+            <circle cx={HEAD_CX + eyeOffset} cy={eyeY} r="2.2" fill="#2b1930" />
+            <circle cx={HEAD_CX - eyeOffset + 0.7} cy={eyeY - 0.7} r="0.55" fill="#fff" opacity="0.8" />
+            <circle cx={HEAD_CX + eyeOffset + 0.7} cy={eyeY - 0.7} r="0.55" fill="#fff" opacity="0.8" />
           </>
         );
       })()}
