@@ -6,6 +6,35 @@ import {
 } from "@/hooks/use-character";
 import { getItemById } from "@/lib/shop";
 
+import hairBob from "@/assets/hair/masked/bob.png";
+import hairLongBangs from "@/assets/hair/masked/long-bangs.png";
+import hairLowPigtails from "@/assets/hair/masked/low-pigtails.png";
+import hairSpaceBuns from "@/assets/hair/masked/space-buns.png";
+import hairTwinBraids from "@/assets/hair/masked/twin-braids.png";
+import hairAfro from "@/assets/hair/masked/afro.png";
+import hairCurtain from "@/assets/hair/masked/curtain.png";
+import hairTopknot from "@/assets/hair/masked/topknot.png";
+import hairSideSweep from "@/assets/hair/masked/side-sweep.png";
+import hairCurls from "@/assets/hair/masked/curls.png";
+import hairPixie from "@/assets/hair/masked/pixie.png";
+
+/** Hairstyles backed by painted PNGs (face masked out). */
+export const HAIR_IMAGES: Partial<Record<HairStyleId, string>> = {
+  "soft-bob": hairBob,
+  "long-bangs": hairLongBangs,
+  "low-pigtails": hairLowPigtails,
+  "space-buns": hairSpaceBuns,
+  "twin-braids": hairTwinBraids,
+  "fluffy-curls": hairCurls,
+  "side-sweep": hairSideSweep,
+  "curtain-cut": hairCurtain,
+  // Extra ids surfaced as new picker options
+  afro: hairAfro,
+  topknot: hairTopknot,
+  // Map a legacy id to pixie so older saves still render
+  fade: hairPixie,
+};
+
 export const HEAD_CX = 50;
 export const HEAD_CY = 42;
 const BASE_RX = 28;
