@@ -308,66 +308,113 @@ function DressShape({
   shoulderW: number;
   hipW: number;
 }) {
-  const sparkle = lighten(color, 0.35);
-  const trim = darken(color, 0.25);
-  if (id?.includes("princess") || id?.includes("starlight")) {
+  const accent = lighten(color, 0.34);
+  const pale = lighten(color, 0.58);
+  const trim = darken(color, 0.24);
+  const waistY = torsoTop + 13;
+  const hemY = legTop + 12;
+
+  const flowerPrint = (baseY = waistY + 4) => (
+    <g opacity="0.9">
+      {[-11, -3, 6, 13].map((dx, i) => (
+        <g key={dx} transform={`translate(${50 + dx} ${baseY + (i % 2) * 5}) scale(0.75)`}>
+          <circle cx="0" cy="-1.2" r="1" fill={pale} />
+          <circle cx="1.2" cy="0" r="1" fill={pale} />
+          <circle cx="0" cy="1.2" r="1" fill={pale} />
+          <circle cx="-1.2" cy="0" r="1" fill={pale} />
+          <circle cx="0" cy="0" r="0.55" fill={trim} />
+        </g>
+      ))}
+    </g>
+  );
+
+  if (id?.includes("sailor")) {
     return (
       <g>
-        <path
-          d={`M ${50 - shoulderW / 2},${torsoTop} Q 50,${torsoTop - 5} ${50 + shoulderW / 2},${torsoTop} L ${50 + hipW / 2 + 15},${legTop + 17} Q 50,${legTop + 23} ${50 - hipW / 2 - 15},${legTop + 17} Z`}
-          fill={color}
-        />
-        <path
-          d={`M ${50 - 7},${torsoTop + 3} L 50,${torsoTop + 14} L ${50 + 7},${torsoTop + 3}`}
-          fill={sparkle}
-          opacity="0.55"
-        />
-        <circle cx="43" cy={legTop + 13} r="1" fill={sparkle} opacity="0.75" />
-        <circle cx="57" cy={legTop + 10} r="0.9" fill={sparkle} opacity="0.7" />
+        <path d={`M ${50 - shoulderW / 2 - 1},${torsoTop + 1} Q 50,${torsoTop - 5} ${50 + shoulderW / 2 + 1},${torsoTop + 1} L ${50 + hipW / 2 + 4},${waistY + 2} L ${50 - hipW / 2 - 4},${waistY + 2} Z`} fill={color} />
+        <path d={`M ${50 - 12},${torsoTop + 2} L 50,${torsoTop + 12} L ${50 + 12},${torsoTop + 2} L ${50 + 8},${torsoTop + 13} L ${50 - 8},${torsoTop + 13} Z`} fill={pale} opacity="0.9" />
+        <path d={`M 50,${torsoTop + 8} l -3,5 h 6 Z`} fill={darken(color, 0.42)} />
+        <path d={`M ${50 - hipW / 2 - 8},${waistY + 1} L ${50 + hipW / 2 + 8},${waistY + 1} L ${50 + hipW / 2 + 11},${hemY} Q 50,${hemY + 5} ${50 - hipW / 2 - 11},${hemY} Z`} fill={lighten(color, 0.1)} />
+        <g stroke={trim} strokeWidth="0.55" opacity="0.72">
+          {[-3, -1.5, 0, 1.5, 3].map((k) => <line key={k} x1={50 + k * 3} y1={waistY + 3} x2={50 + k * 4.1} y2={hemY + 1} />)}
+        </g>
       </g>
     );
   }
-  if (id?.includes("tutu") || id?.includes("party")) {
+
+  if (id?.includes("sweater") || id?.includes("smock")) {
     return (
       <g>
-        <path
-          d={`M ${50 - shoulderW / 2},${torsoTop} Q 50,${torsoTop - 4} ${50 + shoulderW / 2},${torsoTop} L ${50 + hipW / 2 + 6},${legTop + 3} L ${50 - hipW / 2 - 6},${legTop + 3} Z`}
-          fill={color}
-        />
-        <path
-          d={`M ${50 - hipW / 2 - 13},${legTop + 3} Q 50,${legTop + 16} ${50 + hipW / 2 + 13},${legTop + 3} L ${50 + hipW / 2 + 9},${legTop + 12} Q 50,${legTop + 20} ${50 - hipW / 2 - 9},${legTop + 12} Z`}
-          fill={lighten(color, 0.25)}
-          opacity="0.82"
-        />
-        {/* tulle dots */}
-        {Array.from({ length: 8 }).map((_, i) => (
-          <circle key={i} cx={50 - 14 + i * 4} cy={legTop + 9 + (i % 2) * 3} r="0.55" fill={sparkle} opacity="0.8" />
-        ))}
+        <path d={`M ${50 - shoulderW / 2 - 4},${torsoTop + 2} Q 50,${torsoTop - 3} ${50 + shoulderW / 2 + 4},${torsoTop + 2} L ${50 + hipW / 2 + 6},${hemY - 2} Q 50,${hemY + 2} ${50 - hipW / 2 - 6},${hemY - 2} Z`} fill={color} />
+        <path d={`M ${50 - 7},${torsoTop + 1} Q 50,${torsoTop + 6} ${50 + 7},${torsoTop + 1} L ${50 + 5},${torsoTop + 7} Q 50,${torsoTop + 10} ${50 - 5},${torsoTop + 7} Z`} fill={pale} opacity="0.85" />
+        <g stroke={trim} strokeWidth="0.55" opacity="0.55">
+          {[-8, -4, 0, 4, 8].map((dx) => <path key={dx} d={`M ${50 + dx},${torsoTop + 10} q 1.2,4 0,8 q -1.2,4 0,8`} fill="none" />)}
+        </g>
+        <g fill={trim} opacity="0.75">
+          <circle cx="47" cy={torsoTop + 20} r="1.1" />
+          <circle cx="53" cy={torsoTop + 20} r="1.1" />
+          <path d={`M 46,${torsoTop + 24} Q 50,${torsoTop + 27} 54,${torsoTop + 24}`} fill="none" stroke={trim} strokeWidth="0.7" strokeLinecap="round" />
+        </g>
       </g>
     );
   }
-  // Default A-line dress with pattern variation by id.
-  const isPinafore = id?.includes("pinafore");
+
+  if (id?.includes("pinafore")) {
+    return (
+      <g>
+        <path d={`M ${50 - 10},${torsoTop + 1} L ${50 + 10},${torsoTop + 1} L ${50 + hipW / 2 + 9},${hemY} Q 50,${hemY + 3} ${50 - hipW / 2 - 9},${hemY} Z`} fill={color} />
+        <path d={`M ${50 - 15},${torsoTop + 5} Q 50,${torsoTop - 2} ${50 + 15},${torsoTop + 5} L ${50 + 10},${torsoTop + 10} Q 50,${torsoTop + 6} ${50 - 10},${torsoTop + 10} Z`} fill={pale} opacity="0.95" />
+        <rect x={50 - 8.5} y={torsoTop} width="3.2" height="17" rx="1.2" fill={pale} opacity="0.9" />
+        <rect x={50 + 5.3} y={torsoTop} width="3.2" height="17" rx="1.2" fill={pale} opacity="0.9" />
+        <rect x={50 - 5} y={waistY + 2} width="10" height="6" rx="1.2" fill={pale} stroke={trim} strokeWidth="0.45" opacity="0.95" />
+        <path d={`M ${50 - hipW / 2 - 5},${hemY - 2} Q 50,${hemY + 1} ${50 + hipW / 2 + 5},${hemY - 2}`} stroke={trim} strokeWidth="0.6" fill="none" />
+      </g>
+    );
+  }
+
+  if (id?.includes("tutu") || id?.includes("party") || id?.includes("lavender")) {
+    return (
+      <g>
+        <path d={`M ${50 - shoulderW / 2 - 2},${torsoTop + 1} Q 50,${torsoTop - 5} ${50 + shoulderW / 2 + 2},${torsoTop + 1} L ${50 + 9},${waistY + 2} L ${50 - 9},${waistY + 2} Z`} fill={color} />
+        <path d={`M ${50 - 7},${torsoTop + 2} Q 50,${torsoTop + 6} ${50 + 7},${torsoTop + 2} Q 50,${torsoTop + 13} ${50 - 7},${torsoTop + 2} Z`} fill={pale} opacity="0.8" />
+        <path d={`M ${50 - hipW / 2 - 14},${waistY + 2} Q 50,${waistY + 14} ${50 + hipW / 2 + 14},${waistY + 2} L ${50 + hipW / 2 + 10},${hemY + 1} Q 50,${hemY + 7} ${50 - hipW / 2 - 10},${hemY + 1} Z`} fill={lighten(color, 0.22)} opacity="0.88" />
+        <path d={`M ${50 - hipW / 2 - 11},${waistY + 7} Q 50,${waistY + 18} ${50 + hipW / 2 + 11},${waistY + 7} L ${50 + hipW / 2 + 8},${hemY + 4} Q 50,${hemY + 9} ${50 - hipW / 2 - 8},${hemY + 4} Z`} fill={pale} opacity="0.38" />
+        <path d={`M ${50 - 5},${waistY + 1} L ${50 + 5},${waistY + 1} M 50,${waistY + 1} l -4,4 M 50,${waistY + 1} l 4,4`} stroke={trim} strokeWidth="0.75" strokeLinecap="round" />
+      </g>
+    );
+  }
+
+  if (id?.includes("princess") || id?.includes("rose") || id?.includes("night") || id?.includes("starlight")) {
+    return (
+      <g>
+        <path d={`M ${50 - shoulderW / 2 - 1},${torsoTop} Q 50,${torsoTop - 6} ${50 + shoulderW / 2 + 1},${torsoTop} L ${50 + 8},${waistY + 3} L ${50 - 8},${waistY + 3} Z`} fill={color} />
+        <path d={`M ${50 - hipW / 2 - 17},${waistY + 2} C ${50 - 23},${hemY + 5} ${50 + 23},${hemY + 5} ${50 + hipW / 2 + 17},${waistY + 2} L ${50 + hipW / 2 + 20},${hemY + 12} Q 50,${hemY + 20} ${50 - hipW / 2 - 20},${hemY + 12} Z`} fill={color} />
+        <path d={`M ${50 - 7},${torsoTop + 3} L 50,${waistY + 4} L ${50 + 7},${torsoTop + 3}`} fill={pale} opacity="0.55" />
+        <g fill={pale} opacity="0.8">
+          <circle cx="41" cy={hemY + 6} r="1" />
+          <circle cx="58" cy={hemY + 2} r="0.9" />
+          <path d={`M 50,${hemY + 3} l 1,2 l 2,0.5 l -2,0.7 l -1,2 l -1,-2 l -2,-0.7 l 2,-0.5 Z`} />
+        </g>
+      </g>
+    );
+  }
+
+  if (id?.includes("sundress") || id?.includes("floral") || id?.includes("meadow")) {
+    return (
+      <g>
+        <path d={`M ${50 - 8},${torsoTop} L ${50 + 8},${torsoTop} L ${50 + hipW / 2 + 10},${hemY + 2} Q 50,${hemY + 7} ${50 - hipW / 2 - 10},${hemY + 2} Z`} fill={color} />
+        <path d={`M ${50 - 9},${torsoTop} C ${50 - 6},${torsoTop + 5} ${50 - 2},${torsoTop + 5} 50,${torsoTop + 1} C ${50 + 2},${torsoTop + 5} ${50 + 6},${torsoTop + 5} ${50 + 9},${torsoTop} L ${50 + 6},${waistY} L ${50 - 6},${waistY} Z`} fill={lighten(color, 0.12)} />
+        <path d={`M ${50 - 11},${torsoTop - 1} Q ${50 - 14},${torsoTop - 7} ${50 - 18},${torsoTop + 1} M ${50 + 11},${torsoTop - 1} Q ${50 + 14},${torsoTop - 7} ${50 + 18},${torsoTop + 1}`} stroke={trim} strokeWidth="1.4" fill="none" strokeLinecap="round" />
+        {flowerPrint()}
+      </g>
+    );
+  }
+
   return (
     <g>
-      <path
-        d={`M ${50 - shoulderW / 2},${torsoTop} Q ${50 - shoulderW / 2 - 3},${torsoTop + 11} ${50 - hipW / 2 - 8},${legTop + 8} L ${50 + hipW / 2 + 8},${legTop + 8} Q ${50 + shoulderW / 2 + 3},${torsoTop + 11} ${50 + shoulderW / 2},${torsoTop} Q 50,${torsoTop - 3} ${50 - shoulderW / 2},${torsoTop} Z`}
-        fill={color}
-      />
-      {isPinafore && (
-        <>
-          {/* apron straps + pocket */}
-          <rect x={50 - 8} y={torsoTop} width="3" height="10" fill={lighten(color, 0.4)} />
-          <rect x={50 + 5} y={torsoTop} width="3" height="10" fill={lighten(color, 0.4)} />
-          <rect x={50 - 4} y={torsoTop + 12} width="8" height="5" rx="0.5" fill={lighten(color, 0.35)} stroke={trim} strokeWidth="0.3" />
-        </>
-      )}
-      {/* hem trim */}
-      <path
-        d={`M ${50 - hipW / 2 - 8},${legTop + 8} L ${50 + hipW / 2 + 8},${legTop + 8}`}
-        stroke={trim}
-        strokeWidth="0.6"
-      />
+      <path d={`M ${50 - shoulderW / 2},${torsoTop} Q ${50 - shoulderW / 2 - 3},${torsoTop + 11} ${50 - hipW / 2 - 8},${hemY} L ${50 + hipW / 2 + 8},${hemY} Q ${50 + shoulderW / 2 + 3},${torsoTop + 11} ${50 + shoulderW / 2},${torsoTop} Q 50,${torsoTop - 3} ${50 - shoulderW / 2},${torsoTop} Z`} fill={color} />
+      <path d={`M ${50 - 7},${torsoTop + 2} Q 50,${torsoTop + 7} ${50 + 7},${torsoTop + 2}`} stroke={pale} strokeWidth="1.2" fill="none" />
+      {flowerPrint(waistY + 3)}
     </g>
   );
 }
@@ -387,96 +434,124 @@ function TopShape({
   shoulderW: number;
   torsoW: number;
 }) {
-  const accent = lighten(color, 0.35);
-  const dark = darken(color, 0.22);
-  const decorate = (() => {
-    if (id?.includes("flannel")) {
-      // plaid grid
-      return (
-        <g opacity="0.55" stroke={dark} strokeWidth="0.45">
-          {[0, 1, 2, 3].map((i) => (
-            <line key={`v${i}`} x1={50 - torsoW / 2 + 2 + i * 4} y1={torsoTop + 1} x2={50 - torsoW / 2 + 2 + i * 4} y2={torsoBottom - 1} />
-          ))}
-          {[0, 1, 2].map((i) => (
-            <line key={`h${i}`} x1={50 - torsoW / 2} y1={torsoTop + 4 + i * 4} x2={50 + torsoW / 2} y2={torsoTop + 4 + i * 4} />
-          ))}
+  const accent = lighten(color, 0.38);
+  const pale = lighten(color, 0.58);
+  const dark = darken(color, 0.24);
+
+  if (id?.includes("cloak")) {
+    return (
+      <g>
+        <path d={`M ${50 - shoulderW / 2 - 5},${torsoTop + 1} Q 50,${torsoTop - 8} ${50 + shoulderW / 2 + 5},${torsoTop + 1} L ${50 + torsoW / 2 + 9},${torsoBottom + 8} Q 50,${torsoBottom + 12} ${50 - torsoW / 2 - 9},${torsoBottom + 8} Z`} fill={color} />
+        <path d={`M 50,${torsoTop + 1} L ${50 - 7},${torsoBottom + 6} M 50,${torsoTop + 1} L ${50 + 7},${torsoBottom + 6}`} stroke={dark} strokeWidth="0.7" opacity="0.65" />
+        <circle cx="50" cy={torsoTop + 8} r="2" fill={accent} />
+      </g>
+    );
+  }
+
+  if (id?.includes("hoodie")) {
+    return (
+      <g>
+        <path d={`M ${50 - shoulderW / 2 - 3},${torsoTop + 3} Q 50,${torsoTop - 4} ${50 + shoulderW / 2 + 3},${torsoTop + 3} L ${50 + torsoW / 2 + 4},${torsoBottom + 2} Q 50,${torsoBottom + 5} ${50 - torsoW / 2 - 4},${torsoBottom + 2} Z`} fill={color} />
+        <path d={`M ${50 - 8},${torsoTop + 2} Q 50,${torsoTop + 10} ${50 + 8},${torsoTop + 2} Q 50,${torsoTop - 2} ${50 - 8},${torsoTop + 2} Z`} fill={dark} opacity="0.65" />
+        <rect x={50 - 5} y={torsoTop + 15} width="10" height="6" rx="1.5" fill={accent} opacity="0.85" />
+        <path d={`M ${50 - 3},${torsoTop + 10} q -4,3 -4,7 M ${50 + 3},${torsoTop + 10} q 4,3 4,7`} stroke={pale} strokeWidth="0.7" fill="none" strokeLinecap="round" />
+      </g>
+    );
+  }
+
+  if (id?.includes("poncho")) {
+    return (
+      <g>
+        <path d={`M 50,${torsoTop - 4} L ${50 + shoulderW / 2 + 8},${torsoBottom + 8} Q 50,${torsoBottom + 13} ${50 - shoulderW / 2 - 8},${torsoBottom + 8} Z`} fill={color} />
+        <path d={`M ${50 - 12},${torsoTop + 13} H ${50 + 12} M ${50 - 15},${torsoTop + 18} H ${50 + 15}`} stroke={accent} strokeWidth="1.1" opacity="0.8" />
+        <path d={`M ${50 - 4},${torsoTop + 1} Q 50,${torsoTop + 5} ${50 + 4},${torsoTop + 1}`} stroke={dark} strokeWidth="0.9" fill="none" />
+      </g>
+    );
+  }
+
+  if (id?.includes("cardigan") || id?.includes("jacket")) {
+    return (
+      <g>
+        <path d={`M ${50 - shoulderW / 2 - 1},${torsoTop} Q ${50 - shoulderW / 2 - 3},${torsoTop + 14} ${50 - torsoW / 2 - 1},${torsoBottom + 1} L 50,${torsoBottom - 1} L 50,${torsoTop + 4} Q ${50 - 6},${torsoTop + 2} ${50 - shoulderW / 2 - 1},${torsoTop} Z`} fill={color} />
+        <path d={`M ${50 + shoulderW / 2 + 1},${torsoTop} Q ${50 + shoulderW / 2 + 3},${torsoTop + 14} ${50 + torsoW / 2 + 1},${torsoBottom + 1} L 50,${torsoBottom - 1} L 50,${torsoTop + 4} Q ${50 + 6},${torsoTop + 2} ${50 + shoulderW / 2 + 1},${torsoTop} Z`} fill={color} />
+        <path d={`M ${50 - 5},${torsoTop + 2} L 50,${torsoTop + 8} L ${50 + 5},${torsoTop + 2}`} fill={accent} opacity="0.82" />
+        <line x1="50" y1={torsoTop + 4} x2="50" y2={torsoBottom} stroke={dark} strokeWidth="0.65" />
+        {[0, 1, 2].map((i) => <circle key={i} cx="48.3" cy={torsoTop + 10 + i * 5} r="0.65" fill={dark} />)}
+      </g>
+    );
+  }
+
+  if (id?.includes("raincoat")) {
+    return (
+      <g>
+        <path d={`M ${50 - shoulderW / 2 - 2},${torsoTop + 1} Q 50,${torsoTop - 4} ${50 + shoulderW / 2 + 2},${torsoTop + 1} L ${50 + torsoW / 2 + 3},${torsoBottom + 3} L ${50 - torsoW / 2 - 3},${torsoBottom + 3} Z`} fill={color} />
+        <path d={`M ${50 - 10},${torsoTop + 1} Q 50,${torsoTop + 10} ${50 + 10},${torsoTop + 1} Q 50,${torsoTop - 4} ${50 - 10},${torsoTop + 1} Z`} fill={accent} />
+        {[0, 1, 2].map((i) => <path key={i} d={`M ${50 - 4},${torsoTop + 10 + i * 5} h 8`} stroke={dark} strokeWidth="0.9" strokeLinecap="round" />)}
+      </g>
+    );
+  }
+
+  if (id?.includes("flannel")) {
+    return (
+      <g>
+        <path d={`M ${50 - shoulderW / 2},${torsoTop} Q ${50 - shoulderW / 2 - 2},${torsoTop + 12} ${50 - torsoW / 2},${torsoBottom} L ${50 + torsoW / 2},${torsoBottom} Q ${50 + shoulderW / 2 + 2},${torsoTop + 12} ${50 + shoulderW / 2},${torsoTop} Q 50,${torsoTop - 3} ${50 - shoulderW / 2},${torsoTop} Z`} fill={color} />
+        <path d={`M ${50 - 8},${torsoTop + 1} L 50,${torsoTop + 7} L ${50 + 8},${torsoTop + 1} L ${50 + 6},${torsoTop + 9} L ${50 - 6},${torsoTop + 9} Z`} fill={accent} opacity="0.85" />
+        <g stroke={dark} strokeWidth="0.55" opacity="0.55">
+          {[-8, -3, 2, 7].map((dx) => <line key={dx} x1={50 + dx} y1={torsoTop + 1} x2={50 + dx} y2={torsoBottom - 1} />)}
+          {[5, 10, 15].map((dy) => <line key={dy} x1={50 - torsoW / 2} y1={torsoTop + dy} x2={50 + torsoW / 2} y2={torsoTop + dy} />)}
         </g>
-      );
-    }
-    if (id?.includes("sweater") || id?.includes("knit")) {
-      // cable knit ribs
-      return (
-        <g stroke={dark} strokeWidth="0.5" opacity="0.6">
-          {[-4, 0, 4].map((dx) => (
-            <path key={dx} d={`M ${50 + dx},${torsoTop + 2} q 1,3 0,6 q -1,3 0,6`} fill="none" />
-          ))}
+      </g>
+    );
+  }
+
+  if (id?.includes("sweater") || id?.includes("knit")) {
+    return (
+      <g>
+        <path d={`M ${50 - shoulderW / 2 - 1},${torsoTop + 1} Q 50,${torsoTop - 4} ${50 + shoulderW / 2 + 1},${torsoTop + 1} L ${50 + torsoW / 2 + 2},${torsoBottom + 2} Q 50,${torsoBottom + 4} ${50 - torsoW / 2 - 2},${torsoBottom + 2} Z`} fill={color} />
+        <path d={`M ${50 - 8},${torsoTop + 2} Q 50,${torsoTop + 8} ${50 + 8},${torsoTop + 2}`} stroke={accent} strokeWidth="1.1" fill="none" />
+        <g stroke={dark} strokeWidth="0.55" opacity="0.55">
+          {[-6, -2, 2, 6].map((dx) => <path key={dx} d={`M ${50 + dx},${torsoTop + 8} q 1.1,3 0,6 q -1.1,3 0,6`} fill="none" />)}
         </g>
-      );
-    }
-    if (id?.includes("jacket")) {
-      // zipper + lapels
-      return (
-        <g>
-          <line x1="50" y1={torsoTop + 1} x2="50" y2={torsoBottom - 1} stroke={dark} strokeWidth="0.45" />
-          <path d={`M 50,${torsoTop + 1} L ${50 - 4},${torsoTop + 6} L 50,${torsoTop + 8}`} fill={accent} opacity="0.7" />
-          <path d={`M 50,${torsoTop + 1} L ${50 + 4},${torsoTop + 6} L 50,${torsoTop + 8}`} fill={accent} opacity="0.7" />
-        </g>
-      );
-    }
-    if (id?.includes("raincoat")) {
-      // toggles
-      return (
-        <g fill={dark}>
-          <circle cx="50" cy={torsoTop + 6} r="0.7" />
-          <circle cx="50" cy={torsoTop + 12} r="0.7" />
-          <circle cx="50" cy={torsoTop + 18} r="0.7" />
-        </g>
-      );
-    }
-    if (id?.includes("tank")) {
-      return null;
-    }
-    if (id?.includes("longsleeve")) {
-      return <line x1="50" y1={torsoTop + 2} x2="50" y2={torsoBottom - 2} stroke={accent} strokeWidth="0.4" opacity="0.7" />;
-    }
-    if (id?.includes("crop")) {
-      // ribbed band
-      return (
-        <g stroke={accent} strokeWidth="0.4" opacity="0.8">
-          <line x1={50 - torsoW / 2} y1={torsoTop + 11} x2={50 + torsoW / 2} y2={torsoTop + 11} />
-          <line x1={50 - torsoW / 2} y1={torsoTop + 12.5} x2={50 + torsoW / 2} y2={torsoTop + 12.5} />
-        </g>
-      );
-    }
-    return null;
-  })();
+      </g>
+    );
+  }
+
+  if (id?.includes("tank")) {
+    return (
+      <g>
+        <path d={`M ${50 - 7},${torsoTop} L ${50 + 7},${torsoTop} L ${50 + torsoW / 2},${torsoBottom} L ${50 - torsoW / 2},${torsoBottom} Z`} fill={color} />
+        <path d={`M ${50 - 7},${torsoTop} Q ${50 - 10},${torsoTop - 4} ${50 - 13},${torsoTop + 1} M ${50 + 7},${torsoTop} Q ${50 + 10},${torsoTop - 4} ${50 + 13},${torsoTop + 1}`} stroke={dark} strokeWidth="1.2" fill="none" strokeLinecap="round" />
+        <path d={`M ${50 - 5},${torsoTop + 8} H ${50 + 5}`} stroke={accent} strokeWidth="1" />
+      </g>
+    );
+  }
 
   if (id?.includes("crop")) {
     return (
       <g>
-        <path
-          d={`M ${50 - shoulderW / 2},${torsoTop} Q 50,${torsoTop - 3} ${50 + shoulderW / 2},${torsoTop} L ${50 + torsoW / 2},${torsoTop + 13} L ${50 - torsoW / 2},${torsoTop + 13} Z`}
-          fill={color}
-        />
-        {decorate}
+        <path d={`M ${50 - shoulderW / 2},${torsoTop} Q 50,${torsoTop - 3} ${50 + shoulderW / 2},${torsoTop} L ${50 + torsoW / 2 + 1},${torsoTop + 13} L ${50 - torsoW / 2 - 1},${torsoTop + 13} Z`} fill={color} />
+        <path d={`M ${50 - torsoW / 2 - 1},${torsoTop + 10.5} H ${50 + torsoW / 2 + 1} M ${50 - torsoW / 2 - 1},${torsoTop + 12.3} H ${50 + torsoW / 2 + 1}`} stroke={accent} strokeWidth="0.55" />
+        <circle cx="50" cy={torsoTop + 6} r="2.3" fill={pale} opacity="0.8" />
       </g>
     );
   }
-  if (id?.includes("tank")) {
+
+  if (id?.includes("longsleeve")) {
     return (
-      <path
-        d={`M ${50 - 8},${torsoTop} L ${50 + 8},${torsoTop} L ${50 + torsoW / 2},${torsoBottom} L ${50 - torsoW / 2},${torsoBottom} Z`}
-        fill={color}
-      />
+      <g>
+        <path d={`M ${50 - shoulderW / 2},${torsoTop} Q ${50 - shoulderW / 2 - 1},${torsoTop + 12} ${50 - torsoW / 2},${torsoBottom} L ${50 + torsoW / 2},${torsoBottom} Q ${50 + shoulderW / 2 + 1},${torsoTop + 12} ${50 + shoulderW / 2},${torsoTop} Q 50,${torsoTop - 3} ${50 - shoulderW / 2},${torsoTop} Z`} fill={color} />
+        <g stroke={accent} strokeWidth="0.8" opacity="0.85">
+          {[torsoTop + 5, torsoTop + 10, torsoTop + 15].map((y) => <line key={y} x1={50 - torsoW / 2} y1={y} x2={50 + torsoW / 2} y2={y} />)}
+        </g>
+      </g>
     );
   }
+
   return (
     <g>
-      <path
-        d={`M ${50 - shoulderW / 2},${torsoTop} Q ${50 - shoulderW / 2 - 1},${torsoTop + 12} ${50 - torsoW / 2},${torsoBottom} L ${50 + torsoW / 2},${torsoBottom} Q ${50 + shoulderW / 2 + 1},${torsoTop + 12} ${50 + shoulderW / 2},${torsoTop} Q 50,${torsoTop - 3} ${50 - shoulderW / 2},${torsoTop} Z`}
-        fill={color}
-      />
-      {decorate}
+      <path d={`M ${50 - shoulderW / 2},${torsoTop} Q ${50 - shoulderW / 2 - 1},${torsoTop + 12} ${50 - torsoW / 2},${torsoBottom} L ${50 + torsoW / 2},${torsoBottom} Q ${50 + shoulderW / 2 + 1},${torsoTop + 12} ${50 + shoulderW / 2},${torsoTop} Q 50,${torsoTop - 3} ${50 - shoulderW / 2},${torsoTop} Z`} fill={color} />
+      <path d={`M ${50 - 6},${torsoTop + 2} Q 50,${torsoTop + 7} ${50 + 6},${torsoTop + 2}`} stroke={accent} strokeWidth="1" fill="none" />
+      <path d={`M ${50 - 4},${torsoTop + 12} h 8`} stroke={pale} strokeWidth="1" strokeLinecap="round" />
     </g>
   );
 }
@@ -494,62 +569,81 @@ function BottomShape({
   torsoBottom: number;
   hipW: number;
 }) {
-  const accent = lighten(color, 0.3);
-  const dark = darken(color, 0.2);
+  const accent = lighten(color, 0.36);
+  const dark = darken(color, 0.24);
   if (id?.includes("skirt")) {
-    const isPleated = id?.includes("pleat");
-    const isDenim = id?.includes("denim");
+    const denim = id?.includes("denim");
     return (
       <g>
-        <path
-          d={`M ${50 - hipW / 2 - 3},${torsoBottom - 1} L ${50 + hipW / 2 + 3},${torsoBottom - 1} L ${50 + hipW / 2 + 7},${legTop + 10} Q 50,${legTop + 14} ${50 - hipW / 2 - 7},${legTop + 10} Z`}
-          fill={color}
-        />
-        {isPleated && (
-          <g stroke={dark} strokeWidth="0.4" opacity="0.7">
-            {[-2, -1, 0, 1, 2].map((k) => (
-              <line key={k} x1={50 + k * 3} y1={torsoBottom} x2={50 + k * 3.6} y2={legTop + 11} />
-            ))}
-          </g>
-        )}
-        {isDenim && (
+        <path d={`M ${50 - hipW / 2 - 4},${torsoBottom - 2} L ${50 + hipW / 2 + 4},${torsoBottom - 2} L ${50 + hipW / 2 + (denim ? 5 : 9)},${legTop + (denim ? 9 : 12)} Q 50,${legTop + (denim ? 12 : 16)} ${50 - hipW / 2 - (denim ? 5 : 9)},${legTop + (denim ? 9 : 12)} Z`} fill={color} />
+        {denim ? (
           <>
-            <line x1={50 - hipW / 2 - 3} y1={torsoBottom + 1.5} x2={50 + hipW / 2 + 3} y2={torsoBottom + 1.5} stroke={accent} strokeWidth="0.45" strokeDasharray="0.8 0.8" />
-            <rect x={50 - 1} y={torsoBottom} width="2" height="2" fill={accent} opacity="0.9" />
+            <path d={`M ${50 - hipW / 2 - 3},${torsoBottom + 1.5} H ${50 + hipW / 2 + 3}`} stroke={accent} strokeWidth="0.55" strokeDasharray="0.9 0.9" />
+            <rect x={50 - 1.5} y={torsoBottom - 1} width="3" height="2.5" rx="0.4" fill={accent} opacity="0.9" />
+            <path d={`M ${50 - 8},${torsoBottom + 2} q 3,3 6,0 M ${50 + 2},${torsoBottom + 2} q 3,3 6,0`} stroke={dark} strokeWidth="0.45" fill="none" />
           </>
+        ) : (
+          <g stroke={dark} strokeWidth="0.45" opacity="0.7">
+            {[-2, -1, 0, 1, 2].map((k) => <line key={k} x1={50 + k * 3} y1={torsoBottom - 1} x2={50 + k * 4.2} y2={legTop + 12} />)}
+          </g>
         )}
       </g>
     );
   }
+
   if (id?.includes("short")) {
     return (
-      <path
-        d={`M ${50 - hipW / 2},${torsoBottom - 1} L ${50 + hipW / 2},${torsoBottom - 1} L ${50 + hipW / 2},${legTop + 7} L ${51},${legTop + 7} L 50,${legTop + 3} L 49,${legTop + 7} L ${50 - hipW / 2},${legTop + 7} Z`}
-        fill={color}
-      />
+      <g>
+        <path d={`M ${50 - hipW / 2 - 1},${torsoBottom - 1} L ${50 + hipW / 2 + 1},${torsoBottom - 1} L ${50 + hipW / 2 + 1},${legTop + 8} L ${52},${legTop + 8} L 50,${legTop + 4} L 48,${legTop + 8} L ${50 - hipW / 2 - 1},${legTop + 8} Z`} fill={color} />
+        <path d={`M 50,${legTop + 3} V ${legTop + 8}`} stroke={dark} strokeWidth="0.55" />
+        <path d={`M ${50 - hipW / 2 + 2},${torsoBottom + 2} q 3,2 6,0 M ${50 + hipW / 2 - 2},${torsoBottom + 2} q -3,2 -6,0`} stroke={accent} strokeWidth="0.45" fill="none" />
+      </g>
     );
   }
-  // Pants/leggings/overalls — add seams to differentiate.
+
   if (id?.includes("overalls")) {
     return (
       <g>
-        <rect x={50 - 6} y={torsoBottom - 6} width="12" height="6" fill={color} />
-        <rect x={50 - 6} y={torsoBottom - 12} width="2.5" height="7" fill={color} />
-        <rect x={50 + 3.5} y={torsoBottom - 12} width="2.5" height="7" fill={color} />
-        <circle cx={50 - 4} cy={torsoBottom - 4.5} r="0.6" fill={accent} />
-        <circle cx={50 + 4} cy={torsoBottom - 4.5} r="0.6" fill={accent} />
+        <path d={`M ${50 - hipW / 2 + 1},${legTop} h ${hipW - 2} v ${legTop - torsoBottom + 13} h -${hipW - 2} Z`} fill={color} />
+        <rect x={50 - 7} y={torsoBottom - 8} width="14" height="8" rx="1" fill={color} />
+        <rect x={50 - 8} y={torsoBottom - 15} width="3" height="9" rx="1" fill={color} />
+        <rect x={50 + 5} y={torsoBottom - 15} width="3" height="9" rx="1" fill={color} />
+        <rect x={50 - 4} y={torsoBottom - 5.5} width="8" height="4" rx="0.8" fill={accent} opacity="0.75" />
+        <circle cx={50 - 5.3} cy={torsoBottom - 6.2} r="0.7" fill={dark} />
+        <circle cx={50 + 5.3} cy={torsoBottom - 6.2} r="0.7" fill={dark} />
       </g>
     );
   }
+
   if (id?.includes("cargo")) {
     return (
       <g>
-        <rect x={50 - 8} y={torsoBottom + 2} width="3" height="3" fill={dark} opacity="0.7" />
-        <rect x={50 + 5} y={torsoBottom + 2} width="3" height="3" fill={dark} opacity="0.7" />
+        <path d={`M ${50 - hipW / 2 + 1},${legTop} h ${hipW - 2} v 13 h -${hipW - 2} Z`} fill={color} />
+        <rect x={50 - 11} y={legTop + 4} width="6" height="5" rx="1" fill={dark} opacity="0.55" />
+        <rect x={50 + 5} y={legTop + 4} width="6" height="5" rx="1" fill={dark} opacity="0.55" />
+        <path d={`M 50,${legTop + 1} V ${legTop + 13}`} stroke={dark} strokeWidth="0.55" />
+        <path d={`M ${50 - hipW / 2 + 3},${torsoBottom + 1.5} H ${50 + hipW / 2 - 3}`} stroke={accent} strokeWidth="0.55" />
       </g>
     );
   }
-  return null;
+
+  if (id?.includes("legging")) {
+    return (
+      <g>
+        <path d={`M ${50 - hipW / 2 + 2},${legTop} h ${hipW - 4} v 13 h -${hipW - 4} Z`} fill={color} />
+        <path d={`M 50,${legTop + 1} V ${legTop + 13}`} stroke={accent} strokeWidth="0.45" opacity="0.75" />
+        <path d={`M ${50 - hipW / 2 + 4},${legTop + 3} H ${50 + hipW / 2 - 4}`} stroke={dark} strokeWidth="0.5" opacity="0.55" />
+      </g>
+    );
+  }
+
+  return (
+    <g>
+      <path d={`M ${50 - hipW / 2 + 1},${legTop} h ${hipW - 2} v 13 h -${hipW - 2} Z`} fill={color} />
+      <path d={`M 50,${legTop + 1} V ${legTop + 13}`} stroke={dark} strokeWidth="0.55" opacity="0.7" />
+      <path d={`M ${50 - hipW / 2 + 3},${legTop + 3} h 6 M ${50 + hipW / 2 - 9},${legTop + 3} h 6`} stroke={accent} strokeWidth="0.55" strokeLinecap="round" />
+    </g>
+  );
 }
 
 function EarExtra({
