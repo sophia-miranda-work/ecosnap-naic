@@ -6,6 +6,35 @@ import {
 } from "@/hooks/use-character";
 import { getItemById } from "@/lib/shop";
 
+import hairBob from "@/assets/hair/masked/bob.png";
+import hairLongBangs from "@/assets/hair/masked/long-bangs.png";
+import hairLowPigtails from "@/assets/hair/masked/low-pigtails.png";
+import hairSpaceBuns from "@/assets/hair/masked/space-buns.png";
+import hairTwinBraids from "@/assets/hair/masked/twin-braids.png";
+import hairAfro from "@/assets/hair/masked/afro.png";
+import hairCurtain from "@/assets/hair/masked/curtain.png";
+import hairTopknot from "@/assets/hair/masked/topknot.png";
+import hairSideSweep from "@/assets/hair/masked/side-sweep.png";
+import hairCurls from "@/assets/hair/masked/curls.png";
+import hairPixie from "@/assets/hair/masked/pixie.png";
+
+/** Hairstyles backed by painted PNGs (face masked out). */
+export const HAIR_IMAGES: Partial<Record<HairStyleId, string>> = {
+  "soft-bob": hairBob,
+  "long-bangs": hairLongBangs,
+  "low-pigtails": hairLowPigtails,
+  "space-buns": hairSpaceBuns,
+  "twin-braids": hairTwinBraids,
+  "fluffy-curls": hairCurls,
+  "side-sweep": hairSideSweep,
+  "curtain-cut": hairCurtain,
+  // Extra ids surfaced as new picker options
+  afro: hairAfro,
+  topknot: hairTopknot,
+  // Map a legacy id to pixie so older saves still render
+  fade: hairPixie,
+};
+
 export const HEAD_CX = 50;
 export const HEAD_CY = 42;
 const BASE_RX = 28;
@@ -751,6 +780,7 @@ export function DressupAvatar({
   const bottomColor = dress?.color ?? bottom?.color ?? "#3a4f78";
   const shoesColor = shoes?.color ?? "#5b3a1f";
   const hair = hairLayers(dressup.hairstyle as HairStyleId, dressup.hair, rx, ry);
+  const hairImage = HAIR_IMAGES[dressup.hairstyle as HairStyleId] ?? null;
 
   const neckTop = HEAD_CY + ry - 2;
   const torsoTop = neckTop + 4;
@@ -768,7 +798,7 @@ export function DressupAvatar({
       aria-label="Your dress-up avatar"
     >
       <ellipse cx="50" cy="137" rx="28" ry="2.5" fill="currentColor" opacity="0.12" />
-      {hair.back}
+      {!hairImage && hair.back}
 
       {!dress && (
         <BottomShape
@@ -985,7 +1015,18 @@ export function DressupAvatar({
         </>
       )}
 
-      {hair.front}
+      {hairImage ? (
+        <image
+          href={hairImage}
+          x={HEAD_CX - rx - 6}
+          y={HEAD_CY - ry - 10}
+          width={rx * 2 + 12}
+          height={ry * 2 + 18}
+          preserveAspectRatio="xMidYMid meet"
+        />
+      ) : (
+        hair.front
+      )}
       {hairClip && (
         <HairClipShape
           id={hairClip.id}

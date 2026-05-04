@@ -74,14 +74,15 @@ const BODY_SHAPES: { id: BodyShape; label: string }[] = [
 const FREE_HAIRSTYLES: { id: HairStyleId; label: string }[] = [
   { id: "soft-bob", label: "Soft bob" },
   { id: "long-bangs", label: "Long bangs" },
-  { id: "straight-bangs", label: "Straight bangs" },
   { id: "curtain-cut", label: "Curtain cut" },
-  { id: "high-pony", label: "High pony" },
   { id: "low-pigtails", label: "Low pigtails" },
   { id: "space-buns", label: "Space buns" },
   { id: "fluffy-curls", label: "Fluffy curls" },
   { id: "twin-braids", label: "Twin braids" },
   { id: "side-sweep", label: "Side sweep" },
+  { id: "afro", label: "Afro" },
+  { id: "topknot", label: "Topknot bun" },
+  { id: "fade", label: "Pixie cut" },
   { id: "bald", label: "No hair" },
 ];
 
