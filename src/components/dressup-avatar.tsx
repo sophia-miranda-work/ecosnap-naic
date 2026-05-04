@@ -106,13 +106,15 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
   );
 
   const sideBang = (flip = false) => {
-    const dir = flip ? -1 : 1;
+    const partX = flip ? sideR - 8 : sideL + 8;
+    const sweepX = flip ? sideL + 9 : sideR - 9;
+    const tipX = flip ? cx - 5 : cx + 5;
     return (
       <path
-        d={`M ${sideL + 2},${top + 13}
-            C ${sideL + 8},${top + 3} ${sideR - 6},${top + 3} ${sideR - 2},${top + 15}
-            C ${cx + dir * 16},${top + 18} ${cx + dir * 7},${cy + 13} ${cx - dir * 5},${cy + 21}
-            C ${cx - dir * 15},${cy + 14} ${sideL + 5},${cy + 11} ${sideL + 2},${top + 13} Z`}
+        d={`M ${sideL + 3},${top + 12}
+            C ${sideL + 10},${top + 4} ${sideR - 10},${top + 4} ${sideR - 3},${top + 12}
+            C ${sweepX},${top + 17} ${tipX},${cy + 3} ${tipX},${cy + 10}
+            C ${cx + (flip ? 7 : -7)},${cy + 4} ${partX},${top + 14} ${sideL + 3},${top + 12} Z`}
         fill={color}
       />
     );
