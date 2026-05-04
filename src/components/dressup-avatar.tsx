@@ -184,17 +184,16 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
     />
   );
 
+  // Single continuous fringe — no centre gap that exposes the scalp.
   const curtainBangs = () => (
-    <g>
-      <path
-        d={`M ${cx - 1},${top + 8} C ${sideL + 8},${top + 9} ${sideL + 7},${cy + 5} ${cx - 7},${cy + 15} C ${cx - 6},${cy + 3} ${cx - 4},${top + 13} ${cx - 1},${top + 8} Z`}
-        fill={color}
-      />
-      <path
-        d={`M ${cx + 1},${top + 8} C ${sideR - 8},${top + 9} ${sideR - 7},${cy + 5} ${cx + 7},${cy + 15} C ${cx + 6},${cy + 3} ${cx + 4},${top + 13} ${cx + 1},${top + 8} Z`}
-        fill={color}
-      />
-    </g>
+    <path
+      d={`M ${sideL + 4},${top + 9}
+        C ${sideL + 10},${top + 4} ${sideR - 10},${top + 4} ${sideR - 4},${top + 9}
+        C ${sideR - 6},${cy + 6} ${cx + 8},${cy + 14} ${cx + 4},${cy + 16}
+        C ${cx + 1},${cy + 9} ${cx - 1},${cy + 9} ${cx - 4},${cy + 16}
+        C ${cx - 8},${cy + 14} ${sideL + 6},${cy + 6} ${sideL + 4},${top + 9} Z`}
+      fill={color}
+    />
   );
 
   const shine = (x = cx - 11, y = top + 7) => (
