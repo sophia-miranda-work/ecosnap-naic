@@ -6,6 +6,8 @@ import {
   type FaceShape,
   type BodyShape,
   type HairStyleId,
+  type EyebrowStyle,
+  type FacialHairStyle,
   DEFAULT_DRESSUP,
 } from "@/hooks/use-character";
 import { SHOP_ITEMS, type ShopSlot, type ShopItem } from "@/lib/shop";
@@ -87,6 +89,23 @@ const FREE_HAIRSTYLES: { id: HairStyleId; label: string }[] = [
 ];
 
 const PREMIUM_HAIRSTYLES: { id: HairStyleId; label: string; price: number }[] = [];
+
+const EYEBROW_STYLES: { id: EyebrowStyle; label: string }[] = [
+  { id: "none", label: "None" },
+  { id: "soft-arch", label: "Soft arch" },
+  { id: "straight", label: "Straight" },
+  { id: "thick", label: "Thick" },
+  { id: "thin", label: "Thin" },
+  { id: "raised", label: "Raised" },
+];
+
+const FACIAL_HAIR_STYLES: { id: FacialHairStyle; label: string }[] = [
+  { id: "none", label: "Clean" },
+  { id: "stubble", label: "Stubble" },
+  { id: "mustache", label: "Mustache" },
+  { id: "goatee", label: "Goatee" },
+  { id: "full-beard", label: "Full beard" },
+];
 
 function premiumHairItemId(style: HairStyleId): string {
   return `hair-${style}`;
