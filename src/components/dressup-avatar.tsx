@@ -803,7 +803,6 @@ export function DressupAvatar({
   const bottomColor = dress?.color ?? bottom?.color ?? "#3a4f78";
   const shoesColor = shoes?.color ?? "#5b3a1f";
   const hair = hairLayers(dressup.hairstyle as HairStyleId, dressup.hair, rx, ry);
-  const hairImage = HAIR_IMAGES[dressup.hairstyle as HairStyleId] ?? null;
 
   const neckTop = HEAD_CY + ry - 2;
   const torsoTop = neckTop + 4;
@@ -821,7 +820,7 @@ export function DressupAvatar({
       aria-label="Your dress-up avatar"
     >
       <ellipse cx="50" cy="137" rx="28" ry="2.5" fill="currentColor" opacity="0.12" />
-      {!hairImage && hair.back}
+      {hair.back}
 
       {!dress && (
         <BottomShape
@@ -879,32 +878,14 @@ export function DressupAvatar({
       )}
 
       {dress ? (
-        DRESS_IMAGES[dress.id] ? (() => {
-          // Fit dress PNG between shoulders and just below leg-top.
-          const targetW = Math.max(shoulderW, hipW) + 18;
-          const targetH = (legTop + 12) - (torsoTop - 2);
-          const x = 50 - targetW / 2;
-          const y = torsoTop - 2;
-          return (
-            <image
-              href={DRESS_IMAGES[dress.id]}
-              x={x}
-              y={y}
-              width={targetW}
-              height={targetH}
-              preserveAspectRatio="xMidYMid meet"
-            />
-          );
-        })() : (
-          <DressShape
-            id={dress.id}
-            color={topColor}
-            torsoTop={torsoTop}
-            legTop={legTop}
-            shoulderW={shoulderW}
-            hipW={hipW}
-          />
-        )
+        <DressShape
+          id={dress.id}
+          color={topColor}
+          torsoTop={torsoTop}
+          legTop={legTop}
+          shoulderW={shoulderW}
+          hipW={hipW}
+        />
       ) : (
         <TopShape
           id={top?.id}
