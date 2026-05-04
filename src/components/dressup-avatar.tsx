@@ -154,8 +154,7 @@ function darken(hex: string, amount = 0.25): string {
 
 export function hairLayers(style: HairStyleId, color: string, rx: number, ry: number) {
   if (style === "bald") return { back: null, front: null };
-  const hi = lighten(color, 0.35);
-  const sh = darken(color, 0.2);
+
   const cx = HEAD_CX;
   const cy = HEAD_CY;
   const top = cy - ry;
@@ -163,314 +162,140 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
   const sideL = cx - rx;
   const sideR = cx + rx;
 
-  const scalpCap = (drop = cy + 3, lift = 6) => (
-    <path
-      d={`M ${sideL - 3},${drop}
-        C ${sideL - 5},${top + 8} ${sideL + 8},${top - lift} ${cx},${top - lift}
-        C ${sideR - 8},${top - lift} ${sideR + 5},${top + 8} ${sideR + 3},${drop}
-        C ${sideR - 4},${top + 18} ${sideL + 4},${top + 18} ${sideL - 3},${drop} Z`}
-      fill={color}
-    />
+  const sticker = (d: string) => (
+    <path d={d} fill={color} fillRule="evenodd" clipRule="evenodd" />
   );
 
-  const softBangs = (part = 0) => (
-    <path
-      d={`M ${sideL + 2},${top + 12}
-        C ${sideL + 11},${top + 4} ${sideR - 10},${top + 4} ${sideR - 2},${top + 12}
-        C ${sideR - 8},${cy - 1} ${cx + 12 + part},${cy + 5} ${cx + 5 + part},${cy + 12}
-        C ${cx + 1},${cy + 4} ${cx - 5},${cy + 4} ${cx - 10},${cy + 12}
-        C ${cx - 16 + part},${cy + 4} ${sideL + 8},${cy - 1} ${sideL + 2},${top + 12} Z`}
-      fill={color}
-    />
-  );
+  const faceOpening = (hairline = top + 17, inset = 5.5, jaw = bottom + 0.5) => `
+    M ${sideL + inset},${hairline}
+    C ${sideL + inset + 2},${cy + 8} ${sideL + rx * 0.48},${jaw} ${cx},${jaw}
+    C ${sideR - rx * 0.48},${jaw} ${sideR - inset - 2},${cy + 8} ${sideR - inset},${hairline}
+    C ${sideR - 11},${hairline - 4} ${sideL + 11},${hairline - 4} ${sideL + inset},${hairline} Z`;
 
-  // Single continuous fringe — no centre gap that exposes the scalp.
-  const curtainBangs = () => (
-    <path
-      d={`M ${sideL + 4},${top + 9}
-        C ${sideL + 10},${top + 4} ${sideR - 10},${top + 4} ${sideR - 4},${top + 9}
-        C ${sideR - 6},${cy + 6} ${cx + 8},${cy + 14} ${cx + 4},${cy + 16}
-        C ${cx + 1},${cy + 9} ${cx - 1},${cy + 9} ${cx - 4},${cy + 16}
-        C ${cx - 8},${cy + 14} ${sideL + 6},${cy + 6} ${sideL + 4},${top + 9} Z`}
-      fill={color}
-    />
-  );
+  const roundedCap = (drop = cy + 8, lift = 7) => `
+    M ${sideL - 3},${drop}
+    C ${sideL - 7},${top + 7} ${sideL + 8},${top - lift} ${cx},${top - lift}
+    C ${sideR - 8},${top - lift} ${sideR + 7},${top + 7} ${sideR + 3},${drop}
+    C ${sideR - 4},${drop + 11} ${sideL + 4},${drop + 11} ${sideL - 3},${drop} Z`;
 
-  const shine = (x = cx - 11, y = top + 7) => (
-    <path
-      d={`M ${x},${y} C ${x + 8},${y - 4} ${x + 18},${y - 2} ${x + 26},${y + 3}`}
-      stroke={hi}
-      strokeWidth="1.15"
-      strokeLinecap="round"
-      fill="none"
-      opacity="0.45"
-    />
-  );
-
-  const longCurtainBack = (length = 34, flare = 8) => (
-    <path
-      d={`M ${sideL + 1},${cy - 6}
-        C ${sideL - flare},${cy + 10} ${sideL - 4},${bottom + length - 5} ${cx - 10},${bottom + length}
-        L ${cx + 10},${bottom + length}
-        C ${sideR + 4},${bottom + length - 5} ${sideR + flare},${cy + 10} ${sideR - 1},${cy - 6}
-        C ${sideR - 5},${top - 2} ${sideL + 5},${top - 2} ${sideL + 1},${cy - 6} Z`}
-      fill={color}
-    />
-  );
-
-  const curlRow = (startX: number, y: number, count: number, r: number) => (
-    <g>
-      {Array.from({ length: count }, (_, i) => (
-        <circle key={i} cx={startX + i * r * 1.45} cy={y + (i % 2) * 1.4} r={r} fill={color} />
-      ))}
-    </g>
-  );
+  let d: string;
 
   switch (style) {
     case "soft-bob":
     case "short":
     case "bob":
-      return {
-        back: (
-          <path
-            d={`M ${sideL - 2},${cy - 2} C ${sideL - 8},${cy + 17} ${sideL + 4},${bottom + 9} ${cx - 13},${bottom + 10} L ${cx + 13},${bottom + 10} C ${sideR - 4},${bottom + 9} ${sideR + 8},${cy + 17} ${sideR + 2},${cy - 2} Z`}
-            fill={color}
-          />
-        ),
-        front: (
-          <g>
-            {scalpCap(cy + 6, 6)}
-            {softBangs()}
-            <path
-              d={`M ${sideL + 5},${cy + 4} C ${sideL + 2},${cy + 18} ${sideL + 8},${bottom + 6} ${sideL + 16},${bottom + 7}`}
-              stroke={color}
-              strokeWidth="6"
-              strokeLinecap="round"
-              fill="none"
-            />
-            <path
-              d={`M ${sideR - 5},${cy + 4} C ${sideR - 2},${cy + 18} ${sideR - 8},${bottom + 6} ${sideR - 16},${bottom + 7}`}
-              stroke={color}
-              strokeWidth="6"
-              strokeLinecap="round"
-              fill="none"
-            />
-            {shine()}
-          </g>
-        ),
-      };
+      d = `
+        M ${sideL - 5},${cy - 4}
+        C ${sideL - 11},${cy + 12} ${sideL - 1},${bottom + 10} ${cx - 15},${bottom + 12}
+        L ${cx + 15},${bottom + 12}
+        C ${sideR + 1},${bottom + 10} ${sideR + 11},${cy + 12} ${sideR + 5},${cy - 4}
+        C ${sideR + 3},${top - 8} ${sideL - 3},${top - 8} ${sideL - 5},${cy - 4} Z
+        ${faceOpening(top + 18, 6.2, bottom + 1.5)}`;
+      break;
+
     case "long-bangs":
     case "long":
-      return {
-        back: longCurtainBack(38, 9),
-        front: (
-          <g>
-            {scalpCap(cy + 7, 5)}
-            {curtainBangs()}
-            <path
-              d={`M ${sideL + 2},${cy + 2} C ${sideL + 1},${cy + 18} ${sideL + 4},${bottom + 22} ${sideL + 10},${bottom + 34}`}
-              stroke={color}
-              strokeWidth="7"
-              strokeLinecap="round"
-              fill="none"
-            />
-            <path
-              d={`M ${sideR - 2},${cy + 2} C ${sideR - 1},${cy + 18} ${sideR - 4},${bottom + 22} ${sideR - 10},${bottom + 34}`}
-              stroke={color}
-              strokeWidth="7"
-              strokeLinecap="round"
-              fill="none"
-            />
-            {shine(cx - 7, top + 7)}
-          </g>
-        ),
-      };
     case "straight-bangs":
-      return {
-        back: longCurtainBack(29, 4),
-        front: (
-          <g>
-            {scalpCap(cy + 7, 5)}
-            <path
-              d={`M ${sideL + 3},${top + 13} C ${sideL + 11},${top + 5} ${sideR - 11},${top + 5} ${sideR - 3},${top + 13} L ${sideR - 4},${cy + 10} C ${cx + 12},${cy + 8} ${cx - 12},${cy + 8} ${sideL + 4},${cy + 10} Z`}
-              fill={color}
-            />
-            {shine(cx - 12, top + 8)}
-          </g>
-        ),
-      };
     case "curtain-cut":
     case "wavy":
-      return {
-        back: longCurtainBack(24, 10),
-        front: (
-          <g>
-            {scalpCap(cy + 6, 5)}
-            {curtainBangs()}
-            <path
-              d={`M ${sideL + 2},${cy + 1} C ${sideL - 5},${cy + 13} ${sideL + 9},${cy + 20} ${sideL + 5},${cy + 35}`}
-              stroke={color}
-              strokeWidth="7"
-              strokeLinecap="round"
-              fill="none"
-            />
-            <path
-              d={`M ${sideR - 2},${cy + 1} C ${sideR + 5},${cy + 13} ${sideR - 9},${cy + 20} ${sideR - 5},${cy + 35}`}
-              stroke={color}
-              strokeWidth="7"
-              strokeLinecap="round"
-              fill="none"
-            />
-            {shine(cx - 4, top + 8)}
-          </g>
-        ),
-      };
+      d = `
+        M ${sideL - 4},${cy - 7}
+        C ${sideL - 12},${cy + 9} ${sideL - 7},${bottom + 34} ${cx - 13},${bottom + 43}
+        Q ${cx},${bottom + 48} ${cx + 13},${bottom + 43}
+        C ${sideR + 7},${bottom + 34} ${sideR + 12},${cy + 9} ${sideR + 4},${cy - 7}
+        C ${sideR + 2},${top - 8} ${sideL - 2},${top - 8} ${sideL - 4},${cy - 7} Z
+        ${faceOpening(top + 18, 5.8, bottom + 2)}`;
+      break;
+
     case "high-pony":
     case "ponytail":
-      return {
-        back: (
-          <g>
-            <ellipse cx={sideR + 1} cy={cy - 2} rx="7" ry="8" fill={color} />
-            <path
-              d={`M ${sideR + 1},${cy - 3} C ${sideR + 21},${cy + 2} ${sideR + 20},${cy + 25} ${sideR + 8},${cy + 42} C ${sideR - 2},${cy + 37} ${sideR + 1},${cy + 13} ${sideR + 1},${cy - 3} Z`}
-              fill={color}
-            />
-          </g>
-        ),
-        front: (
-          <g>
-            {scalpCap(cy + 5, 6)}
-            {curtainBangs()}
-            <ellipse cx={sideR} cy={cy - 2} rx="3.2" ry="2.3" fill={sh} />
-          </g>
-        ),
-      };
+      d = `
+        M ${sideL - 3},${cy + 7}
+        C ${sideL - 7},${top + 6} ${sideL + 8},${top - 8} ${cx},${top - 8}
+        C ${sideR - 5},${top - 8} ${sideR + 6},${top + 1} ${sideR + 5},${cy - 4}
+        C ${sideR + 21},${cy + 2} ${sideR + 23},${cy + 25} ${sideR + 9},${cy + 43}
+        C ${sideR - 2},${cy + 37} ${sideR + 1},${cy + 17} ${sideR + 1},${cy + 8}
+        C ${sideR - 7},${cy + 18} ${sideL + 7},${cy + 18} ${sideL - 3},${cy + 7} Z
+        ${faceOpening(top + 17, 6, bottom + 0.5)}`;
+      break;
+
     case "low-pigtails":
     case "pigtails":
-      return {
-        back: (
-          <g>
-            <path
-              d={`M ${sideL + 3},${cy + 3} C ${sideL - 15},${cy + 11} ${sideL - 13},${cy + 34} ${sideL - 1},${cy + 43} C ${sideL + 8},${cy + 36} ${sideL + 8},${cy + 17} ${sideL + 3},${cy + 3} Z`}
-              fill={color}
-            />
-            <path
-              d={`M ${sideR - 3},${cy + 3} C ${sideR + 15},${cy + 11} ${sideR + 13},${cy + 34} ${sideR + 1},${cy + 43} C ${sideR - 8},${cy + 36} ${sideR - 8},${cy + 17} ${sideR - 3},${cy + 3} Z`}
-              fill={color}
-            />
-          </g>
-        ),
-        front: (
-          <g>
-            {scalpCap(cy + 6, 5)}
-            {softBangs()}
-            <ellipse cx={sideL + 2} cy={cy + 2} rx="3" ry="2.2" fill={sh} />
-            <ellipse cx={sideR - 2} cy={cy + 2} rx="3" ry="2.2" fill={sh} />
-          </g>
-        ),
-      };
+      d = `
+        M ${sideL - 3},${cy + 3}
+        C ${sideL - 17},${cy + 11} ${sideL - 15},${cy + 35} ${sideL - 1},${cy + 45}
+        C ${sideL + 8},${cy + 39} ${sideL + 8},${cy + 22} ${sideL + 3},${cy + 11}
+        C ${sideL - 8},${top + 7} ${sideL + 8},${top - 7} ${cx},${top - 7}
+        C ${sideR - 8},${top - 7} ${sideR + 8},${top + 7} ${sideR - 3},${cy + 11}
+        C ${sideR - 8},${cy + 22} ${sideR - 8},${cy + 39} ${sideR + 1},${cy + 45}
+        C ${sideR + 15},${cy + 35} ${sideR + 17},${cy + 11} ${sideR + 3},${cy + 3}
+        C ${sideR + 2},${cy + 16} ${sideL - 2},${cy + 16} ${sideL - 3},${cy + 3} Z
+        ${faceOpening(top + 18, 6.2, bottom + 0.5)}`;
+      break;
+
     case "space-buns":
     case "double-bun":
     case "bun":
     case "side-bun":
     case "topknot":
-      return {
-        back: (
-          <g>
-            <ellipse cx={cx - rx * 0.58} cy={top + 1} rx="10" ry="9" fill={color} />
-            <ellipse cx={cx + rx * 0.58} cy={top + 1} rx="10" ry="9" fill={color} />
-          </g>
-        ),
-        front: (
-          <g>
-            {scalpCap(cy + 5, 5)}
-            {softBangs()}
-            <ellipse cx={cx - rx * 0.58} cy={top + 1} rx="10" ry="9" fill={color} />
-            <ellipse cx={cx + rx * 0.58} cy={top + 1} rx="10" ry="9" fill={color} />
-            <path
-              d={`M ${cx - rx * 0.58 - 4},${top + 1} C ${cx - rx * 0.58},${top - 3} ${cx - rx * 0.58 + 5},${top - 2} ${cx - rx * 0.58 + 6},${top + 2}`}
-              stroke={hi}
-              strokeWidth="1"
-              fill="none"
-              opacity="0.45"
-            />
-          </g>
-        ),
-      };
+      d = `
+        M ${cx - rx * 0.7},${top + 6}
+        C ${cx - rx * 1.05},${top + 2} ${cx - rx * 0.95},${top - 14} ${cx - rx * 0.55},${top - 14}
+        C ${cx - rx * 0.25},${top - 16} ${cx - rx * 0.18},${top - 4} ${cx - rx * 0.34},${top + 2}
+        C ${cx - 8},${top - 8} ${cx + 8},${top - 8} ${cx + rx * 0.34},${top + 2}
+        C ${cx + rx * 0.18},${top - 4} ${cx + rx * 0.25},${top - 16} ${cx + rx * 0.55},${top - 14}
+        C ${cx + rx * 0.95},${top - 14} ${cx + rx * 1.05},${top + 2} ${cx + rx * 0.7},${top + 6}
+        C ${sideR + 5},${cy + 4} ${sideR + 1},${cy + 16} ${cx},${cy + 18}
+        C ${sideL - 1},${cy + 16} ${sideL - 5},${cy + 4} ${cx - rx * 0.7},${top + 6} Z
+        ${faceOpening(top + 18, 6, bottom)}`;
+      break;
+
     case "fluffy-curls":
     case "curly":
     case "afro":
-      return {
-        back: <ellipse cx={cx} cy={cy - 4} rx={rx + 9} ry={ry + 4} fill={color} />,
-        front: (
-          <g>
-            <ellipse cx={cx} cy={cy - 4} rx={rx + 6} ry={ry - 1} fill={color} />
-            {curlRow(cx - 30, top + 7, 7, 5.4)}
-            {curlRow(cx - 24, top + 1, 5, 5.8)}
-            <circle cx={cx - 8} cy={top + 2} r="2.7" fill={hi} opacity="0.5" />
-          </g>
-        ),
-      };
+      d = `
+        M ${cx - rx - 10},${cy - 3}
+        C ${cx - rx - 13},${top + 8} ${cx - rx - 2},${top - 5} ${cx - rx * 0.72},${top - 4}
+        C ${cx - rx * 0.62},${top - 15} ${cx - rx * 0.22},${top - 14} ${cx - rx * 0.12},${top - 8}
+        C ${cx + rx * 0.04},${top - 17} ${cx + rx * 0.47},${top - 13} ${cx + rx * 0.52},${top - 5}
+        C ${cx + rx + 4},${top - 7} ${cx + rx + 13},${top + 8} ${cx + rx + 10},${cy - 2}
+        C ${cx + rx + 16},${cy + 14} ${cx + rx + 1},${cy + 25} ${cx + rx * 0.55},${cy + 20}
+        C ${cx + 9},${cy + 28} ${cx - 9},${cy + 28} ${cx - rx * 0.55},${cy + 20}
+        C ${cx - rx - 1},${cy + 25} ${cx - rx - 16},${cy + 14} ${cx - rx - 10},${cy - 3} Z
+        ${faceOpening(top + 22, 7, bottom - 0.5)}`;
+      break;
+
     case "twin-braids":
     case "braids":
-      return {
-        back: (
-          <g>
-            {[0, 1, 2, 3].map((k) => (
-              <g key={k}>
-                <ellipse
-                  cx={sideL + 4 + (k % 2 ? -1.5 : 1.5)}
-                  cy={cy + 9 + k * 9}
-                  rx="4.2"
-                  ry="3.4"
-                  fill={k % 2 ? sh : color}
-                />
-                <ellipse
-                  cx={sideR - 4 + (k % 2 ? 1.5 : -1.5)}
-                  cy={cy + 9 + k * 9}
-                  rx="4.2"
-                  ry="3.4"
-                  fill={k % 2 ? sh : color}
-                />
-              </g>
-            ))}
-          </g>
-        ),
-        front: (
-          <g>
-            {scalpCap(cy + 6, 5)}
-            {softBangs()}
-          </g>
-        ),
-      };
+      d = `
+        M ${sideL - 4},${cy + 4}
+        C ${sideL - 8},${top + 7} ${sideL + 8},${top - 7} ${cx},${top - 7}
+        C ${sideR - 8},${top - 7} ${sideR + 8},${top + 7} ${sideR + 4},${cy + 4}
+        C ${sideR + 11},${cy + 17} ${sideR + 7},${cy + 42} ${sideR - 1},${cy + 50}
+        C ${sideR - 10},${cy + 42} ${sideR - 8},${cy + 19} ${sideR - 4},${cy + 9}
+        C ${sideR - 10},${cy + 18} ${sideL + 10},${cy + 18} ${sideL + 4},${cy + 9}
+        C ${sideL + 8},${cy + 19} ${sideL + 10},${cy + 42} ${sideL + 1},${cy + 50}
+        C ${sideL - 7},${cy + 42} ${sideL - 11},${cy + 17} ${sideL - 4},${cy + 4} Z
+        ${faceOpening(top + 18, 6.2, bottom + 0.5)}`;
+      break;
+
     case "side-sweep":
     case "fade":
     case "undercut":
     case "mohawk":
-      return {
-        back: null,
-        front: (
-          <g>
-            {scalpCap(cy + 2, 6)}
-            <path
-              d={`M ${sideL + 2},${top + 13} C ${cx - 7},${top - 1} ${sideR - 5},${top + 4} ${sideR - 2},${cy + 7} C ${cx + 5},${cy + 3} ${cx - 11},${cy + 8} ${sideL + 2},${top + 13} Z`}
-              fill={color}
-            />
-            {shine(cx - 2, top + 6)}
-          </g>
-        ),
-      };
+      d = `
+        M ${sideL - 1},${cy + 4}
+        C ${sideL - 4},${top + 7} ${sideL + 12},${top - 9} ${cx + 5},${top - 7}
+        C ${sideR - 1},${top - 5} ${sideR + 4},${cy + 3} ${sideR - 1},${cy + 9}
+        C ${cx + 7},${cy + 4} ${cx - 11},${cy + 8} ${sideL - 1},${cy + 4} Z`;
+      break;
+
     default:
-      return {
-        back: null,
-        front: (
-          <g>
-            {scalpCap(cy + 5, 5)}
-            {softBangs()}
-          </g>
-        ),
-      };
+      d = `${roundedCap(cy + 8, 7)} ${faceOpening(top + 18, 6, bottom)}`;
+      break;
   }
+
+  return { back: null, front: sticker(d) };
 }
 
 function bodyMetrics(shape: BodyShape) {
