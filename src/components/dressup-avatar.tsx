@@ -910,14 +910,32 @@ export function DressupAvatar({
       )}
 
       {dress ? (
-        <DressShape
-          id={dress.id}
-          color={topColor}
-          torsoTop={torsoTop}
-          legTop={legTop}
-          shoulderW={shoulderW}
-          hipW={hipW}
-        />
+        DRESS_IMAGES[dress.id] ? (() => {
+          // Fit dress PNG between shoulders and just below leg-top.
+          const targetW = Math.max(shoulderW, hipW) + 18;
+          const targetH = (legTop + 12) - (torsoTop - 2);
+          const x = 50 - targetW / 2;
+          const y = torsoTop - 2;
+          return (
+            <image
+              href={DRESS_IMAGES[dress.id]}
+              x={x}
+              y={y}
+              width={targetW}
+              height={targetH}
+              preserveAspectRatio="xMidYMid meet"
+            />
+          );
+        })() : (
+          <DressShape
+            id={dress.id}
+            color={topColor}
+            torsoTop={torsoTop}
+            legTop={legTop}
+            shoulderW={shoulderW}
+            hipW={hipW}
+          />
+        )
       ) : (
         <TopShape
           id={top?.id}
