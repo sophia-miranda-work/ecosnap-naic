@@ -8,53 +8,10 @@ import {
 } from "@/hooks/use-character";
 import { getItemById } from "@/lib/shop";
 
-/**
- * Hair PNG overlays were causing visible solid-color blocks behind the face
- * and clipped/geometric edges. We now render hair purely through the
- * shape-fitted SVG `hairLayers` below — keep this map empty so the SVG
- * path is taken in the renderer.
- */
-export const HAIR_IMAGES: Partial<Record<HairStyleId, string>> = {};
-
 export const HEAD_CX = 50;
 export const HEAD_CY = 42;
 const BASE_RX = 28;
 const BASE_RY = 29;
-
-/**
- * Per-PNG calibration metrics. Each value is normalized (0-1) within the
- * 512x512 source PNG and describes WHERE the underlying head sits inside the
- * artwork, so we can anchor the hair onto our SVG head regardless of the
- * transparent padding around each hairstyle.
- *
- * - faceCx / faceCy: where the wearer's face center should land
- * - faceRx / faceRy: half-width / half-height of the face the artwork was drawn around
- */
-type HairMetric = {
-  faceCx: number;
-  faceCy: number;
-  faceRx: number;
-  faceRy: number;
-};
-const DEFAULT_HAIR_METRIC: HairMetric = {
-  faceCx: 0.5,
-  faceCy: 0.52,
-  faceRx: 0.30,
-  faceRy: 0.32,
-};
-const HAIR_METRICS: Partial<Record<HairStyleId, HairMetric>> = {
-  "soft-bob":     { faceCx: 0.50, faceCy: 0.54, faceRx: 0.30, faceRy: 0.32 },
-  "long-bangs":   { faceCx: 0.51, faceCy: 0.55, faceRx: 0.27, faceRy: 0.30 },
-  "low-pigtails": { faceCx: 0.50, faceCy: 0.55, faceRx: 0.28, faceRy: 0.30 },
-  "space-buns":   { faceCx: 0.50, faceCy: 0.58, faceRx: 0.28, faceRy: 0.30 },
-  "twin-braids":  { faceCx: 0.50, faceCy: 0.55, faceRx: 0.26, faceRy: 0.30 },
-  "fluffy-curls": { faceCx: 0.51, faceCy: 0.55, faceRx: 0.28, faceRy: 0.30 },
-  "side-sweep":   { faceCx: 0.51, faceCy: 0.56, faceRx: 0.28, faceRy: 0.30 },
-  "curtain-cut":  { faceCx: 0.50, faceCy: 0.55, faceRx: 0.28, faceRy: 0.31 },
-  afro:           { faceCx: 0.50, faceCy: 0.58, faceRx: 0.28, faceRy: 0.30 },
-  topknot:        { faceCx: 0.52, faceCy: 0.60, faceRx: 0.27, faceRy: 0.30 },
-  fade:           { faceCx: 0.51, faceCy: 0.55, faceRx: 0.28, faceRy: 0.30 },
-};
 
 function clamp(n: number, min: number, max: number) {
   return Math.min(max, Math.max(min, n));
