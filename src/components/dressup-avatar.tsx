@@ -1015,7 +1015,18 @@ export function DressupAvatar({
         </>
       )}
 
-      {hair.front}
+      {hairImage ? (
+        <image
+          href={hairImage}
+          x={HEAD_CX - rx - 6}
+          y={HEAD_CY - ry - 10}
+          width={rx * 2 + 12}
+          height={ry * 2 + 18}
+          preserveAspectRatio="xMidYMid meet"
+        />
+      ) : (
+        hair.front
+      )}
       {hairClip && (
         <HairClipShape
           id={hairClip.id}
