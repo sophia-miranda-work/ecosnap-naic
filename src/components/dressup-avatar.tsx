@@ -20,14 +20,14 @@ const HEAD_R = 18;
  *
  *   - SIDE_LEFT / SIDE_RIGHT: just inside the head edge at ear height,
  *     where pigtails sprout.
- *   - BACK_RIGHT: high on the back-right of the head, where a ponytail
+ *   - PONYTAIL_BASE: on the right side edge of the head, where a ponytail
  *     gathers before trailing down.
  *   - CROWN: the very top of the head, used by hats / center parts.
  */
 const ANCHORS = {
   sideLeft: { x: HEAD_CX - HEAD_R * 0.85, y: HEAD_CY - HEAD_R * 0.1 }, // (~34.7, ~38.2)
   sideRight: { x: HEAD_CX + HEAD_R * 0.85, y: HEAD_CY - HEAD_R * 0.1 }, // (~65.3, ~38.2)
-  backRight: { x: HEAD_CX + HEAD_R * 0.55, y: HEAD_CY - HEAD_R * 0.35 }, // (~59.9, ~33.7)
+  ponytailBase: { x: HEAD_CX + HEAD_R * 0.9, y: HEAD_CY + HEAD_R * 0.02 }, // (~66.2, ~40.4)
   crown: { x: HEAD_CX, y: HEAD_CY - HEAD_R }, // (50, 22)
 } as const;
 
@@ -131,26 +131,25 @@ function HairLayer({ style, color }: { style: Hairstyle; color: string }) {
     case "ponytail":
       return (
         <g>
-          {/* Ponytail anchored at ANCHORS.backRight: the base is drawn AT the
-              anchor (inside the head silhouette) and the tail trails down/back
+          {/* Ponytail anchored at ANCHORS.ponytailBase: the base sits on the
+              side edge of the head and the tail trails down/back
               from there. All offsets below are relative to (ax, ay). The tail
               is drawn before the cap so the cap covers the root seam. */}
           {(() => {
-            const { x: ax, y: ay } = ANCHORS.backRight;
+            const { x: ax, y: ay } = ANCHORS.ponytailBase;
             return (
               <>
                 <path
-                  d={`M${ax - 7},${ay - 3}
-                      Q${ax + 9},${ay - 1} ${ax + 16},${ay + 14}
-                      Q${ax + 22},${ay + 28} ${ax + 13},${ay + 38}
-                      Q${ax + 7},${ay + 40} ${ax + 5},${ay + 32}
-                      Q${ax + 9},${ay + 20} ${ax + 1},${ay + 10}
-                      Q${ax - 5},${ay + 4} ${ax - 9},${ay + 3} Z`}
+                  d={`M${ax - 6},${ay - 6}
+                      Q${ax + 8},${ay - 5} ${ax + 13},${ay + 8}
+                      Q${ax + 20},${ay + 25} ${ax + 11},${ay + 39}
+                      Q${ax + 4},${ay + 43} ${ax + 3},${ay + 33}
+                      Q${ax + 7},${ay + 20} ${ax + 1},${ay + 10}
+                      Q${ax - 4},${ay + 4} ${ax - 8},${ay + 4} Z`}
                   fill={color}
                 />
-                {/* Root mass deliberately overlaps the head cap to remove any visible gap. */}
-                <ellipse cx={ax - 1} cy={ay + 2} rx="7" ry="6" fill={color} />
-                <circle cx={ax + 2} cy={ay + 4} r="2.4" fill={hi} opacity="0.85" />
+                {/* Root mass overlaps the side of the head so the tail cannot appear detached. */}
+                <ellipse cx={ax - 3} cy={ay} rx="8" ry="6.5" fill={color} />
               </>
             );
           })()}
@@ -159,6 +158,7 @@ function HairLayer({ style, color }: { style: Hairstyle; color: string }) {
             d="M30,40 Q28,20 50,19 Q72,20 70,40 Q68,30 60,28 Q54,34 46,32 Q38,34 34,32 Q31,34 30,40 Z"
             fill={color}
           />
+          <circle cx={ANCHORS.ponytailBase.x - 1} cy={ANCHORS.ponytailBase.y + 1} r="2.4" fill={hi} opacity="0.85" />
           {/* Highlight */}
           <path d="M42,22 Q50,18 58,22 Q52,25 46,25 Z" fill={hi} opacity="0.55" />
         </g>
