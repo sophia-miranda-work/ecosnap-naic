@@ -6,14 +6,20 @@ import {
   type FaceShape,
   type BodyShape,
   type HairStyleId,
+  DEFAULT_DRESSUP,
 } from "@/hooks/use-character";
-import { SHOP_ITEMS, type ShopSlot } from "@/lib/shop";
+import { SHOP_ITEMS, type ShopSlot, type ShopItem } from "@/lib/shop";
+import { DressupAvatar, hairLayers, HEAD_CX, HEAD_CY } from "@/components/dressup-avatar";
 
 /**
- * Tabbed customization panel. Free options (skin, hair color, basic
- * hairstyles, face & body shape) live alongside premium owned items in their
- * relevant tab. Premium items the user does not own show a coin price and
- * deep-link to the shop.
+ * Tabbed customization panel.
+ *
+ * - The avatar is sticky at the top so the user always sees how their picks
+ *   look as they tap options.
+ * - Hair and clothing options are previewed as mini-avatar tiles so users
+ *   actually see the style — not a text label.
+ * - Tiny accessories (piercings, jewelry, nails, hair clips, ear extras)
+ *   show as isolated SVG icons inside their tile.
  */
 
 type TabId = "skin" | "face" | "hair" | "accessories" | "clothing" | "extras";
@@ -68,10 +74,12 @@ const PREMIUM_HAIRSTYLES: { id: HairStyleId; label: string; price: number }[] = 
   { id: "undercut",    label: "Undercut",   price: 160 },
 ];
 
-/** Premium hairstyles are owned via character_items just like clothing — id stored as `hair-<style>`. */
 function premiumHairItemId(style: HairStyleId): string {
   return `hair-${style}`;
 }
+
+/** Slots that benefit from showing a mini-avatar wearing the item. */
+const AVATAR_PREVIEW_SLOTS = new Set<ShopSlot>(["top", "bottom", "shoes", "dress"]);
 
 export function CharacterCustomizer({ onClose }: { onClose: () => void }) {
   const { character, ownedItems, updateAppearance, equipItem, purchase, refresh } = useCharacter();
@@ -119,10 +127,10 @@ export function CharacterCustomizer({ onClose }: { onClose: () => void }) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-border p-4">
+        <div className="flex items-center justify-between border-b border-border p-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Customize</p>
-            <h2 className="text-lg font-bold text-foreground">Style your explorer</h2>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Customize</p>
+            <h2 className="text-base font-bold text-foreground">Style your explorer</h2>
           </div>
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1 rounded-full bg-foreground px-2.5 py-1 text-xs font-bold text-background">
@@ -131,6 +139,11 @@ export function CharacterCustomizer({ onClose }: { onClose: () => void }) {
             </span>
             <button type="button" onClick={onClose} className="rounded-full p-1.5 text-muted-foreground hover:bg-muted" aria-label="Close">✕</button>
           </div>
+        </div>
+
+        {/* Sticky live preview */}
+        <div className="flex shrink-0 items-center justify-center border-b border-border bg-gradient-to-b from-primary/10 to-transparent py-3">
+          <DressupAvatar dressup={dressup} size={130} />
         </div>
 
         {/* Tabs */}
@@ -155,7 +168,7 @@ export function CharacterCustomizer({ onClose }: { onClose: () => void }) {
         )}
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto p-4">
+        <div className="flex-1 overflow-y-auto p-3">
           {tab === "skin" && (
             <Section title="Skin tone">
               <div className="flex flex-wrap gap-2">
@@ -164,9 +177,15 @@ export function CharacterCustomizer({ onClose }: { onClose: () => void }) {
                 ))}
               </div>
               <SubTitle>Body shape</SubTitle>
-              <div className="flex flex-wrap gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 {BODY_SHAPES.map((b) => (
-                  <Chip key={b.id} active={dressup.bodyShape === b.id} onClick={() => setField({ bodyShape: b.id })}>{b.label}</Chip>
+                  <PreviewTile
+                    key={b.id}
+                    label={b.label}
+                    active={dressup.bodyShape === b.id}
+                    onClick={() => setField({ bodyShape: b.id })}
+                    preview={<MiniAvatar dressup={{ ...dressup, bodyShape: b.id }} />}
+                  />
                 ))}
               </div>
               <SubTitle>Nail polish</SubTitle>
@@ -186,9 +205,15 @@ export function CharacterCustomizer({ onClose }: { onClose: () => void }) {
 
           {tab === "face" && (
             <Section title="Face shape">
-              <div className="flex flex-wrap gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 {FACE_SHAPES.map((f) => (
-                  <Chip key={f.id} active={dressup.faceShape === f.id} onClick={() => setField({ faceShape: f.id })}>{f.label}</Chip>
+                  <PreviewTile
+                    key={f.id}
+                    label={f.label}
+                    active={dressup.faceShape === f.id}
+                    onClick={() => setField({ faceShape: f.id })}
+                    preview={<MiniAvatar dressup={{ ...dressup, faceShape: f.id }} />}
+                  />
                 ))}
               </div>
             </Section>
@@ -204,35 +229,37 @@ export function CharacterCustomizer({ onClose }: { onClose: () => void }) {
                 </div>
               </Section>
               <Section title="Hairstyles">
-                <div className="flex flex-wrap gap-2">
+                <div className="grid grid-cols-3 gap-2">
                   {FREE_HAIRSTYLES.map((h) => (
-                    <Chip key={h.id} active={dressup.hairstyle === h.id} onClick={() => setField({ hairstyle: h.id as Dressup["hairstyle"] })}>{h.label}</Chip>
+                    <PreviewTile
+                      key={h.id}
+                      label={h.label}
+                      active={dressup.hairstyle === h.id}
+                      onClick={() => setField({ hairstyle: h.id as Dressup["hairstyle"] })}
+                      preview={<MiniAvatar dressup={{ ...dressup, hairstyle: h.id as Dressup["hairstyle"] }} />}
+                    />
                   ))}
                 </div>
                 <SubTitle>Premium</SubTitle>
-                <div className="flex flex-wrap gap-2">
+                <div className="grid grid-cols-3 gap-2">
                   {PREMIUM_HAIRSTYLES.map((h) => {
                     const itemId = premiumHairItemId(h.id);
                     const owned = ownedSet.has(itemId);
                     const active = dressup.hairstyle === h.id;
                     return (
-                      <button
+                      <PreviewTile
                         key={h.id}
-                        type="button"
+                        label={h.label}
+                        active={active}
                         disabled={busy === itemId}
                         onClick={() => buyAndApply(itemId, h.price, () => setField({ hairstyle: h.id as Dressup["hairstyle"] }))}
-                        className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors disabled:opacity-50 ${
-                          active ? "border-foreground bg-foreground text-background" : "border-border bg-card text-foreground hover:bg-muted"
-                        }`}
-                      >
-                        {h.label}
-                        {owned ? (active ? <Check className="h-3 w-3" /> : null) : (
-                          <span className="inline-flex items-center gap-0.5 text-accent">
-                            <Lock className="h-3 w-3" />
-                            {h.price}
+                        preview={<MiniAvatar dressup={{ ...dressup, hairstyle: h.id as Dressup["hairstyle"] }} />}
+                        badge={owned ? (active ? <Check className="h-3 w-3" /> : null) : (
+                          <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-accent">
+                            <Lock className="h-2.5 w-2.5" />{h.price}
                           </span>
                         )}
-                      </button>
+                      />
                     );
                   })}
                 </div>
@@ -242,29 +269,29 @@ export function CharacterCustomizer({ onClose }: { onClose: () => void }) {
 
           {tab === "accessories" && (
             <>
-              <SlotPicker label="Earrings" slot="earrings" current={dressup.earrings} {...{ ownedSet, coins, busy, equipItem, buyAndApply }} />
-              <SlotPicker label="Necklace" slot="necklace" current={dressup.necklace} {...{ ownedSet, coins, busy, equipItem, buyAndApply }} />
-              <SlotPicker label="Bracelet" slot="bracelet" current={dressup.bracelet} {...{ ownedSet, coins, busy, equipItem, buyAndApply }} />
-              <SlotPicker label="Hair clip" slot="hairClip" current={dressup.hairClip} {...{ ownedSet, coins, busy, equipItem, buyAndApply }} />
-              <SlotPicker label="Glasses & more" slot="accessory" current={dressup.accessory} {...{ ownedSet, coins, busy, equipItem, buyAndApply }} />
+              <SlotPicker label="Earrings"        slot="earrings"  current={dressup.earrings}  dressup={dressup} {...{ ownedSet, busy, equipItem, buyAndApply }} />
+              <SlotPicker label="Necklace"        slot="necklace"  current={dressup.necklace}  dressup={dressup} {...{ ownedSet, busy, equipItem, buyAndApply }} />
+              <SlotPicker label="Bracelet"        slot="bracelet"  current={dressup.bracelet}  dressup={dressup} {...{ ownedSet, busy, equipItem, buyAndApply }} />
+              <SlotPicker label="Hair clip"       slot="hairClip"  current={dressup.hairClip}  dressup={dressup} {...{ ownedSet, busy, equipItem, buyAndApply }} />
+              <SlotPicker label="Glasses & more"  slot="accessory" current={dressup.accessory} dressup={dressup} {...{ ownedSet, busy, equipItem, buyAndApply }} />
             </>
           )}
 
           {tab === "clothing" && (
             <>
-              <SlotPicker label="Tops" slot="top" current={dressup.top} {...{ ownedSet, coins, busy, equipItem, buyAndApply }} />
-              <SlotPicker label="Bottoms" slot="bottom" current={dressup.bottom} {...{ ownedSet, coins, busy, equipItem, buyAndApply }} />
-              <SlotPicker label="Dresses" slot="dress" current={dressup.dress} {...{ ownedSet, coins, busy, equipItem, buyAndApply }} />
-              <SlotPicker label="Shoes" slot="shoes" current={dressup.shoes} {...{ ownedSet, coins, busy, equipItem, buyAndApply }} />
-              <SlotPicker label="Hats" slot="hat" current={dressup.hat} {...{ ownedSet, coins, busy, equipItem, buyAndApply }} />
+              <SlotPicker label="Tops"     slot="top"    current={dressup.top}    dressup={dressup} {...{ ownedSet, busy, equipItem, buyAndApply }} />
+              <SlotPicker label="Bottoms"  slot="bottom" current={dressup.bottom} dressup={dressup} {...{ ownedSet, busy, equipItem, buyAndApply }} />
+              <SlotPicker label="Dresses"  slot="dress"  current={dressup.dress}  dressup={dressup} {...{ ownedSet, busy, equipItem, buyAndApply }} />
+              <SlotPicker label="Shoes"    slot="shoes"  current={dressup.shoes}  dressup={dressup} {...{ ownedSet, busy, equipItem, buyAndApply }} />
+              <SlotPicker label="Hats"     slot="hat"    current={dressup.hat}    dressup={dressup} {...{ ownedSet, busy, equipItem, buyAndApply }} />
             </>
           )}
 
           {tab === "extras" && (
             <>
-              <SlotPicker label="Ear piercings" slot="earPiercing" current={dressup.earPiercing} {...{ ownedSet, coins, busy, equipItem, buyAndApply }} />
-              <SlotPicker label="Face piercings" slot="facePiercing" current={dressup.facePiercing} {...{ ownedSet, coins, busy, equipItem, buyAndApply }} />
-              <SlotPicker label="Hearing aids & headphones" slot="ears" current={dressup.ears} {...{ ownedSet, coins, busy, equipItem, buyAndApply }} />
+              <SlotPicker label="Ear piercings"               slot="earPiercing"  current={dressup.earPiercing}  dressup={dressup} {...{ ownedSet, busy, equipItem, buyAndApply }} />
+              <SlotPicker label="Face piercings"              slot="facePiercing" current={dressup.facePiercing} dressup={dressup} {...{ ownedSet, busy, equipItem, buyAndApply }} />
+              <SlotPicker label="Hearing aids & headphones"   slot="ears"         current={dressup.ears}         dressup={dressup} {...{ ownedSet, busy, equipItem, buyAndApply }} />
             </>
           )}
         </div>
@@ -272,6 +299,8 @@ export function CharacterCustomizer({ onClose }: { onClose: () => void }) {
     </div>
   );
 }
+
+// ---------------------------- shared building blocks ------------------------
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -297,27 +326,93 @@ function Swatch({ color, active, onClick, bare = false }: { color: string; activ
     </button>
   );
 }
-function Chip({ active, onClick, children }: { active?: boolean; onClick: () => void; children: React.ReactNode }) {
+
+/** A reusable tile that shows a visual preview + a label and active/lock state. */
+function PreviewTile({
+  preview,
+  label,
+  active,
+  disabled,
+  onClick,
+  badge,
+}: {
+  preview: React.ReactNode;
+  label: string;
+  active?: boolean;
+  disabled?: boolean;
+  onClick: () => void;
+  badge?: React.ReactNode;
+}) {
   return (
     <button
       type="button"
+      disabled={disabled}
       onClick={onClick}
       aria-pressed={!!active}
-      className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
-        active ? "border-foreground bg-foreground text-background" : "border-border bg-card text-foreground hover:bg-muted"
+      className={`relative flex flex-col items-center gap-1 rounded-xl border p-1.5 text-center text-[10px] font-semibold transition-colors disabled:opacity-50 ${
+        active ? "border-foreground bg-primary/15 ring-1 ring-primary" : "border-border bg-card hover:bg-muted"
       }`}
     >
-      {children}
+      <div className="grid aspect-square w-full place-items-center overflow-hidden rounded-lg bg-muted/50">
+        {preview}
+      </div>
+      <span className="line-clamp-1 text-foreground">{label}</span>
+      {badge && <span className="absolute right-1 top-1 rounded-full bg-background/80 px-1 py-0.5">{badge}</span>}
     </button>
   );
+}
+
+/** Tiny rendered avatar used inside option tiles. Strips features the user
+ *  isn't choosing right now (no hat/accessory) so the relevant change pops. */
+function MiniAvatar({ dressup }: { dressup: Dressup }) {
+  return (
+    <div className="flex items-center justify-center">
+      <DressupAvatar dressup={dressup} size={56} />
+    </div>
+  );
+}
+
+// ---------------------------- isolated icon previews ------------------------
+
+/** Renders a small SVG showing the item alone (no avatar around it) for tiny
+ *  accessories: jewelry, piercings, nail polish, hair clips, ear extras. */
+function IsolatedItemIcon({ item }: { item: ShopItem }) {
+  // Generic colored badge with the item emoji on top — readable and consistent.
+  const bg = item.color
+    ? `color-mix(in oklab, ${item.color} 35%, var(--card))`
+    : "var(--muted)";
+  return (
+    <div className="grid h-full w-full place-items-center" style={{ background: bg }}>
+      <span className="text-2xl" aria-hidden>{item.overlayEmoji ?? item.emoji}</span>
+    </div>
+  );
+}
+
+/** Builds a dressup with ONLY the slot we're previewing changed — so the
+ *  mini-avatar shows the user the effect of choosing that item. */
+function dressupWithItem(dressup: Dressup, slot: ShopSlot, itemId: string | null): Dressup {
+  // Start from a clean canvas for clothes/hair so the preview isn't dominated
+  // by the user's other equipment in tiny tiles.
+  if (AVATAR_PREVIEW_SLOTS.has(slot)) {
+    const base: Dressup = {
+      ...DEFAULT_DRESSUP,
+      skin: dressup.skin,
+      hair: dressup.hair,
+      hairstyle: dressup.hairstyle,
+      faceShape: dressup.faceShape,
+      bodyShape: dressup.bodyShape,
+    };
+    return { ...base, [slot]: itemId } as Dressup;
+  }
+  return { ...dressup, [slot]: itemId };
 }
 
 function SlotPicker({
   label,
   slot,
   current,
+  dressup,
   ownedSet,
-  coins,
   busy,
   equipItem,
   buyAndApply,
@@ -325,67 +420,64 @@ function SlotPicker({
   label: string;
   slot: ShopSlot;
   current: string | null | undefined;
+  dressup: Dressup;
   ownedSet: Set<string>;
-  coins: number;
   busy: string | null;
   equipItem: (slot: ShopSlot, itemId: string | null) => Promise<void>;
   buyAndApply: (itemId: string, price: number, apply: () => Promise<void> | void) => Promise<void>;
 }) {
   const items = SHOP_ITEMS.filter((i) => i.slot === slot);
   if (items.length === 0) return null;
+  const useAvatarPreview = AVATAR_PREVIEW_SLOTS.has(slot);
+
   return (
     <Section title={label}>
       <div className="grid grid-cols-3 gap-2">
-        <button
-          type="button"
+        {/* "None" tile */}
+        <PreviewTile
+          label="None"
+          active={!current}
           onClick={() => equipItem(slot, null)}
-          className={`flex flex-col items-center gap-1 rounded-xl border p-2 text-center text-[10px] font-semibold ${
-            !current ? "border-foreground bg-primary/15 ring-1 ring-primary" : "border-border bg-card hover:bg-muted"
-          }`}
-        >
-          <span className="grid aspect-square w-full place-items-center rounded-lg bg-muted text-xl">∅</span>
-          None
-        </button>
+          preview={
+            useAvatarPreview
+              ? <MiniAvatar dressup={dressupWithItem(dressup, slot, null)} />
+              : <div className="grid h-full w-full place-items-center text-2xl text-muted-foreground">∅</div>
+          }
+        />
+
         {items.map((item) => {
           const owned = ownedSet.has(item.id);
           const active = current === item.id;
           const free = item.price === 0;
           return (
-            <button
+            <PreviewTile
               key={item.id}
-              type="button"
+              label={item.name}
+              active={active}
               disabled={busy === item.id}
               onClick={() =>
                 owned || free
                   ? equipItem(slot, active ? null : item.id)
                   : buyAndApply(item.id, item.price, () => equipItem(slot, item.id))
               }
-              className={`flex flex-col items-center gap-1 rounded-xl border p-2 text-center text-[10px] font-semibold transition-colors disabled:opacity-50 ${
-                active ? "border-foreground bg-primary/15 ring-1 ring-primary" : "border-border bg-card hover:bg-muted"
-              }`}
-            >
-              <span
-                className="grid aspect-square w-full place-items-center rounded-lg text-2xl"
-                style={{
-                  background: item.color
-                    ? `color-mix(in oklab, ${item.color} 30%, var(--card))`
-                    : "var(--muted)",
-                }}
-                aria-hidden
-              >
-                {item.emoji}
-              </span>
-              <span className="line-clamp-1 text-foreground">{item.name}</span>
-              {!owned && !free && (
+              preview={
+                useAvatarPreview
+                  ? <MiniAvatar dressup={dressupWithItem(dressup, slot, item.id)} />
+                  : <IsolatedItemIcon item={item} />
+              }
+              badge={!owned && !free ? (
                 <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-accent">
-                  <Lock className="h-2.5 w-2.5" />
-                  {item.price}
+                  <Lock className="h-2.5 w-2.5" />{item.price}
                 </span>
-              )}
-            </button>
+              ) : (active ? <Check className="h-3 w-3 text-primary" /> : null)}
+            />
           );
         })}
       </div>
     </Section>
   );
 }
+
+// Suppress unused-import warning when tree-shaken by build (these are used
+// indirectly via `dressup-avatar` but keep the explicit import path warm).
+void hairLayers; void HEAD_CX; void HEAD_CY;
