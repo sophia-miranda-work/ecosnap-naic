@@ -365,6 +365,19 @@ export function CharacterCustomizer({ onClose }: { onClose: () => void }) {
                 )}
               </Section>
               <Section title="Eyebrows">
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="text-[11px] text-muted-foreground">
+                    Current: {EYEBROW_STYLES.find((b) => b.id === (dressup.eyebrows ?? "none"))?.label}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setField({ eyebrows: "none" })}
+                    disabled={(dressup.eyebrows ?? "none") === "none"}
+                    className="rounded-full border border-border bg-card px-3 py-1 text-[11px] font-semibold text-foreground hover:bg-muted disabled:opacity-50"
+                  >
+                    Reset
+                  </button>
+                </div>
                 <div className="grid grid-cols-3 gap-2">
                   {EYEBROW_STYLES.map((b) => (
                     <PreviewTile
