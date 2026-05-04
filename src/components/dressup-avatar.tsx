@@ -20,6 +20,23 @@ import hairSideSweep from "@/assets/hair/solid/side-sweep.png";
 import hairCurls from "@/assets/hair/solid/curls.png";
 import hairPixie from "@/assets/hair/solid/pixie.png";
 
+import dressFloralPink from "@/assets/dresses/clean/floral-pink.png";
+import dressLavenderParty from "@/assets/dresses/clean/lavender-party.png";
+import dressPinaforePink from "@/assets/dresses/clean/pinafore-pink.png";
+import dressSailorBlue from "@/assets/dresses/clean/sailor-blue.png";
+import dressSweaterMint from "@/assets/dresses/clean/sweater-mint.png";
+import dressSundressBlack from "@/assets/dresses/clean/sundress-black.png";
+
+/** Dresses backed by painted PNGs. */
+const DRESS_IMAGES: Record<string, string> = {
+  "dress-floral-pink": dressFloralPink,
+  "dress-lavender-party": dressLavenderParty,
+  "dress-pinafore-pink": dressPinaforePink,
+  "dress-sailor-blue": dressSailorBlue,
+  "dress-sweater-mint": dressSweaterMint,
+  "dress-sundress-black": dressSundressBlack,
+};
+
 /** Hairstyles backed by painted PNGs (face masked out). */
 export const HAIR_IMAGES: Partial<Record<HairStyleId, string>> = {
   "soft-bob": hairBob,
@@ -893,14 +910,32 @@ export function DressupAvatar({
       )}
 
       {dress ? (
-        <DressShape
-          id={dress.id}
-          color={topColor}
-          torsoTop={torsoTop}
-          legTop={legTop}
-          shoulderW={shoulderW}
-          hipW={hipW}
-        />
+        DRESS_IMAGES[dress.id] ? (() => {
+          // Fit dress PNG between shoulders and just below leg-top.
+          const targetW = Math.max(shoulderW, hipW) + 18;
+          const targetH = (legTop + 12) - (torsoTop - 2);
+          const x = 50 - targetW / 2;
+          const y = torsoTop - 2;
+          return (
+            <image
+              href={DRESS_IMAGES[dress.id]}
+              x={x}
+              y={y}
+              width={targetW}
+              height={targetH}
+              preserveAspectRatio="xMidYMid meet"
+            />
+          );
+        })() : (
+          <DressShape
+            id={dress.id}
+            color={topColor}
+            torsoTop={torsoTop}
+            legTop={legTop}
+            shoulderW={shoulderW}
+            hipW={hipW}
+          />
+        )
       ) : (
         <TopShape
           id={top?.id}
