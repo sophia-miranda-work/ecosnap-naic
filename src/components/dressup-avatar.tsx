@@ -8,18 +8,6 @@ import {
 } from "@/hooks/use-character";
 import { getItemById } from "@/lib/shop";
 
-import hairBob from "@/assets/hair/solid/bob.png";
-import hairLongBangs from "@/assets/hair/solid/long-bangs.png";
-import hairLowPigtails from "@/assets/hair/solid/low-pigtails.png";
-import hairSpaceBuns from "@/assets/hair/solid/space-buns.png";
-import hairTwinBraids from "@/assets/hair/solid/twin-braids.png";
-import hairAfro from "@/assets/hair/solid/afro.png";
-import hairCurtain from "@/assets/hair/solid/curtain.png";
-import hairTopknot from "@/assets/hair/solid/topknot.png";
-import hairSideSweep from "@/assets/hair/solid/side-sweep.png";
-import hairCurls from "@/assets/hair/solid/curls.png";
-import hairPixie from "@/assets/hair/solid/pixie.png";
-
 import dressFloralPink from "@/assets/dresses/clean/floral-pink.png";
 import dressLavenderParty from "@/assets/dresses/clean/lavender-party.png";
 import dressPinaforePink from "@/assets/dresses/clean/pinafore-pink.png";
@@ -37,22 +25,13 @@ const DRESS_IMAGES: Record<string, string> = {
   "dress-sundress-black": dressSundressBlack,
 };
 
-/** Hairstyles backed by painted PNGs (face masked out). */
-export const HAIR_IMAGES: Partial<Record<HairStyleId, string>> = {
-  "soft-bob": hairBob,
-  "long-bangs": hairLongBangs,
-  "low-pigtails": hairLowPigtails,
-  "space-buns": hairSpaceBuns,
-  "twin-braids": hairTwinBraids,
-  "fluffy-curls": hairCurls,
-  "side-sweep": hairSideSweep,
-  "curtain-cut": hairCurtain,
-  // Extra ids surfaced as new picker options
-  afro: hairAfro,
-  topknot: hairTopknot,
-  // Map a legacy id to pixie so older saves still render
-  fade: hairPixie,
-};
+/**
+ * Hair PNG overlays were causing visible solid-color blocks behind the face
+ * and clipped/geometric edges. We now render hair purely through the
+ * shape-fitted SVG `hairLayers` below — keep this map empty so the SVG
+ * path is taken in the renderer.
+ */
+export const HAIR_IMAGES: Partial<Record<HairStyleId, string>> = {};
 
 export const HEAD_CX = 50;
 export const HEAD_CY = 42;
@@ -205,17 +184,16 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
     />
   );
 
+  // Single continuous fringe — no centre gap that exposes the scalp.
   const curtainBangs = () => (
-    <g>
-      <path
-        d={`M ${cx - 1},${top + 8} C ${sideL + 8},${top + 9} ${sideL + 7},${cy + 5} ${cx - 7},${cy + 15} C ${cx - 6},${cy + 3} ${cx - 4},${top + 13} ${cx - 1},${top + 8} Z`}
-        fill={color}
-      />
-      <path
-        d={`M ${cx + 1},${top + 8} C ${sideR - 8},${top + 9} ${sideR - 7},${cy + 5} ${cx + 7},${cy + 15} C ${cx + 6},${cy + 3} ${cx + 4},${top + 13} ${cx + 1},${top + 8} Z`}
-        fill={color}
-      />
-    </g>
+    <path
+      d={`M ${sideL + 4},${top + 9}
+        C ${sideL + 10},${top + 4} ${sideR - 10},${top + 4} ${sideR - 4},${top + 9}
+        C ${sideR - 6},${cy + 6} ${cx + 8},${cy + 14} ${cx + 4},${cy + 16}
+        C ${cx + 1},${cy + 9} ${cx - 1},${cy + 9} ${cx - 4},${cy + 16}
+        C ${cx - 8},${cy + 14} ${sideL + 6},${cy + 6} ${sideL + 4},${top + 9} Z`}
+      fill={color}
+    />
   );
 
   const shine = (x = cx - 11, y = top + 7) => (
@@ -523,6 +501,7 @@ function DressShape({
   hipW: number;
 }) {
   const sparkle = lighten(color, 0.35);
+  const trim = darken(color, 0.25);
   if (id?.includes("princess") || id?.includes("starlight")) {
     return (
       <g>
@@ -552,14 +531,36 @@ function DressShape({
           fill={lighten(color, 0.25)}
           opacity="0.82"
         />
+        {/* tulle dots */}
+        {Array.from({ length: 8 }).map((_, i) => (
+          <circle key={i} cx={50 - 14 + i * 4} cy={legTop + 9 + (i % 2) * 3} r="0.55" fill={sparkle} opacity="0.8" />
+        ))}
       </g>
     );
   }
+  // Default A-line dress with pattern variation by id.
+  const isPinafore = id?.includes("pinafore");
   return (
-    <path
-      d={`M ${50 - shoulderW / 2},${torsoTop} Q ${50 - shoulderW / 2 - 3},${torsoTop + 11} ${50 - hipW / 2 - 8},${legTop + 8} L ${50 + hipW / 2 + 8},${legTop + 8} Q ${50 + shoulderW / 2 + 3},${torsoTop + 11} ${50 + shoulderW / 2},${torsoTop} Q 50,${torsoTop - 3} ${50 - shoulderW / 2},${torsoTop} Z`}
-      fill={color}
-    />
+    <g>
+      <path
+        d={`M ${50 - shoulderW / 2},${torsoTop} Q ${50 - shoulderW / 2 - 3},${torsoTop + 11} ${50 - hipW / 2 - 8},${legTop + 8} L ${50 + hipW / 2 + 8},${legTop + 8} Q ${50 + shoulderW / 2 + 3},${torsoTop + 11} ${50 + shoulderW / 2},${torsoTop} Q 50,${torsoTop - 3} ${50 - shoulderW / 2},${torsoTop} Z`}
+        fill={color}
+      />
+      {isPinafore && (
+        <>
+          {/* apron straps + pocket */}
+          <rect x={50 - 8} y={torsoTop} width="3" height="10" fill={lighten(color, 0.4)} />
+          <rect x={50 + 5} y={torsoTop} width="3" height="10" fill={lighten(color, 0.4)} />
+          <rect x={50 - 4} y={torsoTop + 12} width="8" height="5" rx="0.5" fill={lighten(color, 0.35)} stroke={trim} strokeWidth="0.3" />
+        </>
+      )}
+      {/* hem trim */}
+      <path
+        d={`M ${50 - hipW / 2 - 8},${legTop + 8} L ${50 + hipW / 2 + 8},${legTop + 8}`}
+        stroke={trim}
+        strokeWidth="0.6"
+      />
+    </g>
   );
 }
 
@@ -578,12 +579,79 @@ function TopShape({
   shoulderW: number;
   torsoW: number;
 }) {
+  const accent = lighten(color, 0.35);
+  const dark = darken(color, 0.22);
+  const decorate = (() => {
+    if (id?.includes("flannel")) {
+      // plaid grid
+      return (
+        <g opacity="0.55" stroke={dark} strokeWidth="0.45">
+          {[0, 1, 2, 3].map((i) => (
+            <line key={`v${i}`} x1={50 - torsoW / 2 + 2 + i * 4} y1={torsoTop + 1} x2={50 - torsoW / 2 + 2 + i * 4} y2={torsoBottom - 1} />
+          ))}
+          {[0, 1, 2].map((i) => (
+            <line key={`h${i}`} x1={50 - torsoW / 2} y1={torsoTop + 4 + i * 4} x2={50 + torsoW / 2} y2={torsoTop + 4 + i * 4} />
+          ))}
+        </g>
+      );
+    }
+    if (id?.includes("sweater") || id?.includes("knit")) {
+      // cable knit ribs
+      return (
+        <g stroke={dark} strokeWidth="0.5" opacity="0.6">
+          {[-4, 0, 4].map((dx) => (
+            <path key={dx} d={`M ${50 + dx},${torsoTop + 2} q 1,3 0,6 q -1,3 0,6`} fill="none" />
+          ))}
+        </g>
+      );
+    }
+    if (id?.includes("jacket")) {
+      // zipper + lapels
+      return (
+        <g>
+          <line x1="50" y1={torsoTop + 1} x2="50" y2={torsoBottom - 1} stroke={dark} strokeWidth="0.45" />
+          <path d={`M 50,${torsoTop + 1} L ${50 - 4},${torsoTop + 6} L 50,${torsoTop + 8}`} fill={accent} opacity="0.7" />
+          <path d={`M 50,${torsoTop + 1} L ${50 + 4},${torsoTop + 6} L 50,${torsoTop + 8}`} fill={accent} opacity="0.7" />
+        </g>
+      );
+    }
+    if (id?.includes("raincoat")) {
+      // toggles
+      return (
+        <g fill={dark}>
+          <circle cx="50" cy={torsoTop + 6} r="0.7" />
+          <circle cx="50" cy={torsoTop + 12} r="0.7" />
+          <circle cx="50" cy={torsoTop + 18} r="0.7" />
+        </g>
+      );
+    }
+    if (id?.includes("tank")) {
+      return null;
+    }
+    if (id?.includes("longsleeve")) {
+      return <line x1="50" y1={torsoTop + 2} x2="50" y2={torsoBottom - 2} stroke={accent} strokeWidth="0.4" opacity="0.7" />;
+    }
+    if (id?.includes("crop")) {
+      // ribbed band
+      return (
+        <g stroke={accent} strokeWidth="0.4" opacity="0.8">
+          <line x1={50 - torsoW / 2} y1={torsoTop + 11} x2={50 + torsoW / 2} y2={torsoTop + 11} />
+          <line x1={50 - torsoW / 2} y1={torsoTop + 12.5} x2={50 + torsoW / 2} y2={torsoTop + 12.5} />
+        </g>
+      );
+    }
+    return null;
+  })();
+
   if (id?.includes("crop")) {
     return (
-      <path
-        d={`M ${50 - shoulderW / 2},${torsoTop} Q 50,${torsoTop - 3} ${50 + shoulderW / 2},${torsoTop} L ${50 + torsoW / 2},${torsoTop + 13} L ${50 - torsoW / 2},${torsoTop + 13} Z`}
-        fill={color}
-      />
+      <g>
+        <path
+          d={`M ${50 - shoulderW / 2},${torsoTop} Q 50,${torsoTop - 3} ${50 + shoulderW / 2},${torsoTop} L ${50 + torsoW / 2},${torsoTop + 13} L ${50 - torsoW / 2},${torsoTop + 13} Z`}
+          fill={color}
+        />
+        {decorate}
+      </g>
     );
   }
   if (id?.includes("tank")) {
@@ -595,10 +663,13 @@ function TopShape({
     );
   }
   return (
-    <path
-      d={`M ${50 - shoulderW / 2},${torsoTop} Q ${50 - shoulderW / 2 - 1},${torsoTop + 12} ${50 - torsoW / 2},${torsoBottom} L ${50 + torsoW / 2},${torsoBottom} Q ${50 + shoulderW / 2 + 1},${torsoTop + 12} ${50 + shoulderW / 2},${torsoTop} Q 50,${torsoTop - 3} ${50 - shoulderW / 2},${torsoTop} Z`}
-      fill={color}
-    />
+    <g>
+      <path
+        d={`M ${50 - shoulderW / 2},${torsoTop} Q ${50 - shoulderW / 2 - 1},${torsoTop + 12} ${50 - torsoW / 2},${torsoBottom} L ${50 + torsoW / 2},${torsoBottom} Q ${50 + shoulderW / 2 + 1},${torsoTop + 12} ${50 + shoulderW / 2},${torsoTop} Q 50,${torsoTop - 3} ${50 - shoulderW / 2},${torsoTop} Z`}
+        fill={color}
+      />
+      {decorate}
+    </g>
   );
 }
 
@@ -615,12 +686,31 @@ function BottomShape({
   torsoBottom: number;
   hipW: number;
 }) {
+  const accent = lighten(color, 0.3);
+  const dark = darken(color, 0.2);
   if (id?.includes("skirt")) {
+    const isPleated = id?.includes("pleat");
+    const isDenim = id?.includes("denim");
     return (
-      <path
-        d={`M ${50 - hipW / 2 - 3},${torsoBottom - 1} L ${50 + hipW / 2 + 3},${torsoBottom - 1} L ${50 + hipW / 2 + 7},${legTop + 10} Q 50,${legTop + 14} ${50 - hipW / 2 - 7},${legTop + 10} Z`}
-        fill={color}
-      />
+      <g>
+        <path
+          d={`M ${50 - hipW / 2 - 3},${torsoBottom - 1} L ${50 + hipW / 2 + 3},${torsoBottom - 1} L ${50 + hipW / 2 + 7},${legTop + 10} Q 50,${legTop + 14} ${50 - hipW / 2 - 7},${legTop + 10} Z`}
+          fill={color}
+        />
+        {isPleated && (
+          <g stroke={dark} strokeWidth="0.4" opacity="0.7">
+            {[-2, -1, 0, 1, 2].map((k) => (
+              <line key={k} x1={50 + k * 3} y1={torsoBottom} x2={50 + k * 3.6} y2={legTop + 11} />
+            ))}
+          </g>
+        )}
+        {isDenim && (
+          <>
+            <line x1={50 - hipW / 2 - 3} y1={torsoBottom + 1.5} x2={50 + hipW / 2 + 3} y2={torsoBottom + 1.5} stroke={accent} strokeWidth="0.45" strokeDasharray="0.8 0.8" />
+            <rect x={50 - 1} y={torsoBottom} width="2" height="2" fill={accent} opacity="0.9" />
+          </>
+        )}
+      </g>
     );
   }
   if (id?.includes("short")) {
@@ -629,6 +719,26 @@ function BottomShape({
         d={`M ${50 - hipW / 2},${torsoBottom - 1} L ${50 + hipW / 2},${torsoBottom - 1} L ${50 + hipW / 2},${legTop + 7} L ${51},${legTop + 7} L 50,${legTop + 3} L 49,${legTop + 7} L ${50 - hipW / 2},${legTop + 7} Z`}
         fill={color}
       />
+    );
+  }
+  // Pants/leggings/overalls — add seams to differentiate.
+  if (id?.includes("overalls")) {
+    return (
+      <g>
+        <rect x={50 - 6} y={torsoBottom - 6} width="12" height="6" fill={color} />
+        <rect x={50 - 6} y={torsoBottom - 12} width="2.5" height="7" fill={color} />
+        <rect x={50 + 3.5} y={torsoBottom - 12} width="2.5" height="7" fill={color} />
+        <circle cx={50 - 4} cy={torsoBottom - 4.5} r="0.6" fill={accent} />
+        <circle cx={50 + 4} cy={torsoBottom - 4.5} r="0.6" fill={accent} />
+      </g>
+    );
+  }
+  if (id?.includes("cargo")) {
+    return (
+      <g>
+        <rect x={50 - 8} y={torsoBottom + 2} width="3" height="3" fill={dark} opacity="0.7" />
+        <rect x={50 + 5} y={torsoBottom + 2} width="3" height="3" fill={dark} opacity="0.7" />
+      </g>
     );
   }
   return null;
