@@ -102,16 +102,24 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
   const sideL = cx - rx;
   const sideR = cx + rx;
 
-  const shape = (d: string) => <path d={d} fill={color} />;
+  const sticker = (d: string) => (
+    <path d={d} fill={color} fillRule="evenodd" clipRule="evenodd" />
+  );
 
-  const cap = (drop = cy + 8, lift = 7) => `
+  const faceOpening = (hairline = top + 17, inset = 5.5, jaw = bottom + 0.5) => `
+    M ${sideL + inset},${hairline}
+    C ${sideL + inset + 2},${cy + 8} ${sideL + rx * 0.48},${jaw} ${cx},${jaw}
+    C ${sideR - rx * 0.48},${jaw} ${sideR - inset - 2},${cy + 8} ${sideR - inset},${hairline}
+    C ${sideR - 11},${hairline - 4} ${sideL + 11},${hairline - 4} ${sideL + inset},${hairline} Z`;
+
+  const roundedCap = (drop = cy + 8, lift = 7) => `
     M ${sideL - 3},${drop}
     C ${sideL - 7},${top + 7} ${sideL + 8},${top - lift} ${cx},${top - lift}
     C ${sideR - 8},${top - lift} ${sideR + 7},${top + 7} ${sideR + 3},${drop}
-    C ${sideR - 8},${drop + 7} ${cx + 7},${drop + 3} ${cx},${drop + 12}
-    C ${cx - 7},${drop + 3} ${sideL + 8},${drop + 7} ${sideL - 3},${drop} Z`;
+    C ${sideR - 4},${drop + 11} ${sideL + 4},${drop + 11} ${sideL - 3},${drop} Z`;
 
   let d: string;
+
   switch (style) {
     case "soft-bob":
     case "short":
@@ -119,38 +127,38 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
       d = `
         M ${sideL - 5},${cy - 4}
         C ${sideL - 11},${cy + 12} ${sideL - 1},${bottom + 10} ${cx - 15},${bottom + 12}
-        C ${cx - 4},${bottom + 9} ${cx + 4},${bottom + 9} ${cx + 15},${bottom + 12}
+        L ${cx + 15},${bottom + 12}
         C ${sideR + 1},${bottom + 10} ${sideR + 11},${cy + 12} ${sideR + 5},${cy - 4}
-        C ${sideR + 3},${top - 8} ${sideL - 3},${top - 8} ${sideL - 5},${cy - 4}
-        C ${sideL + 7},${cy + 10} ${cx - 8},${cy + 12} ${cx},${cy + 20}
-        C ${cx + 8},${cy + 12} ${sideR - 7},${cy + 10} ${sideR + 5},${cy - 4} Z`;
+        C ${sideR + 3},${top - 8} ${sideL - 3},${top - 8} ${sideL - 5},${cy - 4} Z
+        ${faceOpening(top + 18, 6.2, bottom + 1.5)}`;
       break;
+
     case "long-bangs":
     case "long":
     case "straight-bangs":
     case "curtain-cut":
     case "wavy":
       d = `
-        M ${sideL - 5},${cy - 7}
-        C ${sideL - 13},${cy + 10} ${sideL - 8},${bottom + 34} ${cx - 13},${bottom + 43}
-        C ${cx - 6},${bottom + 38} ${cx - 7},${cy + 16} ${sideL + 5},${cy + 9}
-        C ${cx - 7},${cy + 12} ${cx - 4},${cy + 18} ${cx},${cy + 22}
-        C ${cx + 4},${cy + 18} ${cx + 7},${cy + 12} ${sideR - 5},${cy + 9}
-        C ${cx + 7},${cy + 16} ${cx + 6},${bottom + 38} ${cx + 13},${bottom + 43}
-        C ${sideR + 8},${bottom + 34} ${sideR + 13},${cy + 10} ${sideR + 5},${cy - 7}
-        C ${sideR + 2},${top - 8} ${sideL - 2},${top - 8} ${sideL - 5},${cy - 7} Z`;
+        M ${sideL - 4},${cy - 7}
+        C ${sideL - 12},${cy + 9} ${sideL - 7},${bottom + 34} ${cx - 13},${bottom + 43}
+        Q ${cx},${bottom + 48} ${cx + 13},${bottom + 43}
+        C ${sideR + 7},${bottom + 34} ${sideR + 12},${cy + 9} ${sideR + 4},${cy - 7}
+        C ${sideR + 2},${top - 8} ${sideL - 2},${top - 8} ${sideL - 4},${cy - 7} Z
+        ${faceOpening(top + 18, 5.8, bottom + 2)}`;
       break;
+
     case "high-pony":
     case "ponytail":
       d = `
         M ${sideL - 3},${cy + 7}
         C ${sideL - 7},${top + 6} ${sideL + 8},${top - 8} ${cx},${top - 8}
-        C ${sideR - 5},${top - 8} ${sideR + 7},${top + 1} ${sideR + 5},${cy - 4}
-        C ${sideR + 22},${cy + 2} ${sideR + 23},${cy + 25} ${sideR + 9},${cy + 43}
+        C ${sideR - 5},${top - 8} ${sideR + 6},${top + 1} ${sideR + 5},${cy - 4}
+        C ${sideR + 21},${cy + 2} ${sideR + 23},${cy + 25} ${sideR + 9},${cy + 43}
         C ${sideR - 2},${cy + 37} ${sideR + 1},${cy + 17} ${sideR + 1},${cy + 8}
-        C ${sideR - 7},${cy + 17} ${cx + 7},${cy + 12} ${cx},${cy + 20}
-        C ${cx - 7},${cy + 12} ${sideL + 7},${cy + 17} ${sideL - 3},${cy + 7} Z`;
+        C ${sideR - 7},${cy + 18} ${sideL + 7},${cy + 18} ${sideL - 3},${cy + 7} Z
+        ${faceOpening(top + 17, 6, bottom + 0.5)}`;
       break;
+
     case "low-pigtails":
     case "pigtails":
       d = `
@@ -161,9 +169,10 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
         C ${sideR - 8},${top - 7} ${sideR + 8},${top + 7} ${sideR - 3},${cy + 11}
         C ${sideR - 8},${cy + 22} ${sideR - 8},${cy + 39} ${sideR + 1},${cy + 45}
         C ${sideR + 15},${cy + 35} ${sideR + 17},${cy + 11} ${sideR + 3},${cy + 3}
-        C ${sideR - 7},${cy + 17} ${cx + 7},${cy + 12} ${cx},${cy + 20}
-        C ${cx - 7},${cy + 12} ${sideL + 7},${cy + 17} ${sideL - 3},${cy + 3} Z`;
+        C ${sideR + 2},${cy + 16} ${sideL - 2},${cy + 16} ${sideL - 3},${cy + 3} Z
+        ${faceOpening(top + 18, 6.2, bottom + 0.5)}`;
       break;
+
     case "space-buns":
     case "double-bun":
     case "bun":
@@ -176,9 +185,11 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
         C ${cx - 8},${top - 8} ${cx + 8},${top - 8} ${cx + rx * 0.34},${top + 2}
         C ${cx + rx * 0.18},${top - 4} ${cx + rx * 0.25},${top - 16} ${cx + rx * 0.55},${top - 14}
         C ${cx + rx * 0.95},${top - 14} ${cx + rx * 1.05},${top + 2} ${cx + rx * 0.7},${top + 6}
-        C ${sideR + 5},${cy + 4} ${sideR + 1},${cy + 16} ${cx},${cy + 20}
-        C ${sideL - 1},${cy + 16} ${sideL - 5},${cy + 4} ${cx - rx * 0.7},${top + 6} Z`;
+        C ${sideR + 5},${cy + 4} ${sideR + 1},${cy + 16} ${cx},${cy + 18}
+        C ${sideL - 1},${cy + 16} ${sideL - 5},${cy + 4} ${cx - rx * 0.7},${top + 6} Z
+        ${faceOpening(top + 18, 6, bottom)}`;
       break;
+
     case "fluffy-curls":
     case "curly":
     case "afro":
@@ -189,10 +200,11 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
         C ${cx + rx * 0.04},${top - 17} ${cx + rx * 0.47},${top - 13} ${cx + rx * 0.52},${top - 5}
         C ${cx + rx + 4},${top - 7} ${cx + rx + 13},${top + 8} ${cx + rx + 10},${cy - 2}
         C ${cx + rx + 16},${cy + 14} ${cx + rx + 1},${cy + 25} ${cx + rx * 0.55},${cy + 20}
-        C ${cx + 9},${cy + 29} ${cx + 6},${cy + 16} ${cx},${cy + 23}
-        C ${cx - 6},${cy + 16} ${cx - 9},${cy + 29} ${cx - rx * 0.55},${cy + 20}
-        C ${cx - rx - 1},${cy + 25} ${cx - rx - 16},${cy + 14} ${cx - rx - 10},${cy - 3} Z`;
+        C ${cx + 9},${cy + 28} ${cx - 9},${cy + 28} ${cx - rx * 0.55},${cy + 20}
+        C ${cx - rx - 1},${cy + 25} ${cx - rx - 16},${cy + 14} ${cx - rx - 10},${cy - 3} Z
+        ${faceOpening(top + 22, 7, bottom - 0.5)}`;
       break;
+
     case "twin-braids":
     case "braids":
       d = `
@@ -201,11 +213,12 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
         C ${sideR - 8},${top - 7} ${sideR + 8},${top + 7} ${sideR + 4},${cy + 4}
         C ${sideR + 11},${cy + 17} ${sideR + 7},${cy + 42} ${sideR - 1},${cy + 50}
         C ${sideR - 10},${cy + 42} ${sideR - 8},${cy + 19} ${sideR - 4},${cy + 9}
-        C ${sideR - 10},${cy + 17} ${cx + 7},${cy + 12} ${cx},${cy + 20}
-        C ${cx - 7},${cy + 12} ${sideL + 10},${cy + 17} ${sideL + 4},${cy + 9}
+        C ${sideR - 10},${cy + 18} ${sideL + 10},${cy + 18} ${sideL + 4},${cy + 9}
         C ${sideL + 8},${cy + 19} ${sideL + 10},${cy + 42} ${sideL + 1},${cy + 50}
-        C ${sideL - 7},${cy + 42} ${sideL - 11},${cy + 17} ${sideL - 4},${cy + 4} Z`;
+        C ${sideL - 7},${cy + 42} ${sideL - 11},${cy + 17} ${sideL - 4},${cy + 4} Z
+        ${faceOpening(top + 18, 6.2, bottom + 0.5)}`;
       break;
+
     case "side-sweep":
     case "fade":
     case "undercut":
@@ -216,12 +229,13 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
         C ${sideR - 1},${top - 5} ${sideR + 4},${cy + 3} ${sideR - 1},${cy + 9}
         C ${cx + 7},${cy + 4} ${cx - 11},${cy + 8} ${sideL - 1},${cy + 4} Z`;
       break;
+
     default:
-      d = cap(cy + 8, 7);
+      d = `${roundedCap(cy + 8, 7)} ${faceOpening(top + 18, 6, bottom)}`;
       break;
   }
 
-  return { back: null, front: shape(d) };
+  return { back: null, front: sticker(d) };
 }
 
 function bodyMetrics(shape: BodyShape) {
