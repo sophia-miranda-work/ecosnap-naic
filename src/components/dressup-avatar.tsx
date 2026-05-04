@@ -1050,16 +1050,30 @@ export function DressupAvatar({
         </>
       )}
 
-      {hairImage ? (
-        <image
-          href={hairImage}
-          x={HEAD_CX - rx - 6}
-          y={HEAD_CY - ry - 10}
-          width={rx * 2 + 12}
-          height={ry * 2 + 18}
-          preserveAspectRatio="xMidYMid meet"
-        />
-      ) : (
+      {hairImage ? (() => {
+        const m = HAIR_METRICS[dressup.hairstyle as HairStyleId] ?? DEFAULT_HAIR_METRIC;
+        // Scale the PNG so its embedded face matches the SVG head radii.
+        // Use the larger of the two scale factors so the hair never looks
+        // pinched relative to the head.
+        const scaleX = rx / (m.faceRx * 512);
+        const scaleY = ry / (m.faceRy * 512);
+        const scale = (scaleX + scaleY) / 2;
+        const imgW = 512 * scale;
+        const imgH = 512 * scale;
+        // Anchor the artwork's face center on the SVG head center.
+        const x = HEAD_CX - m.faceCx * imgW;
+        const y = HEAD_CY - m.faceCy * imgH;
+        return (
+          <image
+            href={hairImage}
+            x={x}
+            y={y}
+            width={imgW}
+            height={imgH}
+            preserveAspectRatio="xMidYMid meet"
+          />
+        );
+      })() : (
         hair.front
       )}
       {hairClip && (
