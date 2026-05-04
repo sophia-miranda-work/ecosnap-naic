@@ -256,7 +256,9 @@ export function CharacterCustomizer({ onClose }: { onClose: () => void }) {
                   max="112"
                   step="1"
                   value={Math.round((dressup.headSize ?? 1) * 100)}
-                  onChange={(event) => setField({ headSize: Number(event.currentTarget.value) / 100 })}
+                  onChange={(event) =>
+                    setField({ headSize: Number(event.currentTarget.value) / 100 })
+                  }
                   className="w-full accent-current"
                   aria-label="Head size"
                 />
@@ -562,8 +564,24 @@ function IsolatedItemIcon({ item }: { item: ShopItem }) {
   if (["earrings", "earPiercing", "ears"].includes(item.slot)) {
     return (
       <svg viewBox="0 0 72 72" className="h-full w-full text-foreground" aria-hidden>
-        <ellipse cx="25" cy="36" rx="10" ry="16" fill={skin} stroke="currentColor" strokeOpacity="0.18" />
-        <ellipse cx="47" cy="36" rx="10" ry="16" fill={skin} stroke="currentColor" strokeOpacity="0.18" />
+        <ellipse
+          cx="25"
+          cy="36"
+          rx="10"
+          ry="16"
+          fill={skin}
+          stroke="currentColor"
+          strokeOpacity="0.18"
+        />
+        <ellipse
+          cx="47"
+          cy="36"
+          rx="10"
+          ry="16"
+          fill={skin}
+          stroke="currentColor"
+          strokeOpacity="0.18"
+        />
         <ellipse cx="25" cy="37" rx="4" ry="8" fill="rgba(255,255,255,.22)" />
         <ellipse cx="47" cy="37" rx="4" ry="8" fill="rgba(255,255,255,.22)" />
         {item.slot === "ears" && item.id.includes("headphones") ? (
@@ -603,29 +621,87 @@ function IsolatedItemIcon({ item }: { item: ShopItem }) {
         <circle cx="36" cy="36" r="23" fill={skin} stroke="currentColor" strokeOpacity="0.16" />
         <ellipse cx="28" cy="35" rx="3" ry="4" fill="currentColor" />
         <ellipse cx="44" cy="35" rx="3" ry="4" fill="currentColor" />
-        <path d="M 33 47 Q 36 50 39 47" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-        {item.id.includes("nose") ? <circle cx="40" cy="42" r="2.4" fill={c} /> : item.id.includes("eyebrow") ? <rect x="24" y="28" width="8" height="2.4" rx="1" fill={c} /> : <circle cx="31" cy="49" r="2.6" fill="none" stroke={c} strokeWidth="2" />}
+        <path
+          d="M 33 47 Q 36 50 39 47"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          fill="none"
+          strokeLinecap="round"
+        />
+        {item.id.includes("nose") ? (
+          <circle cx="40" cy="42" r="2.4" fill={c} />
+        ) : item.id.includes("eyebrow") ? (
+          <rect x="24" y="28" width="8" height="2.4" rx="1" fill={c} />
+        ) : (
+          <circle cx="31" cy="49" r="2.6" fill="none" stroke={c} strokeWidth="2" />
+        )}
       </svg>
     );
   }
 
   if (item.slot === "necklace") {
-    return <svg viewBox="0 0 72 72" className="h-full w-full" aria-hidden><path d="M 20 24 Q 36 52 52 24" stroke={c} strokeWidth="3" fill="none" strokeLinecap="round" /><path d="M 36 44 L 42 50 L 36 57 L 30 50 Z" fill={c} /></svg>;
+    return (
+      <svg viewBox="0 0 72 72" className="h-full w-full" aria-hidden>
+        <path
+          d="M 20 24 Q 36 52 52 24"
+          stroke={c}
+          strokeWidth="3"
+          fill="none"
+          strokeLinecap="round"
+        />
+        <path d="M 36 44 L 42 50 L 36 57 L 30 50 Z" fill={c} />
+      </svg>
+    );
   }
   if (item.slot === "bracelet") {
-    return <svg viewBox="0 0 72 72" className="h-full w-full" aria-hidden><ellipse cx="36" cy="36" rx="19" ry="12" fill="none" stroke={c} strokeWidth="5" />{[0,1,2,3].map((i)=><circle key={i} cx={24+i*8} cy={29+(i%2)*14} r="3" fill={dark} />)}</svg>;
+    return (
+      <svg viewBox="0 0 72 72" className="h-full w-full" aria-hidden>
+        <ellipse cx="36" cy="36" rx="19" ry="12" fill="none" stroke={c} strokeWidth="5" />
+        {[0, 1, 2, 3].map((i) => (
+          <circle key={i} cx={24 + i * 8} cy={29 + (i % 2) * 14} r="3" fill={dark} />
+        ))}
+      </svg>
+    );
   }
   if (item.slot === "hairClip") {
-    return <svg viewBox="0 0 72 72" className="h-full w-full" aria-hidden><path d="M 36 36 L 18 25 Q 10 36 18 47 Z" fill={c} /><path d="M 36 36 L 54 25 Q 62 36 54 47 Z" fill={c} /><circle cx="36" cy="36" r="6" fill={dark} /></svg>;
+    return (
+      <svg viewBox="0 0 72 72" className="h-full w-full" aria-hidden>
+        <path d="M 36 36 L 18 25 Q 10 36 18 47 Z" fill={c} />
+        <path d="M 36 36 L 54 25 Q 62 36 54 47 Z" fill={c} />
+        <circle cx="36" cy="36" r="6" fill={dark} />
+      </svg>
+    );
   }
   if (item.slot === "hat") {
-    return <svg viewBox="0 0 72 72" className="h-full w-full" aria-hidden><ellipse cx="36" cy="45" rx="27" ry="6" fill={c} /><path d="M 21 45 Q 36 16 51 45 Z" fill={c} opacity="0.9" /></svg>;
+    return (
+      <svg viewBox="0 0 72 72" className="h-full w-full" aria-hidden>
+        <ellipse cx="36" cy="45" rx="27" ry="6" fill={c} />
+        <path d="M 21 45 Q 36 16 51 45 Z" fill={c} opacity="0.9" />
+      </svg>
+    );
   }
   if (item.slot === "accessory") {
-    return <svg viewBox="0 0 72 72" className="h-full w-full" aria-hidden><circle cx="28" cy="33" r="9" fill="none" stroke={c} strokeWidth="4" /><circle cx="48" cy="33" r="9" fill="none" stroke={c} strokeWidth="4" /><path d="M 37 33 L 39 33" stroke={c} strokeWidth="4" /><path d="M 25 48 Q 36 56 47 48" stroke={c} strokeWidth="5" fill="none" strokeLinecap="round" /></svg>;
+    return (
+      <svg viewBox="0 0 72 72" className="h-full w-full" aria-hidden>
+        <circle cx="28" cy="33" r="9" fill="none" stroke={c} strokeWidth="4" />
+        <circle cx="48" cy="33" r="9" fill="none" stroke={c} strokeWidth="4" />
+        <path d="M 37 33 L 39 33" stroke={c} strokeWidth="4" />
+        <path
+          d="M 25 48 Q 36 56 47 48"
+          stroke={c}
+          strokeWidth="5"
+          fill="none"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
   }
 
-  return <div className="grid h-full w-full place-items-center"><span className="h-8 w-8 rounded-full border-4 border-current" style={{ color: c }} /></div>;
+  return (
+    <div className="grid h-full w-full place-items-center">
+      <span className="h-8 w-8 rounded-full border-4 border-current" style={{ color: c }} />
+    </div>
+  );
 }
 
 /** Builds a dressup with ONLY the slot we're previewing changed — so the
@@ -728,4 +804,3 @@ function SlotPicker({
     </Section>
   );
 }
-
