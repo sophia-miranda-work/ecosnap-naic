@@ -131,32 +131,34 @@ function HairLayer({ style, color }: { style: Hairstyle; color: string }) {
     case "ponytail":
       return (
         <g>
-          {/* Cap with sweep toward the tie — drawn first so the tail overlaps it */}
-          <path
-            d="M30,40 Q28,20 50,19 Q72,20 70,40 Q68,30 58,28 Q52,34 46,32 Q38,34 34,32 Q31,34 30,40 Z"
-            fill={color}
-          />
           {/* Ponytail anchored at ANCHORS.backRight: the base is drawn AT the
               anchor (inside the head silhouette) and the tail trails down/back
-              from there. All offsets below are relative to (ax, ay). */}
+              from there. All offsets below are relative to (ax, ay). The tail
+              is drawn before the cap so the cap covers the root seam. */}
           {(() => {
             const { x: ax, y: ay } = ANCHORS.backRight;
             return (
               <>
                 <path
-                  d={`M${ax - 2},${ay - 1}
-                      Q${ax + 12},${ay + 4} ${ax + 16},${ay + 18}
-                      Q${ax + 18},${ay + 30} ${ax + 12},${ay + 34}
-                      Q${ax + 8},${ay + 34} ${ax + 8},${ay + 28}
-                      Q${ax + 10},${ay + 18} ${ax + 4},${ay + 10}
-                      Q${ax},${ay + 4} ${ax - 4},${ay + 2} Z`}
+                  d={`M${ax - 7},${ay - 3}
+                      Q${ax + 9},${ay - 1} ${ax + 16},${ay + 14}
+                      Q${ax + 22},${ay + 28} ${ax + 13},${ay + 38}
+                      Q${ax + 7},${ay + 40} ${ax + 5},${ay + 32}
+                      Q${ax + 9},${ay + 20} ${ax + 1},${ay + 10}
+                      Q${ax - 5},${ay + 4} ${ax - 9},${ay + 3} Z`}
                   fill={color}
                 />
-                {/* Hair tie sits exactly on the anchor */}
-                <circle cx={ax + 2} cy={ay + 2} r="2.4" fill={hi} opacity="0.85" />
+                {/* Root mass deliberately overlaps the head cap to remove any visible gap. */}
+                <ellipse cx={ax - 1} cy={ay + 2} rx="7" ry="6" fill={color} />
+                <circle cx={ax + 2} cy={ay + 4} r="2.4" fill={hi} opacity="0.85" />
               </>
             );
           })()}
+          {/* Cap with sweep toward the tie — drawn last so the ponytail root tucks underneath it */}
+          <path
+            d="M30,40 Q28,20 50,19 Q72,20 70,40 Q68,30 60,28 Q54,34 46,32 Q38,34 34,32 Q31,34 30,40 Z"
+            fill={color}
+          />
           {/* Highlight */}
           <path d="M42,22 Q50,18 58,22 Q52,25 46,25 Z" fill={hi} opacity="0.55" />
         </g>
