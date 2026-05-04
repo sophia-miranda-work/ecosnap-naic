@@ -38,11 +38,9 @@ const HAIR_COLORS = ["#1a1410", "#3b2a1a", "#7a5236", "#b88a4a", "#d9b56b", "#c9
 const NAIL_COLORS = [null, "#e83a5a", "#f0a8c0", "#a83af0", "#3a8af0", "#3af0a8", "#f0e83a", "#1a1410"];
 
 const FACE_SHAPES: { id: FaceShape; label: string }[] = [
-  { id: "round",   label: "Round" },
-  { id: "oval",    label: "Oval" },
-  { id: "square",  label: "Square" },
-  { id: "heart",   label: "Heart" },
-  { id: "diamond", label: "Diamond" },
+  { id: "round", label: "Large round" },
+  { id: "oval", label: "Soft oval" },
+  { id: "heart", label: "Baby round" },
 ];
 
 const BODY_SHAPES: { id: BodyShape; label: string }[] = [
