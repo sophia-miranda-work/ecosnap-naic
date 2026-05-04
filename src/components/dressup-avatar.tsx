@@ -8,70 +8,10 @@ import {
 } from "@/hooks/use-character";
 import { getItemById } from "@/lib/shop";
 
-import dressFloralPink from "@/assets/dresses/clean/floral-pink.png";
-import dressLavenderParty from "@/assets/dresses/clean/lavender-party.png";
-import dressPinaforePink from "@/assets/dresses/clean/pinafore-pink.png";
-import dressSailorBlue from "@/assets/dresses/clean/sailor-blue.png";
-import dressSweaterMint from "@/assets/dresses/clean/sweater-mint.png";
-import dressSundressBlack from "@/assets/dresses/clean/sundress-black.png";
-
-/** Dresses backed by painted PNGs. */
-const DRESS_IMAGES: Record<string, string> = {
-  "dress-floral-pink": dressFloralPink,
-  "dress-lavender-party": dressLavenderParty,
-  "dress-pinafore-pink": dressPinaforePink,
-  "dress-sailor-blue": dressSailorBlue,
-  "dress-sweater-mint": dressSweaterMint,
-  "dress-sundress-black": dressSundressBlack,
-};
-
-/**
- * Hair PNG overlays were causing visible solid-color blocks behind the face
- * and clipped/geometric edges. We now render hair purely through the
- * shape-fitted SVG `hairLayers` below — keep this map empty so the SVG
- * path is taken in the renderer.
- */
-export const HAIR_IMAGES: Partial<Record<HairStyleId, string>> = {};
-
 export const HEAD_CX = 50;
 export const HEAD_CY = 42;
 const BASE_RX = 28;
 const BASE_RY = 29;
-
-/**
- * Per-PNG calibration metrics. Each value is normalized (0-1) within the
- * 512x512 source PNG and describes WHERE the underlying head sits inside the
- * artwork, so we can anchor the hair onto our SVG head regardless of the
- * transparent padding around each hairstyle.
- *
- * - faceCx / faceCy: where the wearer's face center should land
- * - faceRx / faceRy: half-width / half-height of the face the artwork was drawn around
- */
-type HairMetric = {
-  faceCx: number;
-  faceCy: number;
-  faceRx: number;
-  faceRy: number;
-};
-const DEFAULT_HAIR_METRIC: HairMetric = {
-  faceCx: 0.5,
-  faceCy: 0.52,
-  faceRx: 0.30,
-  faceRy: 0.32,
-};
-const HAIR_METRICS: Partial<Record<HairStyleId, HairMetric>> = {
-  "soft-bob":     { faceCx: 0.50, faceCy: 0.54, faceRx: 0.30, faceRy: 0.32 },
-  "long-bangs":   { faceCx: 0.51, faceCy: 0.55, faceRx: 0.27, faceRy: 0.30 },
-  "low-pigtails": { faceCx: 0.50, faceCy: 0.55, faceRx: 0.28, faceRy: 0.30 },
-  "space-buns":   { faceCx: 0.50, faceCy: 0.58, faceRx: 0.28, faceRy: 0.30 },
-  "twin-braids":  { faceCx: 0.50, faceCy: 0.55, faceRx: 0.26, faceRy: 0.30 },
-  "fluffy-curls": { faceCx: 0.51, faceCy: 0.55, faceRx: 0.28, faceRy: 0.30 },
-  "side-sweep":   { faceCx: 0.51, faceCy: 0.56, faceRx: 0.28, faceRy: 0.30 },
-  "curtain-cut":  { faceCx: 0.50, faceCy: 0.55, faceRx: 0.28, faceRy: 0.31 },
-  afro:           { faceCx: 0.50, faceCy: 0.58, faceRx: 0.28, faceRy: 0.30 },
-  topknot:        { faceCx: 0.52, faceCy: 0.60, faceRx: 0.27, faceRy: 0.30 },
-  fade:           { faceCx: 0.51, faceCy: 0.55, faceRx: 0.28, faceRy: 0.30 },
-};
 
 function clamp(n: number, min: number, max: number) {
   return Math.min(max, Math.max(min, n));
@@ -154,8 +94,7 @@ function darken(hex: string, amount = 0.25): string {
 
 export function hairLayers(style: HairStyleId, color: string, rx: number, ry: number) {
   if (style === "bald") return { back: null, front: null };
-  const hi = lighten(color, 0.35);
-  const sh = darken(color, 0.2);
+
   const cx = HEAD_CX;
   const cy = HEAD_CY;
   const top = cy - ry;
@@ -163,314 +102,140 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
   const sideL = cx - rx;
   const sideR = cx + rx;
 
-  const scalpCap = (drop = cy + 3, lift = 6) => (
-    <path
-      d={`M ${sideL - 3},${drop}
-        C ${sideL - 5},${top + 8} ${sideL + 8},${top - lift} ${cx},${top - lift}
-        C ${sideR - 8},${top - lift} ${sideR + 5},${top + 8} ${sideR + 3},${drop}
-        C ${sideR - 4},${top + 18} ${sideL + 4},${top + 18} ${sideL - 3},${drop} Z`}
-      fill={color}
-    />
+  const sticker = (d: string) => (
+    <path d={d} fill={color} fillRule="evenodd" clipRule="evenodd" />
   );
 
-  const softBangs = (part = 0) => (
-    <path
-      d={`M ${sideL + 2},${top + 12}
-        C ${sideL + 11},${top + 4} ${sideR - 10},${top + 4} ${sideR - 2},${top + 12}
-        C ${sideR - 8},${cy - 1} ${cx + 12 + part},${cy + 5} ${cx + 5 + part},${cy + 12}
-        C ${cx + 1},${cy + 4} ${cx - 5},${cy + 4} ${cx - 10},${cy + 12}
-        C ${cx - 16 + part},${cy + 4} ${sideL + 8},${cy - 1} ${sideL + 2},${top + 12} Z`}
-      fill={color}
-    />
-  );
+  const faceOpening = (hairline = top + 17, inset = 5.5, jaw = bottom + 0.5) => `
+    M ${sideL + inset},${hairline}
+    C ${sideL + inset + 2},${cy + 8} ${sideL + rx * 0.48},${jaw} ${cx},${jaw}
+    C ${sideR - rx * 0.48},${jaw} ${sideR - inset - 2},${cy + 8} ${sideR - inset},${hairline}
+    C ${sideR - 11},${hairline - 4} ${sideL + 11},${hairline - 4} ${sideL + inset},${hairline} Z`;
 
-  // Single continuous fringe — no centre gap that exposes the scalp.
-  const curtainBangs = () => (
-    <path
-      d={`M ${sideL + 4},${top + 9}
-        C ${sideL + 10},${top + 4} ${sideR - 10},${top + 4} ${sideR - 4},${top + 9}
-        C ${sideR - 6},${cy + 6} ${cx + 8},${cy + 14} ${cx + 4},${cy + 16}
-        C ${cx + 1},${cy + 9} ${cx - 1},${cy + 9} ${cx - 4},${cy + 16}
-        C ${cx - 8},${cy + 14} ${sideL + 6},${cy + 6} ${sideL + 4},${top + 9} Z`}
-      fill={color}
-    />
-  );
+  const roundedCap = (drop = cy + 8, lift = 7) => `
+    M ${sideL - 3},${drop}
+    C ${sideL - 7},${top + 7} ${sideL + 8},${top - lift} ${cx},${top - lift}
+    C ${sideR - 8},${top - lift} ${sideR + 7},${top + 7} ${sideR + 3},${drop}
+    C ${sideR - 4},${drop + 11} ${sideL + 4},${drop + 11} ${sideL - 3},${drop} Z`;
 
-  const shine = (x = cx - 11, y = top + 7) => (
-    <path
-      d={`M ${x},${y} C ${x + 8},${y - 4} ${x + 18},${y - 2} ${x + 26},${y + 3}`}
-      stroke={hi}
-      strokeWidth="1.15"
-      strokeLinecap="round"
-      fill="none"
-      opacity="0.45"
-    />
-  );
-
-  const longCurtainBack = (length = 34, flare = 8) => (
-    <path
-      d={`M ${sideL + 1},${cy - 6}
-        C ${sideL - flare},${cy + 10} ${sideL - 4},${bottom + length - 5} ${cx - 10},${bottom + length}
-        L ${cx + 10},${bottom + length}
-        C ${sideR + 4},${bottom + length - 5} ${sideR + flare},${cy + 10} ${sideR - 1},${cy - 6}
-        C ${sideR - 5},${top - 2} ${sideL + 5},${top - 2} ${sideL + 1},${cy - 6} Z`}
-      fill={color}
-    />
-  );
-
-  const curlRow = (startX: number, y: number, count: number, r: number) => (
-    <g>
-      {Array.from({ length: count }, (_, i) => (
-        <circle key={i} cx={startX + i * r * 1.45} cy={y + (i % 2) * 1.4} r={r} fill={color} />
-      ))}
-    </g>
-  );
+  let d: string;
 
   switch (style) {
     case "soft-bob":
     case "short":
     case "bob":
-      return {
-        back: (
-          <path
-            d={`M ${sideL - 2},${cy - 2} C ${sideL - 8},${cy + 17} ${sideL + 4},${bottom + 9} ${cx - 13},${bottom + 10} L ${cx + 13},${bottom + 10} C ${sideR - 4},${bottom + 9} ${sideR + 8},${cy + 17} ${sideR + 2},${cy - 2} Z`}
-            fill={color}
-          />
-        ),
-        front: (
-          <g>
-            {scalpCap(cy + 6, 6)}
-            {softBangs()}
-            <path
-              d={`M ${sideL + 5},${cy + 4} C ${sideL + 2},${cy + 18} ${sideL + 8},${bottom + 6} ${sideL + 16},${bottom + 7}`}
-              stroke={color}
-              strokeWidth="6"
-              strokeLinecap="round"
-              fill="none"
-            />
-            <path
-              d={`M ${sideR - 5},${cy + 4} C ${sideR - 2},${cy + 18} ${sideR - 8},${bottom + 6} ${sideR - 16},${bottom + 7}`}
-              stroke={color}
-              strokeWidth="6"
-              strokeLinecap="round"
-              fill="none"
-            />
-            {shine()}
-          </g>
-        ),
-      };
+      d = `
+        M ${sideL - 5},${cy - 4}
+        C ${sideL - 11},${cy + 12} ${sideL - 1},${bottom + 10} ${cx - 15},${bottom + 12}
+        L ${cx + 15},${bottom + 12}
+        C ${sideR + 1},${bottom + 10} ${sideR + 11},${cy + 12} ${sideR + 5},${cy - 4}
+        C ${sideR + 3},${top - 8} ${sideL - 3},${top - 8} ${sideL - 5},${cy - 4} Z
+        ${faceOpening(top + 18, 6.2, bottom + 1.5)}`;
+      break;
+
     case "long-bangs":
     case "long":
-      return {
-        back: longCurtainBack(38, 9),
-        front: (
-          <g>
-            {scalpCap(cy + 7, 5)}
-            {curtainBangs()}
-            <path
-              d={`M ${sideL + 2},${cy + 2} C ${sideL + 1},${cy + 18} ${sideL + 4},${bottom + 22} ${sideL + 10},${bottom + 34}`}
-              stroke={color}
-              strokeWidth="7"
-              strokeLinecap="round"
-              fill="none"
-            />
-            <path
-              d={`M ${sideR - 2},${cy + 2} C ${sideR - 1},${cy + 18} ${sideR - 4},${bottom + 22} ${sideR - 10},${bottom + 34}`}
-              stroke={color}
-              strokeWidth="7"
-              strokeLinecap="round"
-              fill="none"
-            />
-            {shine(cx - 7, top + 7)}
-          </g>
-        ),
-      };
     case "straight-bangs":
-      return {
-        back: longCurtainBack(29, 4),
-        front: (
-          <g>
-            {scalpCap(cy + 7, 5)}
-            <path
-              d={`M ${sideL + 3},${top + 13} C ${sideL + 11},${top + 5} ${sideR - 11},${top + 5} ${sideR - 3},${top + 13} L ${sideR - 4},${cy + 10} C ${cx + 12},${cy + 8} ${cx - 12},${cy + 8} ${sideL + 4},${cy + 10} Z`}
-              fill={color}
-            />
-            {shine(cx - 12, top + 8)}
-          </g>
-        ),
-      };
     case "curtain-cut":
     case "wavy":
-      return {
-        back: longCurtainBack(24, 10),
-        front: (
-          <g>
-            {scalpCap(cy + 6, 5)}
-            {curtainBangs()}
-            <path
-              d={`M ${sideL + 2},${cy + 1} C ${sideL - 5},${cy + 13} ${sideL + 9},${cy + 20} ${sideL + 5},${cy + 35}`}
-              stroke={color}
-              strokeWidth="7"
-              strokeLinecap="round"
-              fill="none"
-            />
-            <path
-              d={`M ${sideR - 2},${cy + 1} C ${sideR + 5},${cy + 13} ${sideR - 9},${cy + 20} ${sideR - 5},${cy + 35}`}
-              stroke={color}
-              strokeWidth="7"
-              strokeLinecap="round"
-              fill="none"
-            />
-            {shine(cx - 4, top + 8)}
-          </g>
-        ),
-      };
+      d = `
+        M ${sideL - 4},${cy - 7}
+        C ${sideL - 12},${cy + 9} ${sideL - 7},${bottom + 34} ${cx - 13},${bottom + 43}
+        Q ${cx},${bottom + 48} ${cx + 13},${bottom + 43}
+        C ${sideR + 7},${bottom + 34} ${sideR + 12},${cy + 9} ${sideR + 4},${cy - 7}
+        C ${sideR + 2},${top - 8} ${sideL - 2},${top - 8} ${sideL - 4},${cy - 7} Z
+        ${faceOpening(top + 18, 5.8, bottom + 2)}`;
+      break;
+
     case "high-pony":
     case "ponytail":
-      return {
-        back: (
-          <g>
-            <ellipse cx={sideR + 1} cy={cy - 2} rx="7" ry="8" fill={color} />
-            <path
-              d={`M ${sideR + 1},${cy - 3} C ${sideR + 21},${cy + 2} ${sideR + 20},${cy + 25} ${sideR + 8},${cy + 42} C ${sideR - 2},${cy + 37} ${sideR + 1},${cy + 13} ${sideR + 1},${cy - 3} Z`}
-              fill={color}
-            />
-          </g>
-        ),
-        front: (
-          <g>
-            {scalpCap(cy + 5, 6)}
-            {curtainBangs()}
-            <ellipse cx={sideR} cy={cy - 2} rx="3.2" ry="2.3" fill={sh} />
-          </g>
-        ),
-      };
+      d = `
+        M ${sideL - 3},${cy + 7}
+        C ${sideL - 7},${top + 6} ${sideL + 8},${top - 8} ${cx},${top - 8}
+        C ${sideR - 5},${top - 8} ${sideR + 6},${top + 1} ${sideR + 5},${cy - 4}
+        C ${sideR + 21},${cy + 2} ${sideR + 23},${cy + 25} ${sideR + 9},${cy + 43}
+        C ${sideR - 2},${cy + 37} ${sideR + 1},${cy + 17} ${sideR + 1},${cy + 8}
+        C ${sideR - 7},${cy + 18} ${sideL + 7},${cy + 18} ${sideL - 3},${cy + 7} Z
+        ${faceOpening(top + 17, 6, bottom + 0.5)}`;
+      break;
+
     case "low-pigtails":
     case "pigtails":
-      return {
-        back: (
-          <g>
-            <path
-              d={`M ${sideL + 3},${cy + 3} C ${sideL - 15},${cy + 11} ${sideL - 13},${cy + 34} ${sideL - 1},${cy + 43} C ${sideL + 8},${cy + 36} ${sideL + 8},${cy + 17} ${sideL + 3},${cy + 3} Z`}
-              fill={color}
-            />
-            <path
-              d={`M ${sideR - 3},${cy + 3} C ${sideR + 15},${cy + 11} ${sideR + 13},${cy + 34} ${sideR + 1},${cy + 43} C ${sideR - 8},${cy + 36} ${sideR - 8},${cy + 17} ${sideR - 3},${cy + 3} Z`}
-              fill={color}
-            />
-          </g>
-        ),
-        front: (
-          <g>
-            {scalpCap(cy + 6, 5)}
-            {softBangs()}
-            <ellipse cx={sideL + 2} cy={cy + 2} rx="3" ry="2.2" fill={sh} />
-            <ellipse cx={sideR - 2} cy={cy + 2} rx="3" ry="2.2" fill={sh} />
-          </g>
-        ),
-      };
+      d = `
+        M ${sideL - 3},${cy + 3}
+        C ${sideL - 17},${cy + 11} ${sideL - 15},${cy + 35} ${sideL - 1},${cy + 45}
+        C ${sideL + 8},${cy + 39} ${sideL + 8},${cy + 22} ${sideL + 3},${cy + 11}
+        C ${sideL - 8},${top + 7} ${sideL + 8},${top - 7} ${cx},${top - 7}
+        C ${sideR - 8},${top - 7} ${sideR + 8},${top + 7} ${sideR - 3},${cy + 11}
+        C ${sideR - 8},${cy + 22} ${sideR - 8},${cy + 39} ${sideR + 1},${cy + 45}
+        C ${sideR + 15},${cy + 35} ${sideR + 17},${cy + 11} ${sideR + 3},${cy + 3}
+        C ${sideR + 2},${cy + 16} ${sideL - 2},${cy + 16} ${sideL - 3},${cy + 3} Z
+        ${faceOpening(top + 18, 6.2, bottom + 0.5)}`;
+      break;
+
     case "space-buns":
     case "double-bun":
     case "bun":
     case "side-bun":
     case "topknot":
-      return {
-        back: (
-          <g>
-            <ellipse cx={cx - rx * 0.58} cy={top + 1} rx="10" ry="9" fill={color} />
-            <ellipse cx={cx + rx * 0.58} cy={top + 1} rx="10" ry="9" fill={color} />
-          </g>
-        ),
-        front: (
-          <g>
-            {scalpCap(cy + 5, 5)}
-            {softBangs()}
-            <ellipse cx={cx - rx * 0.58} cy={top + 1} rx="10" ry="9" fill={color} />
-            <ellipse cx={cx + rx * 0.58} cy={top + 1} rx="10" ry="9" fill={color} />
-            <path
-              d={`M ${cx - rx * 0.58 - 4},${top + 1} C ${cx - rx * 0.58},${top - 3} ${cx - rx * 0.58 + 5},${top - 2} ${cx - rx * 0.58 + 6},${top + 2}`}
-              stroke={hi}
-              strokeWidth="1"
-              fill="none"
-              opacity="0.45"
-            />
-          </g>
-        ),
-      };
+      d = `
+        M ${cx - rx * 0.7},${top + 6}
+        C ${cx - rx * 1.05},${top + 2} ${cx - rx * 0.95},${top - 14} ${cx - rx * 0.55},${top - 14}
+        C ${cx - rx * 0.25},${top - 16} ${cx - rx * 0.18},${top - 4} ${cx - rx * 0.34},${top + 2}
+        C ${cx - 8},${top - 8} ${cx + 8},${top - 8} ${cx + rx * 0.34},${top + 2}
+        C ${cx + rx * 0.18},${top - 4} ${cx + rx * 0.25},${top - 16} ${cx + rx * 0.55},${top - 14}
+        C ${cx + rx * 0.95},${top - 14} ${cx + rx * 1.05},${top + 2} ${cx + rx * 0.7},${top + 6}
+        C ${sideR + 5},${cy + 4} ${sideR + 1},${cy + 16} ${cx},${cy + 18}
+        C ${sideL - 1},${cy + 16} ${sideL - 5},${cy + 4} ${cx - rx * 0.7},${top + 6} Z
+        ${faceOpening(top + 18, 6, bottom)}`;
+      break;
+
     case "fluffy-curls":
     case "curly":
     case "afro":
-      return {
-        back: <ellipse cx={cx} cy={cy - 4} rx={rx + 9} ry={ry + 4} fill={color} />,
-        front: (
-          <g>
-            <ellipse cx={cx} cy={cy - 4} rx={rx + 6} ry={ry - 1} fill={color} />
-            {curlRow(cx - 30, top + 7, 7, 5.4)}
-            {curlRow(cx - 24, top + 1, 5, 5.8)}
-            <circle cx={cx - 8} cy={top + 2} r="2.7" fill={hi} opacity="0.5" />
-          </g>
-        ),
-      };
+      d = `
+        M ${cx - rx - 10},${cy - 3}
+        C ${cx - rx - 13},${top + 8} ${cx - rx - 2},${top - 5} ${cx - rx * 0.72},${top - 4}
+        C ${cx - rx * 0.62},${top - 15} ${cx - rx * 0.22},${top - 14} ${cx - rx * 0.12},${top - 8}
+        C ${cx + rx * 0.04},${top - 17} ${cx + rx * 0.47},${top - 13} ${cx + rx * 0.52},${top - 5}
+        C ${cx + rx + 4},${top - 7} ${cx + rx + 13},${top + 8} ${cx + rx + 10},${cy - 2}
+        C ${cx + rx + 16},${cy + 14} ${cx + rx + 1},${cy + 25} ${cx + rx * 0.55},${cy + 20}
+        C ${cx + 9},${cy + 28} ${cx - 9},${cy + 28} ${cx - rx * 0.55},${cy + 20}
+        C ${cx - rx - 1},${cy + 25} ${cx - rx - 16},${cy + 14} ${cx - rx - 10},${cy - 3} Z
+        ${faceOpening(top + 22, 7, bottom - 0.5)}`;
+      break;
+
     case "twin-braids":
     case "braids":
-      return {
-        back: (
-          <g>
-            {[0, 1, 2, 3].map((k) => (
-              <g key={k}>
-                <ellipse
-                  cx={sideL + 4 + (k % 2 ? -1.5 : 1.5)}
-                  cy={cy + 9 + k * 9}
-                  rx="4.2"
-                  ry="3.4"
-                  fill={k % 2 ? sh : color}
-                />
-                <ellipse
-                  cx={sideR - 4 + (k % 2 ? 1.5 : -1.5)}
-                  cy={cy + 9 + k * 9}
-                  rx="4.2"
-                  ry="3.4"
-                  fill={k % 2 ? sh : color}
-                />
-              </g>
-            ))}
-          </g>
-        ),
-        front: (
-          <g>
-            {scalpCap(cy + 6, 5)}
-            {softBangs()}
-          </g>
-        ),
-      };
+      d = `
+        M ${sideL - 4},${cy + 4}
+        C ${sideL - 8},${top + 7} ${sideL + 8},${top - 7} ${cx},${top - 7}
+        C ${sideR - 8},${top - 7} ${sideR + 8},${top + 7} ${sideR + 4},${cy + 4}
+        C ${sideR + 11},${cy + 17} ${sideR + 7},${cy + 42} ${sideR - 1},${cy + 50}
+        C ${sideR - 10},${cy + 42} ${sideR - 8},${cy + 19} ${sideR - 4},${cy + 9}
+        C ${sideR - 10},${cy + 18} ${sideL + 10},${cy + 18} ${sideL + 4},${cy + 9}
+        C ${sideL + 8},${cy + 19} ${sideL + 10},${cy + 42} ${sideL + 1},${cy + 50}
+        C ${sideL - 7},${cy + 42} ${sideL - 11},${cy + 17} ${sideL - 4},${cy + 4} Z
+        ${faceOpening(top + 18, 6.2, bottom + 0.5)}`;
+      break;
+
     case "side-sweep":
     case "fade":
     case "undercut":
     case "mohawk":
-      return {
-        back: null,
-        front: (
-          <g>
-            {scalpCap(cy + 2, 6)}
-            <path
-              d={`M ${sideL + 2},${top + 13} C ${cx - 7},${top - 1} ${sideR - 5},${top + 4} ${sideR - 2},${cy + 7} C ${cx + 5},${cy + 3} ${cx - 11},${cy + 8} ${sideL + 2},${top + 13} Z`}
-              fill={color}
-            />
-            {shine(cx - 2, top + 6)}
-          </g>
-        ),
-      };
+      d = `
+        M ${sideL - 1},${cy + 4}
+        C ${sideL - 4},${top + 7} ${sideL + 12},${top - 9} ${cx + 5},${top - 7}
+        C ${sideR - 1},${top - 5} ${sideR + 4},${cy + 3} ${sideR - 1},${cy + 9}
+        C ${cx + 7},${cy + 4} ${cx - 11},${cy + 8} ${sideL - 1},${cy + 4} Z`;
+      break;
+
     default:
-      return {
-        back: null,
-        front: (
-          <g>
-            {scalpCap(cy + 5, 5)}
-            {softBangs()}
-          </g>
-        ),
-      };
+      d = `${roundedCap(cy + 8, 7)} ${faceOpening(top + 18, 6, bottom)}`;
+      break;
   }
+
+  return { back: null, front: sticker(d) };
 }
 
 function bodyMetrics(shape: BodyShape) {
@@ -500,66 +265,113 @@ function DressShape({
   shoulderW: number;
   hipW: number;
 }) {
-  const sparkle = lighten(color, 0.35);
-  const trim = darken(color, 0.25);
-  if (id?.includes("princess") || id?.includes("starlight")) {
+  const accent = lighten(color, 0.34);
+  const pale = lighten(color, 0.58);
+  const trim = darken(color, 0.24);
+  const waistY = torsoTop + 13;
+  const hemY = legTop + 12;
+
+  const flowerPrint = (baseY = waistY + 4) => (
+    <g opacity="0.9">
+      {[-11, -3, 6, 13].map((dx, i) => (
+        <g key={dx} transform={`translate(${50 + dx} ${baseY + (i % 2) * 5}) scale(0.75)`}>
+          <circle cx="0" cy="-1.2" r="1" fill={pale} />
+          <circle cx="1.2" cy="0" r="1" fill={pale} />
+          <circle cx="0" cy="1.2" r="1" fill={pale} />
+          <circle cx="-1.2" cy="0" r="1" fill={pale} />
+          <circle cx="0" cy="0" r="0.55" fill={trim} />
+        </g>
+      ))}
+    </g>
+  );
+
+  if (id?.includes("sailor")) {
     return (
       <g>
-        <path
-          d={`M ${50 - shoulderW / 2},${torsoTop} Q 50,${torsoTop - 5} ${50 + shoulderW / 2},${torsoTop} L ${50 + hipW / 2 + 15},${legTop + 17} Q 50,${legTop + 23} ${50 - hipW / 2 - 15},${legTop + 17} Z`}
-          fill={color}
-        />
-        <path
-          d={`M ${50 - 7},${torsoTop + 3} L 50,${torsoTop + 14} L ${50 + 7},${torsoTop + 3}`}
-          fill={sparkle}
-          opacity="0.55"
-        />
-        <circle cx="43" cy={legTop + 13} r="1" fill={sparkle} opacity="0.75" />
-        <circle cx="57" cy={legTop + 10} r="0.9" fill={sparkle} opacity="0.7" />
+        <path d={`M ${50 - shoulderW / 2 - 1},${torsoTop + 1} Q 50,${torsoTop - 5} ${50 + shoulderW / 2 + 1},${torsoTop + 1} L ${50 + hipW / 2 + 4},${waistY + 2} L ${50 - hipW / 2 - 4},${waistY + 2} Z`} fill={color} />
+        <path d={`M ${50 - 12},${torsoTop + 2} L 50,${torsoTop + 12} L ${50 + 12},${torsoTop + 2} L ${50 + 8},${torsoTop + 13} L ${50 - 8},${torsoTop + 13} Z`} fill={pale} opacity="0.9" />
+        <path d={`M 50,${torsoTop + 8} l -3,5 h 6 Z`} fill={darken(color, 0.42)} />
+        <path d={`M ${50 - hipW / 2 - 8},${waistY + 1} L ${50 + hipW / 2 + 8},${waistY + 1} L ${50 + hipW / 2 + 11},${hemY} Q 50,${hemY + 5} ${50 - hipW / 2 - 11},${hemY} Z`} fill={lighten(color, 0.1)} />
+        <g stroke={trim} strokeWidth="0.55" opacity="0.72">
+          {[-3, -1.5, 0, 1.5, 3].map((k) => <line key={k} x1={50 + k * 3} y1={waistY + 3} x2={50 + k * 4.1} y2={hemY + 1} />)}
+        </g>
       </g>
     );
   }
-  if (id?.includes("tutu") || id?.includes("party")) {
+
+  if (id?.includes("sweater") || id?.includes("smock")) {
     return (
       <g>
-        <path
-          d={`M ${50 - shoulderW / 2},${torsoTop} Q 50,${torsoTop - 4} ${50 + shoulderW / 2},${torsoTop} L ${50 + hipW / 2 + 6},${legTop + 3} L ${50 - hipW / 2 - 6},${legTop + 3} Z`}
-          fill={color}
-        />
-        <path
-          d={`M ${50 - hipW / 2 - 13},${legTop + 3} Q 50,${legTop + 16} ${50 + hipW / 2 + 13},${legTop + 3} L ${50 + hipW / 2 + 9},${legTop + 12} Q 50,${legTop + 20} ${50 - hipW / 2 - 9},${legTop + 12} Z`}
-          fill={lighten(color, 0.25)}
-          opacity="0.82"
-        />
-        {/* tulle dots */}
-        {Array.from({ length: 8 }).map((_, i) => (
-          <circle key={i} cx={50 - 14 + i * 4} cy={legTop + 9 + (i % 2) * 3} r="0.55" fill={sparkle} opacity="0.8" />
-        ))}
+        <path d={`M ${50 - shoulderW / 2 - 4},${torsoTop + 2} Q 50,${torsoTop - 3} ${50 + shoulderW / 2 + 4},${torsoTop + 2} L ${50 + hipW / 2 + 6},${hemY - 2} Q 50,${hemY + 2} ${50 - hipW / 2 - 6},${hemY - 2} Z`} fill={color} />
+        <path d={`M ${50 - 7},${torsoTop + 1} Q 50,${torsoTop + 6} ${50 + 7},${torsoTop + 1} L ${50 + 5},${torsoTop + 7} Q 50,${torsoTop + 10} ${50 - 5},${torsoTop + 7} Z`} fill={pale} opacity="0.85" />
+        <g stroke={trim} strokeWidth="0.55" opacity="0.55">
+          {[-8, -4, 0, 4, 8].map((dx) => <path key={dx} d={`M ${50 + dx},${torsoTop + 10} q 1.2,4 0,8 q -1.2,4 0,8`} fill="none" />)}
+        </g>
+        <g fill={trim} opacity="0.75">
+          <circle cx="47" cy={torsoTop + 20} r="1.1" />
+          <circle cx="53" cy={torsoTop + 20} r="1.1" />
+          <path d={`M 46,${torsoTop + 24} Q 50,${torsoTop + 27} 54,${torsoTop + 24}`} fill="none" stroke={trim} strokeWidth="0.7" strokeLinecap="round" />
+        </g>
       </g>
     );
   }
-  // Default A-line dress with pattern variation by id.
-  const isPinafore = id?.includes("pinafore");
+
+  if (id?.includes("pinafore")) {
+    return (
+      <g>
+        <path d={`M ${50 - 10},${torsoTop + 1} L ${50 + 10},${torsoTop + 1} L ${50 + hipW / 2 + 9},${hemY} Q 50,${hemY + 3} ${50 - hipW / 2 - 9},${hemY} Z`} fill={color} />
+        <path d={`M ${50 - 15},${torsoTop + 5} Q 50,${torsoTop - 2} ${50 + 15},${torsoTop + 5} L ${50 + 10},${torsoTop + 10} Q 50,${torsoTop + 6} ${50 - 10},${torsoTop + 10} Z`} fill={pale} opacity="0.95" />
+        <rect x={50 - 8.5} y={torsoTop} width="3.2" height="17" rx="1.2" fill={pale} opacity="0.9" />
+        <rect x={50 + 5.3} y={torsoTop} width="3.2" height="17" rx="1.2" fill={pale} opacity="0.9" />
+        <rect x={50 - 5} y={waistY + 2} width="10" height="6" rx="1.2" fill={pale} stroke={trim} strokeWidth="0.45" opacity="0.95" />
+        <path d={`M ${50 - hipW / 2 - 5},${hemY - 2} Q 50,${hemY + 1} ${50 + hipW / 2 + 5},${hemY - 2}`} stroke={trim} strokeWidth="0.6" fill="none" />
+      </g>
+    );
+  }
+
+  if (id?.includes("tutu") || id?.includes("party") || id?.includes("lavender")) {
+    return (
+      <g>
+        <path d={`M ${50 - shoulderW / 2 - 2},${torsoTop + 1} Q 50,${torsoTop - 5} ${50 + shoulderW / 2 + 2},${torsoTop + 1} L ${50 + 9},${waistY + 2} L ${50 - 9},${waistY + 2} Z`} fill={color} />
+        <path d={`M ${50 - 7},${torsoTop + 2} Q 50,${torsoTop + 6} ${50 + 7},${torsoTop + 2} Q 50,${torsoTop + 13} ${50 - 7},${torsoTop + 2} Z`} fill={pale} opacity="0.8" />
+        <path d={`M ${50 - hipW / 2 - 14},${waistY + 2} Q 50,${waistY + 14} ${50 + hipW / 2 + 14},${waistY + 2} L ${50 + hipW / 2 + 10},${hemY + 1} Q 50,${hemY + 7} ${50 - hipW / 2 - 10},${hemY + 1} Z`} fill={lighten(color, 0.22)} opacity="0.88" />
+        <path d={`M ${50 - hipW / 2 - 11},${waistY + 7} Q 50,${waistY + 18} ${50 + hipW / 2 + 11},${waistY + 7} L ${50 + hipW / 2 + 8},${hemY + 4} Q 50,${hemY + 9} ${50 - hipW / 2 - 8},${hemY + 4} Z`} fill={pale} opacity="0.38" />
+        <path d={`M ${50 - 5},${waistY + 1} L ${50 + 5},${waistY + 1} M 50,${waistY + 1} l -4,4 M 50,${waistY + 1} l 4,4`} stroke={trim} strokeWidth="0.75" strokeLinecap="round" />
+      </g>
+    );
+  }
+
+  if (id?.includes("princess") || id?.includes("rose") || id?.includes("night") || id?.includes("starlight")) {
+    return (
+      <g>
+        <path d={`M ${50 - shoulderW / 2 - 1},${torsoTop} Q 50,${torsoTop - 6} ${50 + shoulderW / 2 + 1},${torsoTop} L ${50 + 8},${waistY + 3} L ${50 - 8},${waistY + 3} Z`} fill={color} />
+        <path d={`M ${50 - hipW / 2 - 17},${waistY + 2} C ${50 - 23},${hemY + 5} ${50 + 23},${hemY + 5} ${50 + hipW / 2 + 17},${waistY + 2} L ${50 + hipW / 2 + 20},${hemY + 12} Q 50,${hemY + 20} ${50 - hipW / 2 - 20},${hemY + 12} Z`} fill={color} />
+        <path d={`M ${50 - 7},${torsoTop + 3} L 50,${waistY + 4} L ${50 + 7},${torsoTop + 3}`} fill={pale} opacity="0.55" />
+        <g fill={pale} opacity="0.8">
+          <circle cx="41" cy={hemY + 6} r="1" />
+          <circle cx="58" cy={hemY + 2} r="0.9" />
+          <path d={`M 50,${hemY + 3} l 1,2 l 2,0.5 l -2,0.7 l -1,2 l -1,-2 l -2,-0.7 l 2,-0.5 Z`} />
+        </g>
+      </g>
+    );
+  }
+
+  if (id?.includes("sundress") || id?.includes("floral") || id?.includes("meadow")) {
+    return (
+      <g>
+        <path d={`M ${50 - 8},${torsoTop} L ${50 + 8},${torsoTop} L ${50 + hipW / 2 + 10},${hemY + 2} Q 50,${hemY + 7} ${50 - hipW / 2 - 10},${hemY + 2} Z`} fill={color} />
+        <path d={`M ${50 - 9},${torsoTop} C ${50 - 6},${torsoTop + 5} ${50 - 2},${torsoTop + 5} 50,${torsoTop + 1} C ${50 + 2},${torsoTop + 5} ${50 + 6},${torsoTop + 5} ${50 + 9},${torsoTop} L ${50 + 6},${waistY} L ${50 - 6},${waistY} Z`} fill={lighten(color, 0.12)} />
+        <path d={`M ${50 - 11},${torsoTop - 1} Q ${50 - 14},${torsoTop - 7} ${50 - 18},${torsoTop + 1} M ${50 + 11},${torsoTop - 1} Q ${50 + 14},${torsoTop - 7} ${50 + 18},${torsoTop + 1}`} stroke={trim} strokeWidth="1.4" fill="none" strokeLinecap="round" />
+        {flowerPrint()}
+      </g>
+    );
+  }
+
   return (
     <g>
-      <path
-        d={`M ${50 - shoulderW / 2},${torsoTop} Q ${50 - shoulderW / 2 - 3},${torsoTop + 11} ${50 - hipW / 2 - 8},${legTop + 8} L ${50 + hipW / 2 + 8},${legTop + 8} Q ${50 + shoulderW / 2 + 3},${torsoTop + 11} ${50 + shoulderW / 2},${torsoTop} Q 50,${torsoTop - 3} ${50 - shoulderW / 2},${torsoTop} Z`}
-        fill={color}
-      />
-      {isPinafore && (
-        <>
-          {/* apron straps + pocket */}
-          <rect x={50 - 8} y={torsoTop} width="3" height="10" fill={lighten(color, 0.4)} />
-          <rect x={50 + 5} y={torsoTop} width="3" height="10" fill={lighten(color, 0.4)} />
-          <rect x={50 - 4} y={torsoTop + 12} width="8" height="5" rx="0.5" fill={lighten(color, 0.35)} stroke={trim} strokeWidth="0.3" />
-        </>
-      )}
-      {/* hem trim */}
-      <path
-        d={`M ${50 - hipW / 2 - 8},${legTop + 8} L ${50 + hipW / 2 + 8},${legTop + 8}`}
-        stroke={trim}
-        strokeWidth="0.6"
-      />
+      <path d={`M ${50 - shoulderW / 2},${torsoTop} Q ${50 - shoulderW / 2 - 3},${torsoTop + 11} ${50 - hipW / 2 - 8},${hemY} L ${50 + hipW / 2 + 8},${hemY} Q ${50 + shoulderW / 2 + 3},${torsoTop + 11} ${50 + shoulderW / 2},${torsoTop} Q 50,${torsoTop - 3} ${50 - shoulderW / 2},${torsoTop} Z`} fill={color} />
+      <path d={`M ${50 - 7},${torsoTop + 2} Q 50,${torsoTop + 7} ${50 + 7},${torsoTop + 2}`} stroke={pale} strokeWidth="1.2" fill="none" />
+      {flowerPrint(waistY + 3)}
     </g>
   );
 }
@@ -579,96 +391,124 @@ function TopShape({
   shoulderW: number;
   torsoW: number;
 }) {
-  const accent = lighten(color, 0.35);
-  const dark = darken(color, 0.22);
-  const decorate = (() => {
-    if (id?.includes("flannel")) {
-      // plaid grid
-      return (
-        <g opacity="0.55" stroke={dark} strokeWidth="0.45">
-          {[0, 1, 2, 3].map((i) => (
-            <line key={`v${i}`} x1={50 - torsoW / 2 + 2 + i * 4} y1={torsoTop + 1} x2={50 - torsoW / 2 + 2 + i * 4} y2={torsoBottom - 1} />
-          ))}
-          {[0, 1, 2].map((i) => (
-            <line key={`h${i}`} x1={50 - torsoW / 2} y1={torsoTop + 4 + i * 4} x2={50 + torsoW / 2} y2={torsoTop + 4 + i * 4} />
-          ))}
+  const accent = lighten(color, 0.38);
+  const pale = lighten(color, 0.58);
+  const dark = darken(color, 0.24);
+
+  if (id?.includes("cloak")) {
+    return (
+      <g>
+        <path d={`M ${50 - shoulderW / 2 - 5},${torsoTop + 1} Q 50,${torsoTop - 8} ${50 + shoulderW / 2 + 5},${torsoTop + 1} L ${50 + torsoW / 2 + 9},${torsoBottom + 8} Q 50,${torsoBottom + 12} ${50 - torsoW / 2 - 9},${torsoBottom + 8} Z`} fill={color} />
+        <path d={`M 50,${torsoTop + 1} L ${50 - 7},${torsoBottom + 6} M 50,${torsoTop + 1} L ${50 + 7},${torsoBottom + 6}`} stroke={dark} strokeWidth="0.7" opacity="0.65" />
+        <circle cx="50" cy={torsoTop + 8} r="2" fill={accent} />
+      </g>
+    );
+  }
+
+  if (id?.includes("hoodie")) {
+    return (
+      <g>
+        <path d={`M ${50 - shoulderW / 2 - 3},${torsoTop + 3} Q 50,${torsoTop - 4} ${50 + shoulderW / 2 + 3},${torsoTop + 3} L ${50 + torsoW / 2 + 4},${torsoBottom + 2} Q 50,${torsoBottom + 5} ${50 - torsoW / 2 - 4},${torsoBottom + 2} Z`} fill={color} />
+        <path d={`M ${50 - 8},${torsoTop + 2} Q 50,${torsoTop + 10} ${50 + 8},${torsoTop + 2} Q 50,${torsoTop - 2} ${50 - 8},${torsoTop + 2} Z`} fill={dark} opacity="0.65" />
+        <rect x={50 - 5} y={torsoTop + 15} width="10" height="6" rx="1.5" fill={accent} opacity="0.85" />
+        <path d={`M ${50 - 3},${torsoTop + 10} q -4,3 -4,7 M ${50 + 3},${torsoTop + 10} q 4,3 4,7`} stroke={pale} strokeWidth="0.7" fill="none" strokeLinecap="round" />
+      </g>
+    );
+  }
+
+  if (id?.includes("poncho")) {
+    return (
+      <g>
+        <path d={`M 50,${torsoTop - 4} L ${50 + shoulderW / 2 + 8},${torsoBottom + 8} Q 50,${torsoBottom + 13} ${50 - shoulderW / 2 - 8},${torsoBottom + 8} Z`} fill={color} />
+        <path d={`M ${50 - 12},${torsoTop + 13} H ${50 + 12} M ${50 - 15},${torsoTop + 18} H ${50 + 15}`} stroke={accent} strokeWidth="1.1" opacity="0.8" />
+        <path d={`M ${50 - 4},${torsoTop + 1} Q 50,${torsoTop + 5} ${50 + 4},${torsoTop + 1}`} stroke={dark} strokeWidth="0.9" fill="none" />
+      </g>
+    );
+  }
+
+  if (id?.includes("cardigan") || id?.includes("jacket")) {
+    return (
+      <g>
+        <path d={`M ${50 - shoulderW / 2 - 1},${torsoTop} Q ${50 - shoulderW / 2 - 3},${torsoTop + 14} ${50 - torsoW / 2 - 1},${torsoBottom + 1} L 50,${torsoBottom - 1} L 50,${torsoTop + 4} Q ${50 - 6},${torsoTop + 2} ${50 - shoulderW / 2 - 1},${torsoTop} Z`} fill={color} />
+        <path d={`M ${50 + shoulderW / 2 + 1},${torsoTop} Q ${50 + shoulderW / 2 + 3},${torsoTop + 14} ${50 + torsoW / 2 + 1},${torsoBottom + 1} L 50,${torsoBottom - 1} L 50,${torsoTop + 4} Q ${50 + 6},${torsoTop + 2} ${50 + shoulderW / 2 + 1},${torsoTop} Z`} fill={color} />
+        <path d={`M ${50 - 5},${torsoTop + 2} L 50,${torsoTop + 8} L ${50 + 5},${torsoTop + 2}`} fill={accent} opacity="0.82" />
+        <line x1="50" y1={torsoTop + 4} x2="50" y2={torsoBottom} stroke={dark} strokeWidth="0.65" />
+        {[0, 1, 2].map((i) => <circle key={i} cx="48.3" cy={torsoTop + 10 + i * 5} r="0.65" fill={dark} />)}
+      </g>
+    );
+  }
+
+  if (id?.includes("raincoat")) {
+    return (
+      <g>
+        <path d={`M ${50 - shoulderW / 2 - 2},${torsoTop + 1} Q 50,${torsoTop - 4} ${50 + shoulderW / 2 + 2},${torsoTop + 1} L ${50 + torsoW / 2 + 3},${torsoBottom + 3} L ${50 - torsoW / 2 - 3},${torsoBottom + 3} Z`} fill={color} />
+        <path d={`M ${50 - 10},${torsoTop + 1} Q 50,${torsoTop + 10} ${50 + 10},${torsoTop + 1} Q 50,${torsoTop - 4} ${50 - 10},${torsoTop + 1} Z`} fill={accent} />
+        {[0, 1, 2].map((i) => <path key={i} d={`M ${50 - 4},${torsoTop + 10 + i * 5} h 8`} stroke={dark} strokeWidth="0.9" strokeLinecap="round" />)}
+      </g>
+    );
+  }
+
+  if (id?.includes("flannel")) {
+    return (
+      <g>
+        <path d={`M ${50 - shoulderW / 2},${torsoTop} Q ${50 - shoulderW / 2 - 2},${torsoTop + 12} ${50 - torsoW / 2},${torsoBottom} L ${50 + torsoW / 2},${torsoBottom} Q ${50 + shoulderW / 2 + 2},${torsoTop + 12} ${50 + shoulderW / 2},${torsoTop} Q 50,${torsoTop - 3} ${50 - shoulderW / 2},${torsoTop} Z`} fill={color} />
+        <path d={`M ${50 - 8},${torsoTop + 1} L 50,${torsoTop + 7} L ${50 + 8},${torsoTop + 1} L ${50 + 6},${torsoTop + 9} L ${50 - 6},${torsoTop + 9} Z`} fill={accent} opacity="0.85" />
+        <g stroke={dark} strokeWidth="0.55" opacity="0.55">
+          {[-8, -3, 2, 7].map((dx) => <line key={dx} x1={50 + dx} y1={torsoTop + 1} x2={50 + dx} y2={torsoBottom - 1} />)}
+          {[5, 10, 15].map((dy) => <line key={dy} x1={50 - torsoW / 2} y1={torsoTop + dy} x2={50 + torsoW / 2} y2={torsoTop + dy} />)}
         </g>
-      );
-    }
-    if (id?.includes("sweater") || id?.includes("knit")) {
-      // cable knit ribs
-      return (
-        <g stroke={dark} strokeWidth="0.5" opacity="0.6">
-          {[-4, 0, 4].map((dx) => (
-            <path key={dx} d={`M ${50 + dx},${torsoTop + 2} q 1,3 0,6 q -1,3 0,6`} fill="none" />
-          ))}
+      </g>
+    );
+  }
+
+  if (id?.includes("sweater") || id?.includes("knit")) {
+    return (
+      <g>
+        <path d={`M ${50 - shoulderW / 2 - 1},${torsoTop + 1} Q 50,${torsoTop - 4} ${50 + shoulderW / 2 + 1},${torsoTop + 1} L ${50 + torsoW / 2 + 2},${torsoBottom + 2} Q 50,${torsoBottom + 4} ${50 - torsoW / 2 - 2},${torsoBottom + 2} Z`} fill={color} />
+        <path d={`M ${50 - 8},${torsoTop + 2} Q 50,${torsoTop + 8} ${50 + 8},${torsoTop + 2}`} stroke={accent} strokeWidth="1.1" fill="none" />
+        <g stroke={dark} strokeWidth="0.55" opacity="0.55">
+          {[-6, -2, 2, 6].map((dx) => <path key={dx} d={`M ${50 + dx},${torsoTop + 8} q 1.1,3 0,6 q -1.1,3 0,6`} fill="none" />)}
         </g>
-      );
-    }
-    if (id?.includes("jacket")) {
-      // zipper + lapels
-      return (
-        <g>
-          <line x1="50" y1={torsoTop + 1} x2="50" y2={torsoBottom - 1} stroke={dark} strokeWidth="0.45" />
-          <path d={`M 50,${torsoTop + 1} L ${50 - 4},${torsoTop + 6} L 50,${torsoTop + 8}`} fill={accent} opacity="0.7" />
-          <path d={`M 50,${torsoTop + 1} L ${50 + 4},${torsoTop + 6} L 50,${torsoTop + 8}`} fill={accent} opacity="0.7" />
-        </g>
-      );
-    }
-    if (id?.includes("raincoat")) {
-      // toggles
-      return (
-        <g fill={dark}>
-          <circle cx="50" cy={torsoTop + 6} r="0.7" />
-          <circle cx="50" cy={torsoTop + 12} r="0.7" />
-          <circle cx="50" cy={torsoTop + 18} r="0.7" />
-        </g>
-      );
-    }
-    if (id?.includes("tank")) {
-      return null;
-    }
-    if (id?.includes("longsleeve")) {
-      return <line x1="50" y1={torsoTop + 2} x2="50" y2={torsoBottom - 2} stroke={accent} strokeWidth="0.4" opacity="0.7" />;
-    }
-    if (id?.includes("crop")) {
-      // ribbed band
-      return (
-        <g stroke={accent} strokeWidth="0.4" opacity="0.8">
-          <line x1={50 - torsoW / 2} y1={torsoTop + 11} x2={50 + torsoW / 2} y2={torsoTop + 11} />
-          <line x1={50 - torsoW / 2} y1={torsoTop + 12.5} x2={50 + torsoW / 2} y2={torsoTop + 12.5} />
-        </g>
-      );
-    }
-    return null;
-  })();
+      </g>
+    );
+  }
+
+  if (id?.includes("tank")) {
+    return (
+      <g>
+        <path d={`M ${50 - 7},${torsoTop} L ${50 + 7},${torsoTop} L ${50 + torsoW / 2},${torsoBottom} L ${50 - torsoW / 2},${torsoBottom} Z`} fill={color} />
+        <path d={`M ${50 - 7},${torsoTop} Q ${50 - 10},${torsoTop - 4} ${50 - 13},${torsoTop + 1} M ${50 + 7},${torsoTop} Q ${50 + 10},${torsoTop - 4} ${50 + 13},${torsoTop + 1}`} stroke={dark} strokeWidth="1.2" fill="none" strokeLinecap="round" />
+        <path d={`M ${50 - 5},${torsoTop + 8} H ${50 + 5}`} stroke={accent} strokeWidth="1" />
+      </g>
+    );
+  }
 
   if (id?.includes("crop")) {
     return (
       <g>
-        <path
-          d={`M ${50 - shoulderW / 2},${torsoTop} Q 50,${torsoTop - 3} ${50 + shoulderW / 2},${torsoTop} L ${50 + torsoW / 2},${torsoTop + 13} L ${50 - torsoW / 2},${torsoTop + 13} Z`}
-          fill={color}
-        />
-        {decorate}
+        <path d={`M ${50 - shoulderW / 2},${torsoTop} Q 50,${torsoTop - 3} ${50 + shoulderW / 2},${torsoTop} L ${50 + torsoW / 2 + 1},${torsoTop + 13} L ${50 - torsoW / 2 - 1},${torsoTop + 13} Z`} fill={color} />
+        <path d={`M ${50 - torsoW / 2 - 1},${torsoTop + 10.5} H ${50 + torsoW / 2 + 1} M ${50 - torsoW / 2 - 1},${torsoTop + 12.3} H ${50 + torsoW / 2 + 1}`} stroke={accent} strokeWidth="0.55" />
+        <circle cx="50" cy={torsoTop + 6} r="2.3" fill={pale} opacity="0.8" />
       </g>
     );
   }
-  if (id?.includes("tank")) {
+
+  if (id?.includes("longsleeve")) {
     return (
-      <path
-        d={`M ${50 - 8},${torsoTop} L ${50 + 8},${torsoTop} L ${50 + torsoW / 2},${torsoBottom} L ${50 - torsoW / 2},${torsoBottom} Z`}
-        fill={color}
-      />
+      <g>
+        <path d={`M ${50 - shoulderW / 2},${torsoTop} Q ${50 - shoulderW / 2 - 1},${torsoTop + 12} ${50 - torsoW / 2},${torsoBottom} L ${50 + torsoW / 2},${torsoBottom} Q ${50 + shoulderW / 2 + 1},${torsoTop + 12} ${50 + shoulderW / 2},${torsoTop} Q 50,${torsoTop - 3} ${50 - shoulderW / 2},${torsoTop} Z`} fill={color} />
+        <g stroke={accent} strokeWidth="0.8" opacity="0.85">
+          {[torsoTop + 5, torsoTop + 10, torsoTop + 15].map((y) => <line key={y} x1={50 - torsoW / 2} y1={y} x2={50 + torsoW / 2} y2={y} />)}
+        </g>
+      </g>
     );
   }
+
   return (
     <g>
-      <path
-        d={`M ${50 - shoulderW / 2},${torsoTop} Q ${50 - shoulderW / 2 - 1},${torsoTop + 12} ${50 - torsoW / 2},${torsoBottom} L ${50 + torsoW / 2},${torsoBottom} Q ${50 + shoulderW / 2 + 1},${torsoTop + 12} ${50 + shoulderW / 2},${torsoTop} Q 50,${torsoTop - 3} ${50 - shoulderW / 2},${torsoTop} Z`}
-        fill={color}
-      />
-      {decorate}
+      <path d={`M ${50 - shoulderW / 2},${torsoTop} Q ${50 - shoulderW / 2 - 1},${torsoTop + 12} ${50 - torsoW / 2},${torsoBottom} L ${50 + torsoW / 2},${torsoBottom} Q ${50 + shoulderW / 2 + 1},${torsoTop + 12} ${50 + shoulderW / 2},${torsoTop} Q 50,${torsoTop - 3} ${50 - shoulderW / 2},${torsoTop} Z`} fill={color} />
+      <path d={`M ${50 - 6},${torsoTop + 2} Q 50,${torsoTop + 7} ${50 + 6},${torsoTop + 2}`} stroke={accent} strokeWidth="1" fill="none" />
+      <path d={`M ${50 - 4},${torsoTop + 12} h 8`} stroke={pale} strokeWidth="1" strokeLinecap="round" />
     </g>
   );
 }
@@ -686,62 +526,81 @@ function BottomShape({
   torsoBottom: number;
   hipW: number;
 }) {
-  const accent = lighten(color, 0.3);
-  const dark = darken(color, 0.2);
+  const accent = lighten(color, 0.36);
+  const dark = darken(color, 0.24);
   if (id?.includes("skirt")) {
-    const isPleated = id?.includes("pleat");
-    const isDenim = id?.includes("denim");
+    const denim = id?.includes("denim");
     return (
       <g>
-        <path
-          d={`M ${50 - hipW / 2 - 3},${torsoBottom - 1} L ${50 + hipW / 2 + 3},${torsoBottom - 1} L ${50 + hipW / 2 + 7},${legTop + 10} Q 50,${legTop + 14} ${50 - hipW / 2 - 7},${legTop + 10} Z`}
-          fill={color}
-        />
-        {isPleated && (
-          <g stroke={dark} strokeWidth="0.4" opacity="0.7">
-            {[-2, -1, 0, 1, 2].map((k) => (
-              <line key={k} x1={50 + k * 3} y1={torsoBottom} x2={50 + k * 3.6} y2={legTop + 11} />
-            ))}
-          </g>
-        )}
-        {isDenim && (
+        <path d={`M ${50 - hipW / 2 - 4},${torsoBottom - 2} L ${50 + hipW / 2 + 4},${torsoBottom - 2} L ${50 + hipW / 2 + (denim ? 5 : 9)},${legTop + (denim ? 9 : 12)} Q 50,${legTop + (denim ? 12 : 16)} ${50 - hipW / 2 - (denim ? 5 : 9)},${legTop + (denim ? 9 : 12)} Z`} fill={color} />
+        {denim ? (
           <>
-            <line x1={50 - hipW / 2 - 3} y1={torsoBottom + 1.5} x2={50 + hipW / 2 + 3} y2={torsoBottom + 1.5} stroke={accent} strokeWidth="0.45" strokeDasharray="0.8 0.8" />
-            <rect x={50 - 1} y={torsoBottom} width="2" height="2" fill={accent} opacity="0.9" />
+            <path d={`M ${50 - hipW / 2 - 3},${torsoBottom + 1.5} H ${50 + hipW / 2 + 3}`} stroke={accent} strokeWidth="0.55" strokeDasharray="0.9 0.9" />
+            <rect x={50 - 1.5} y={torsoBottom - 1} width="3" height="2.5" rx="0.4" fill={accent} opacity="0.9" />
+            <path d={`M ${50 - 8},${torsoBottom + 2} q 3,3 6,0 M ${50 + 2},${torsoBottom + 2} q 3,3 6,0`} stroke={dark} strokeWidth="0.45" fill="none" />
           </>
+        ) : (
+          <g stroke={dark} strokeWidth="0.45" opacity="0.7">
+            {[-2, -1, 0, 1, 2].map((k) => <line key={k} x1={50 + k * 3} y1={torsoBottom - 1} x2={50 + k * 4.2} y2={legTop + 12} />)}
+          </g>
         )}
       </g>
     );
   }
+
   if (id?.includes("short")) {
     return (
-      <path
-        d={`M ${50 - hipW / 2},${torsoBottom - 1} L ${50 + hipW / 2},${torsoBottom - 1} L ${50 + hipW / 2},${legTop + 7} L ${51},${legTop + 7} L 50,${legTop + 3} L 49,${legTop + 7} L ${50 - hipW / 2},${legTop + 7} Z`}
-        fill={color}
-      />
+      <g>
+        <path d={`M ${50 - hipW / 2 - 1},${torsoBottom - 1} L ${50 + hipW / 2 + 1},${torsoBottom - 1} L ${50 + hipW / 2 + 1},${legTop + 8} L ${52},${legTop + 8} L 50,${legTop + 4} L 48,${legTop + 8} L ${50 - hipW / 2 - 1},${legTop + 8} Z`} fill={color} />
+        <path d={`M 50,${legTop + 3} V ${legTop + 8}`} stroke={dark} strokeWidth="0.55" />
+        <path d={`M ${50 - hipW / 2 + 2},${torsoBottom + 2} q 3,2 6,0 M ${50 + hipW / 2 - 2},${torsoBottom + 2} q -3,2 -6,0`} stroke={accent} strokeWidth="0.45" fill="none" />
+      </g>
     );
   }
-  // Pants/leggings/overalls — add seams to differentiate.
+
   if (id?.includes("overalls")) {
     return (
       <g>
-        <rect x={50 - 6} y={torsoBottom - 6} width="12" height="6" fill={color} />
-        <rect x={50 - 6} y={torsoBottom - 12} width="2.5" height="7" fill={color} />
-        <rect x={50 + 3.5} y={torsoBottom - 12} width="2.5" height="7" fill={color} />
-        <circle cx={50 - 4} cy={torsoBottom - 4.5} r="0.6" fill={accent} />
-        <circle cx={50 + 4} cy={torsoBottom - 4.5} r="0.6" fill={accent} />
+        <path d={`M ${50 - hipW / 2 + 1},${legTop} h ${hipW - 2} v ${legTop - torsoBottom + 13} h -${hipW - 2} Z`} fill={color} />
+        <rect x={50 - 7} y={torsoBottom - 8} width="14" height="8" rx="1" fill={color} />
+        <rect x={50 - 8} y={torsoBottom - 15} width="3" height="9" rx="1" fill={color} />
+        <rect x={50 + 5} y={torsoBottom - 15} width="3" height="9" rx="1" fill={color} />
+        <rect x={50 - 4} y={torsoBottom - 5.5} width="8" height="4" rx="0.8" fill={accent} opacity="0.75" />
+        <circle cx={50 - 5.3} cy={torsoBottom - 6.2} r="0.7" fill={dark} />
+        <circle cx={50 + 5.3} cy={torsoBottom - 6.2} r="0.7" fill={dark} />
       </g>
     );
   }
+
   if (id?.includes("cargo")) {
     return (
       <g>
-        <rect x={50 - 8} y={torsoBottom + 2} width="3" height="3" fill={dark} opacity="0.7" />
-        <rect x={50 + 5} y={torsoBottom + 2} width="3" height="3" fill={dark} opacity="0.7" />
+        <path d={`M ${50 - hipW / 2 + 1},${legTop} h ${hipW - 2} v 13 h -${hipW - 2} Z`} fill={color} />
+        <rect x={50 - 11} y={legTop + 4} width="6" height="5" rx="1" fill={dark} opacity="0.55" />
+        <rect x={50 + 5} y={legTop + 4} width="6" height="5" rx="1" fill={dark} opacity="0.55" />
+        <path d={`M 50,${legTop + 1} V ${legTop + 13}`} stroke={dark} strokeWidth="0.55" />
+        <path d={`M ${50 - hipW / 2 + 3},${torsoBottom + 1.5} H ${50 + hipW / 2 - 3}`} stroke={accent} strokeWidth="0.55" />
       </g>
     );
   }
-  return null;
+
+  if (id?.includes("legging")) {
+    return (
+      <g>
+        <path d={`M ${50 - hipW / 2 + 2},${legTop} h ${hipW - 4} v 13 h -${hipW - 4} Z`} fill={color} />
+        <path d={`M 50,${legTop + 1} V ${legTop + 13}`} stroke={accent} strokeWidth="0.45" opacity="0.75" />
+        <path d={`M ${50 - hipW / 2 + 4},${legTop + 3} H ${50 + hipW / 2 - 4}`} stroke={dark} strokeWidth="0.5" opacity="0.55" />
+      </g>
+    );
+  }
+
+  return (
+    <g>
+      <path d={`M ${50 - hipW / 2 + 1},${legTop} h ${hipW - 2} v 13 h -${hipW - 2} Z`} fill={color} />
+      <path d={`M 50,${legTop + 1} V ${legTop + 13}`} stroke={dark} strokeWidth="0.55" opacity="0.7" />
+      <path d={`M ${50 - hipW / 2 + 3},${legTop + 3} h 6 M ${50 + hipW / 2 - 9},${legTop + 3} h 6`} stroke={accent} strokeWidth="0.55" strokeLinecap="round" />
+    </g>
+  );
 }
 
 function EarExtra({
@@ -944,7 +803,6 @@ export function DressupAvatar({
   const bottomColor = dress?.color ?? bottom?.color ?? "#3a4f78";
   const shoesColor = shoes?.color ?? "#5b3a1f";
   const hair = hairLayers(dressup.hairstyle as HairStyleId, dressup.hair, rx, ry);
-  const hairImage = HAIR_IMAGES[dressup.hairstyle as HairStyleId] ?? null;
 
   const neckTop = HEAD_CY + ry - 2;
   const torsoTop = neckTop + 4;
@@ -962,7 +820,7 @@ export function DressupAvatar({
       aria-label="Your dress-up avatar"
     >
       <ellipse cx="50" cy="137" rx="28" ry="2.5" fill="currentColor" opacity="0.12" />
-      {!hairImage && hair.back}
+      {hair.back}
 
       {!dress && (
         <BottomShape
@@ -1020,32 +878,14 @@ export function DressupAvatar({
       )}
 
       {dress ? (
-        DRESS_IMAGES[dress.id] ? (() => {
-          // Fit dress PNG between shoulders and just below leg-top.
-          const targetW = Math.max(shoulderW, hipW) + 18;
-          const targetH = (legTop + 12) - (torsoTop - 2);
-          const x = 50 - targetW / 2;
-          const y = torsoTop - 2;
-          return (
-            <image
-              href={DRESS_IMAGES[dress.id]}
-              x={x}
-              y={y}
-              width={targetW}
-              height={targetH}
-              preserveAspectRatio="xMidYMid meet"
-            />
-          );
-        })() : (
-          <DressShape
-            id={dress.id}
-            color={topColor}
-            torsoTop={torsoTop}
-            legTop={legTop}
-            shoulderW={shoulderW}
-            hipW={hipW}
-          />
-        )
+        <DressShape
+          id={dress.id}
+          color={topColor}
+          torsoTop={torsoTop}
+          legTop={legTop}
+          shoulderW={shoulderW}
+          hipW={hipW}
+        />
       ) : (
         <TopShape
           id={top?.id}
@@ -1197,32 +1037,7 @@ export function DressupAvatar({
         </>
       )}
 
-      {hairImage ? (() => {
-        const m = HAIR_METRICS[dressup.hairstyle as HairStyleId] ?? DEFAULT_HAIR_METRIC;
-        // Scale the PNG so its embedded face matches the SVG head radii.
-        // Use the larger of the two scale factors so the hair never looks
-        // pinched relative to the head.
-        const scaleX = rx / (m.faceRx * 512);
-        const scaleY = ry / (m.faceRy * 512);
-        const scale = (scaleX + scaleY) / 2;
-        const imgW = 512 * scale;
-        const imgH = 512 * scale;
-        // Anchor the artwork's face center on the SVG head center.
-        const x = HEAD_CX - m.faceCx * imgW;
-        const y = HEAD_CY - m.faceCy * imgH;
-        return (
-          <image
-            href={hairImage}
-            x={x}
-            y={y}
-            width={imgW}
-            height={imgH}
-            preserveAspectRatio="xMidYMid meet"
-          />
-        );
-      })() : (
-        hair.front
-      )}
+      {hair.front}
       {hairClip && (
         <HairClipShape
           id={hairClip.id}
