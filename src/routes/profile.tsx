@@ -3,9 +3,9 @@ import { useState } from "react";
 import { Coins, Flame, Footprints, Pencil, Settings as SettingsIcon, Shirt, Sparkles, Trophy } from "lucide-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useCharacter, DEFAULT_DRESSUP } from "@/hooks/use-character";
-import { SHOP_ITEMS, type ShopSlot } from "@/lib/shop";
 import { CharacterCreator } from "@/components/character-creator";
 import { DressupAvatar } from "@/components/dressup-avatar";
+import { CharacterCustomizer } from "@/components/character-customizer";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -30,9 +30,9 @@ const ACCENT_SWATCHES: Record<string, string> = {
 
 function ProfilePage() {
   const navigate = useNavigate();
-  const { character, loading, updateAppearance, ownedItems, equipItem } = useCharacter();
+  const { character, loading } = useCharacter();
   const [editing, setEditing] = useState(false);
-  const [skinPick, setSkinPick] = useState(false);
+  const [customizing, setCustomizing] = useState(false);
 
   const stats = [
     { icon: Flame, label: "Day streak", value: "7" },
@@ -47,32 +47,6 @@ function ProfilePage() {
   const bio = character?.bio ?? "Joined this spring";
   const dressup = character?.dressup ?? DEFAULT_DRESSUP;
   const coins = character?.coins ?? 0;
-
-  const SKIN_TONES = ["#f7d9bd", "#f1c9a5", "#d9a87a", "#a87651", "#7a5236", "#4a3220"];
-  const HAIR_COLORS = ["#1a1410", "#3b2a1a", "#7a5236", "#b88a4a", "#d9b56b", "#c95a3a", "#5a4a8a"];
-  const HAIRSTYLES: Array<{
-    id: "short" | "long" | "bun" | "curly" | "ponytail" | "pigtails" | "bald";
-    label: string;
-  }> = [
-    { id: "short", label: "Short" },
-    { id: "long", label: "Long" },
-    { id: "bun", label: "Bun" },
-    { id: "curly", label: "Curly" },
-    { id: "ponytail", label: "Ponytail" },
-    { id: "pigtails", label: "Pigtails" },
-    { id: "bald", label: "Bald" },
-  ];
-
-  const ownedSet = new Set(ownedItems);
-  const wardrobe = SHOP_ITEMS.filter((i) => ownedSet.has(i.id));
-  const SLOT_ORDER: ShopSlot[] = ["hat", "top", "bottom", "shoes", "accessory"];
-  const SLOT_LABELS: Record<ShopSlot, string> = {
-    hat: "Hats",
-    top: "Tops",
-    bottom: "Bottoms",
-    shoes: "Shoes",
-    accessory: "Accessories",
-  };
 
   return (
     <div className="px-5 pt-8">
