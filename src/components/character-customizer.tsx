@@ -9,7 +9,7 @@ import {
   DEFAULT_DRESSUP,
 } from "@/hooks/use-character";
 import { SHOP_ITEMS, type ShopSlot, type ShopItem } from "@/lib/shop";
-import { DressupAvatar, hairLayers, HEAD_CX, HEAD_CY } from "@/components/dressup-avatar";
+import { DressupAvatar } from "@/components/dressup-avatar";
 
 /**
  * Tabbed customization panel.
@@ -57,9 +57,12 @@ const NAIL_COLORS = [
 ];
 
 const FACE_SHAPES: { id: FaceShape; label: string }[] = [
-  { id: "round", label: "Large round" },
-  { id: "oval", label: "Soft oval" },
-  { id: "heart", label: "Baby round" },
+  { id: "round", label: "Round" },
+  { id: "oval", label: "Oval" },
+  { id: "heart", label: "Soft heart" },
+  { id: "diamond", label: "Diamond" },
+  { id: "octagon", label: "Soft octagon" },
+  { id: "long", label: "Long oval" },
 ];
 
 const BODY_SHAPES: { id: BodyShape; label: string }[] = [
@@ -69,27 +72,20 @@ const BODY_SHAPES: { id: BodyShape; label: string }[] = [
 ];
 
 const FREE_HAIRSTYLES: { id: HairStyleId; label: string }[] = [
-  { id: "bald", label: "Bald" },
-  { id: "short", label: "Short" },
-  { id: "long", label: "Long" },
-  { id: "curly", label: "Curly" },
-  { id: "wavy", label: "Wavy" },
-  { id: "bob", label: "Bob" },
-  { id: "fade", label: "Fade" },
-  { id: "ponytail", label: "Ponytail" },
-  { id: "pigtails", label: "Pigtails" },
-  { id: "bun", label: "Bun" },
+  { id: "soft-bob", label: "Soft bob" },
+  { id: "long-bangs", label: "Long bangs" },
+  { id: "straight-bangs", label: "Straight bangs" },
+  { id: "curtain-cut", label: "Curtain cut" },
+  { id: "high-pony", label: "High pony" },
+  { id: "low-pigtails", label: "Low pigtails" },
+  { id: "space-buns", label: "Space buns" },
+  { id: "fluffy-curls", label: "Fluffy curls" },
+  { id: "twin-braids", label: "Twin braids" },
+  { id: "side-sweep", label: "Side sweep" },
+  { id: "bald", label: "No hair" },
 ];
 
-const PREMIUM_HAIRSTYLES: { id: HairStyleId; label: string; price: number }[] = [
-  { id: "afro", label: "Afro", price: 150 },
-  { id: "side-bun", label: "Side Bun", price: 130 },
-  { id: "double-bun", label: "Double Bun", price: 140 },
-  { id: "braids", label: "Braids", price: 180 },
-  { id: "topknot", label: "Top Knot", price: 120 },
-  { id: "mohawk", label: "Mohawk", price: 200 },
-  { id: "undercut", label: "Undercut", price: 160 },
-];
+const PREMIUM_HAIRSTYLES: { id: HairStyleId; label: string; price: number }[] = [];
 
 function premiumHairItemId(style: HairStyleId): string {
   return `hair-${style}`;
@@ -134,7 +130,7 @@ export function CharacterCustomizer({ onClose }: { onClose: () => void }) {
   }
 
   function setField<K extends keyof Dressup>(patch: Partial<Pick<Dressup, K>>) {
-    return updateAppearance(patch as Partial<Pick<Dressup, "skin" | "hair" | "hairstyle">>);
+    return updateAppearance(patch as Partial<Dressup>);
   }
 
   return (
@@ -252,6 +248,26 @@ export function CharacterCustomizer({ onClose }: { onClose: () => void }) {
                   />
                 ))}
               </div>
+              <SubTitle>Head size</SubTitle>
+              <div className="rounded-lg border border-border bg-card px-3 py-3">
+                <input
+                  type="range"
+                  min="86"
+                  max="112"
+                  step="1"
+                  value={Math.round((dressup.headSize ?? 1) * 100)}
+                  onChange={(event) =>
+                    setField({ headSize: Number(event.currentTarget.value) / 100 })
+                  }
+                  className="w-full accent-current"
+                  aria-label="Head size"
+                />
+                <div className="mt-1 flex justify-between text-[10px] font-semibold text-muted-foreground">
+                  <span>Smaller</span>
+                  <span>{Math.round((dressup.headSize ?? 1) * 100)}%</span>
+                  <span>Bigger</span>
+                </div>
+              </div>
             </Section>
           )}
 
@@ -285,44 +301,48 @@ export function CharacterCustomizer({ onClose }: { onClose: () => void }) {
                     />
                   ))}
                 </div>
-                <SubTitle>Premium</SubTitle>
-                <div className="grid grid-cols-3 gap-2">
-                  {PREMIUM_HAIRSTYLES.map((h) => {
-                    const itemId = premiumHairItemId(h.id);
-                    const owned = ownedSet.has(itemId);
-                    const active = dressup.hairstyle === h.id;
-                    return (
-                      <PreviewTile
-                        key={h.id}
-                        label={h.label}
-                        active={active}
-                        disabled={busy === itemId}
-                        onClick={() =>
-                          buyAndApply(itemId, h.price, () =>
-                            setField({ hairstyle: h.id as Dressup["hairstyle"] }),
-                          )
-                        }
-                        preview={
-                          <MiniAvatar
-                            dressup={{ ...dressup, hairstyle: h.id as Dressup["hairstyle"] }}
+                {PREMIUM_HAIRSTYLES.length > 0 && (
+                  <>
+                    <SubTitle>Premium</SubTitle>
+                    <div className="grid grid-cols-3 gap-2">
+                      {PREMIUM_HAIRSTYLES.map((h) => {
+                        const itemId = premiumHairItemId(h.id);
+                        const owned = ownedSet.has(itemId);
+                        const active = dressup.hairstyle === h.id;
+                        return (
+                          <PreviewTile
+                            key={h.id}
+                            label={h.label}
+                            active={active}
+                            disabled={busy === itemId}
+                            onClick={() =>
+                              buyAndApply(itemId, h.price, () =>
+                                setField({ hairstyle: h.id as Dressup["hairstyle"] }),
+                              )
+                            }
+                            preview={
+                              <MiniAvatar
+                                dressup={{ ...dressup, hairstyle: h.id as Dressup["hairstyle"] }}
+                              />
+                            }
+                            badge={
+                              owned ? (
+                                active ? (
+                                  <Check className="h-3 w-3" />
+                                ) : null
+                              ) : (
+                                <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-accent">
+                                  <Lock className="h-2.5 w-2.5" />
+                                  {h.price}
+                                </span>
+                              )
+                            }
                           />
-                        }
-                        badge={
-                          owned ? (
-                            active ? (
-                              <Check className="h-3 w-3" />
-                            ) : null
-                          ) : (
-                            <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-accent">
-                              <Lock className="h-2.5 w-2.5" />
-                              {h.price}
-                            </span>
-                          )
-                        }
-                      />
-                    );
-                  })}
-                </div>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
               </Section>
             </>
           )}
@@ -537,13 +557,149 @@ function MiniAvatar({ dressup }: { dressup: Dressup }) {
 /** Renders a small SVG showing the item alone (no avatar around it) for tiny
  *  accessories: jewelry, piercings, nail polish, hair clips, ear extras. */
 function IsolatedItemIcon({ item }: { item: ShopItem }) {
-  // Generic colored badge with the item emoji on top — readable and consistent.
-  const bg = item.color ? `color-mix(in oklab, ${item.color} 35%, var(--card))` : "var(--muted)";
+  const c = item.color ?? "currentColor";
+  const dark = "color-mix(in oklab, currentColor 70%, var(--background))";
+  const skin = "#f1c9a5";
+
+  if (["earrings", "earPiercing", "ears"].includes(item.slot)) {
+    return (
+      <svg viewBox="0 0 72 72" className="h-full w-full text-foreground" aria-hidden>
+        <ellipse
+          cx="25"
+          cy="36"
+          rx="10"
+          ry="16"
+          fill={skin}
+          stroke="currentColor"
+          strokeOpacity="0.18"
+        />
+        <ellipse
+          cx="47"
+          cy="36"
+          rx="10"
+          ry="16"
+          fill={skin}
+          stroke="currentColor"
+          strokeOpacity="0.18"
+        />
+        <ellipse cx="25" cy="37" rx="4" ry="8" fill="rgba(255,255,255,.22)" />
+        <ellipse cx="47" cy="37" rx="4" ry="8" fill="rgba(255,255,255,.22)" />
+        {item.slot === "ears" && item.id.includes("headphones") ? (
+          <>
+            <path d="M 25 24 Q 36 12 47 24" stroke={c} strokeWidth="5" fill="none" />
+            <ellipse cx="25" cy="38" rx="8" ry="10" fill={c} />
+            <ellipse cx="47" cy="38" rx="8" ry="10" fill={c} />
+          </>
+        ) : item.slot === "ears" && item.id.includes("pods") ? (
+          <>
+            <rect x="23" y="36" width="4" height="11" rx="2" fill={c} />
+            <rect x="45" y="36" width="4" height="11" rx="2" fill={c} />
+          </>
+        ) : item.slot === "ears" ? (
+          <>
+            <path d="M 21 28 q -7 5 0 12" stroke={c} strokeWidth="3" fill="none" />
+            <path d="M 51 28 q 7 5 0 12" stroke={c} strokeWidth="3" fill="none" />
+          </>
+        ) : item.id.includes("hoops") || item.id.includes("cuff") ? (
+          <>
+            <circle cx="25" cy="50" r="5" fill="none" stroke={c} strokeWidth="2.5" />
+            <circle cx="47" cy="50" r="5" fill="none" stroke={c} strokeWidth="2.5" />
+          </>
+        ) : (
+          <>
+            <circle cx="25" cy="49" r="3.2" fill={c} />
+            <circle cx="47" cy="49" r="3.2" fill={c} />
+          </>
+        )}
+      </svg>
+    );
+  }
+
+  if (item.slot === "facePiercing") {
+    return (
+      <svg viewBox="0 0 72 72" className="h-full w-full text-foreground" aria-hidden>
+        <circle cx="36" cy="36" r="23" fill={skin} stroke="currentColor" strokeOpacity="0.16" />
+        <ellipse cx="28" cy="35" rx="3" ry="4" fill="currentColor" />
+        <ellipse cx="44" cy="35" rx="3" ry="4" fill="currentColor" />
+        <path
+          d="M 33 47 Q 36 50 39 47"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          fill="none"
+          strokeLinecap="round"
+        />
+        {item.id.includes("nose") ? (
+          <circle cx="40" cy="42" r="2.4" fill={c} />
+        ) : item.id.includes("eyebrow") ? (
+          <rect x="24" y="28" width="8" height="2.4" rx="1" fill={c} />
+        ) : (
+          <circle cx="31" cy="49" r="2.6" fill="none" stroke={c} strokeWidth="2" />
+        )}
+      </svg>
+    );
+  }
+
+  if (item.slot === "necklace") {
+    return (
+      <svg viewBox="0 0 72 72" className="h-full w-full" aria-hidden>
+        <path
+          d="M 20 24 Q 36 52 52 24"
+          stroke={c}
+          strokeWidth="3"
+          fill="none"
+          strokeLinecap="round"
+        />
+        <path d="M 36 44 L 42 50 L 36 57 L 30 50 Z" fill={c} />
+      </svg>
+    );
+  }
+  if (item.slot === "bracelet") {
+    return (
+      <svg viewBox="0 0 72 72" className="h-full w-full" aria-hidden>
+        <ellipse cx="36" cy="36" rx="19" ry="12" fill="none" stroke={c} strokeWidth="5" />
+        {[0, 1, 2, 3].map((i) => (
+          <circle key={i} cx={24 + i * 8} cy={29 + (i % 2) * 14} r="3" fill={dark} />
+        ))}
+      </svg>
+    );
+  }
+  if (item.slot === "hairClip") {
+    return (
+      <svg viewBox="0 0 72 72" className="h-full w-full" aria-hidden>
+        <path d="M 36 36 L 18 25 Q 10 36 18 47 Z" fill={c} />
+        <path d="M 36 36 L 54 25 Q 62 36 54 47 Z" fill={c} />
+        <circle cx="36" cy="36" r="6" fill={dark} />
+      </svg>
+    );
+  }
+  if (item.slot === "hat") {
+    return (
+      <svg viewBox="0 0 72 72" className="h-full w-full" aria-hidden>
+        <ellipse cx="36" cy="45" rx="27" ry="6" fill={c} />
+        <path d="M 21 45 Q 36 16 51 45 Z" fill={c} opacity="0.9" />
+      </svg>
+    );
+  }
+  if (item.slot === "accessory") {
+    return (
+      <svg viewBox="0 0 72 72" className="h-full w-full" aria-hidden>
+        <circle cx="28" cy="33" r="9" fill="none" stroke={c} strokeWidth="4" />
+        <circle cx="48" cy="33" r="9" fill="none" stroke={c} strokeWidth="4" />
+        <path d="M 37 33 L 39 33" stroke={c} strokeWidth="4" />
+        <path
+          d="M 25 48 Q 36 56 47 48"
+          stroke={c}
+          strokeWidth="5"
+          fill="none"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  }
+
   return (
-    <div className="grid h-full w-full place-items-center" style={{ background: bg }}>
-      <span className="text-2xl" aria-hidden>
-        {item.overlayEmoji ?? item.emoji}
-      </span>
+    <div className="grid h-full w-full place-items-center">
+      <span className="h-8 w-8 rounded-full border-4 border-current" style={{ color: c }} />
     </div>
   );
 }
@@ -648,9 +804,3 @@ function SlotPicker({
     </Section>
   );
 }
-
-// Suppress unused-import warning when tree-shaken by build (these are used
-// indirectly via `dressup-avatar` but keep the explicit import path warm).
-void hairLayers;
-void HEAD_CX;
-void HEAD_CY;

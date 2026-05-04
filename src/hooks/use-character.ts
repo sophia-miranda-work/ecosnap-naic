@@ -4,9 +4,27 @@ import { getDeviceId } from "@/lib/device-id";
 import type { ShopSlot } from "@/lib/shop";
 import type { AgeGroup, Clothing, SkinType } from "@/lib/vitamin-d";
 
-export type Hairstyle = "short" | "long" | "bun" | "curly" | "ponytail" | "pigtails" | "bald";
+export type Hairstyle =
+  | "soft-bob"
+  | "long-bangs"
+  | "straight-bangs"
+  | "curtain-cut"
+  | "high-pony"
+  | "low-pigtails"
+  | "space-buns"
+  | "fluffy-curls"
+  | "twin-braids"
+  | "side-sweep"
+  | "bald"
+  // Legacy saved values still render, but the picker no longer offers them.
+  | "short"
+  | "long"
+  | "bun"
+  | "curly"
+  | "ponytail"
+  | "pigtails";
 
-/** Extended hairstyle catalog. Older "Hairstyle" values are kept for back-compat. */
+/** Extended hairstyle catalog. Older values are kept for back-compat. */
 export type HairStyleId =
   | Hairstyle
   | "afro"
@@ -20,13 +38,13 @@ export type HairStyleId =
   | "topknot"
   | "undercut";
 
-export type FaceShape = "round" | "oval" | "heart" | "square" | "diamond";
+export type FaceShape = "round" | "oval" | "heart" | "diamond" | "octagon" | "long" | "square";
 export type BodyShape = "slim" | "average" | "stocky";
 
 export type Dressup = {
   skin: string;
   hair: string;
-  hairstyle: Hairstyle;
+  hairstyle: HairStyleId;
   hat: string | null;
   top: string | null;
   bottom: string | null;
@@ -35,6 +53,7 @@ export type Dressup = {
   // ---- new optional fields (defaults below) ----
   faceShape?: FaceShape;
   bodyShape?: BodyShape;
+  headSize?: number;
   nail?: string | null; // nail polish color hex, or null
   earrings?: string | null; // item id
   necklace?: string | null;
@@ -49,7 +68,7 @@ export type Dressup = {
 export const DEFAULT_DRESSUP: Dressup = {
   skin: "#f1c9a5",
   hair: "#3b2a1a",
-  hairstyle: "short",
+  hairstyle: "soft-bob",
   hat: null,
   top: null,
   bottom: null,
@@ -57,6 +76,7 @@ export const DEFAULT_DRESSUP: Dressup = {
   accessory: null,
   faceShape: "oval",
   bodyShape: "average",
+  headSize: 1,
   nail: null,
   earrings: null,
   necklace: null,
@@ -93,8 +113,10 @@ export type CharacterDraft = {
 function normalizeDressup(raw: unknown): Dressup {
   if (!raw || typeof raw !== "object") return DEFAULT_DRESSUP;
   const dressup = { ...DEFAULT_DRESSUP, ...(raw as Partial<Dressup>) };
-  if (dressup.faceShape === "square" || dressup.faceShape === "diamond") {
-    dressup.faceShape = "round";
+  if (!dressup.headSize || typeof dressup.headSize !== "number") {
+    dressup.headSize = 1;
+  } else {
+    dressup.headSize = Math.min(1.12, Math.max(0.86, dressup.headSize));
   }
   return dressup;
 }
