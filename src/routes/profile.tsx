@@ -167,6 +167,8 @@ function ProfilePage() {
           onSaved={() => navigate({ to: "/" })}
         />
       )}
+
+      {customizing && <CharacterCustomizer onClose={() => setCustomizing(false)} />}
     </div>
   );
 }
