@@ -108,26 +108,29 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
   const browY = top + ry * 0.62;
   const dark = darken(color, 0.18);
   const shine = lighten(color, 0.35);
+  const soft = darken(color, 0.08);
 
   // Cap = hugs the head from temple to temple, over the crown.
-  // Dips slightly in the middle for soft bangs (no center part line).
+  // Slightly inflated on top for fuller volume; soft rounded bang
+  // sweep across the forehead (no center part).
   const cap = (drop = browY, lift = 4, bangDip = 2) => `
-    M ${sideL - 1.5},${drop + 1}
-    C ${sideL - 3},${cy - ry * 0.2} ${sideL - 2},${top + ry * 0.18} ${cx - rx * 0.55},${top - lift * 0.4}
-    C ${cx - rx * 0.25},${top - lift} ${cx + rx * 0.25},${top - lift} ${cx + rx * 0.55},${top - lift * 0.4}
-    C ${sideR + 2},${top + ry * 0.18} ${sideR + 3},${cy - ry * 0.2} ${sideR + 1.5},${drop + 1}
-    C ${sideR - 4},${drop - bangDip - 1} ${cx + 6},${drop + bangDip} ${cx},${drop + bangDip}
-    C ${cx - 6},${drop + bangDip} ${sideL + 4},${drop - bangDip - 1} ${sideL - 1.5},${drop + 1} Z`;
+    M ${sideL - 2},${drop + 1.5}
+    C ${sideL - 3.5},${cy - ry * 0.25} ${sideL - 2.5},${top + ry * 0.1} ${cx - rx * 0.6},${top - lift * 0.55}
+    C ${cx - rx * 0.3},${top - lift - 1} ${cx + rx * 0.3},${top - lift - 1} ${cx + rx * 0.6},${top - lift * 0.55}
+    C ${sideR + 2.5},${top + ry * 0.1} ${sideR + 3.5},${cy - ry * 0.25} ${sideR + 2},${drop + 1.5}
+    C ${sideR - 3},${drop - bangDip * 0.4} ${cx + rx * 0.35},${drop + bangDip + 0.5} ${cx},${drop + bangDip + 0.5}
+    C ${cx - rx * 0.35},${drop + bangDip + 0.5} ${sideL + 3},${drop - bangDip * 0.4} ${sideL - 2},${drop + 1.5} Z`;
 
   // Side panels that hang along the cheeks (used for medium/long hair).
+  // Smoothly tucked under the chin with a rounded tip.
   const sidePanel = (sideX: number, dir: 1 | -1, length: number, flare = 0) => {
-    const inX = sideX + dir * 2;
+    const inX = sideX + dir * 2.2;
     const tipY = cy + length;
     return `
-      M ${sideX - dir * 1},${browY + 1}
-      C ${sideX + dir * 1.5},${cy + length * 0.3} ${sideX + dir * (1 + flare)},${cy + length * 0.7} ${sideX + dir * (2 + flare)},${tipY}
-      Q ${sideX + dir * 0.5},${tipY + 2} ${inX},${tipY - 1}
-      C ${inX - dir * 0.5},${cy + length * 0.6} ${inX - dir * 0.5},${cy + length * 0.25} ${sideX - dir * 1},${browY + 1} Z`;
+      M ${sideX - dir * 1.2},${browY + 1.5}
+      C ${sideX + dir * 1.2},${cy + length * 0.28} ${sideX + dir * (1 + flare)},${cy + length * 0.72} ${sideX + dir * (2.2 + flare)},${tipY}
+      Q ${sideX + dir * 0.8},${tipY + 2.2} ${inX},${tipY - 1.2}
+      C ${inX - dir * 0.6},${cy + length * 0.6} ${inX - dir * 0.4},${cy + length * 0.22} ${sideX - dir * 1.2},${browY + 1.5} Z`;
   };
 
   // Long flowing hair behind the head (back layer).
@@ -138,27 +141,32 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
     C ${sideR + width * 0.6},${cy + length} ${sideR + width},${cy + length * 0.4} ${sideR - 2},${cy - 4}
     C ${sideR - 4},${top + 4} ${sideL + 4},${top + 4} ${sideL + 2},${cy - 4} Z`;
 
-  // Solid bun anchored to the cap.
+  // Solid bun anchored to the cap with a soft blended base.
   const bun = (bx: number, by: number, r: number) => (
     <g>
-      <ellipse cx={bx} cy={by} rx={r} ry={r * 0.92} fill={color} />
-      <ellipse cx={bx - r * 0.3} cy={by - r * 0.3} rx={r * 0.35} ry={r * 0.22} fill={shine} opacity="0.45" />
-      {/* anchor strands so it never looks floating */}
-      <path d={`M ${bx},${by + r * 0.85} Q ${bx},${by + r * 1.4} ${bx + (bx > cx ? -2 : 2)},${by + r * 1.6}`} stroke={dark} strokeWidth="1.2" fill="none" strokeLinecap="round" />
+      {/* base blend so the bun never looks floating */}
+      <ellipse cx={bx} cy={by + r * 0.7} rx={r * 0.95} ry={r * 0.45} fill={soft} />
+      <ellipse cx={bx} cy={by} rx={r} ry={r * 0.95} fill={color} />
+      <ellipse cx={bx - r * 0.3} cy={by - r * 0.32} rx={r * 0.4} ry={r * 0.24} fill={shine} opacity="0.5" />
     </g>
   );
 
-  // Pigtail / pony tube anchored to the side or crown.
+  // Pigtail / pony tube anchored to the side or crown — fuller body
+  // with a rounded tip and a soft base blob to hide the seam.
   const tail = (ax: number, ay: number, tx: number, ty: number, w: number) => {
     const mx = (ax + tx) / 2;
     const my = (ay + ty) / 2;
+    const fullW = w * 1.25;
     return (
-      <path
-        d={`M ${ax - w / 2},${ay} Q ${mx - w * 0.4},${my} ${tx - w * 0.55},${ty}
-            Q ${tx},${ty + w * 0.6} ${tx + w * 0.55},${ty}
-            Q ${mx + w * 0.4},${my} ${ax + w / 2},${ay} Z`}
-        fill={color}
-      />
+      <g>
+        <ellipse cx={ax} cy={ay} rx={fullW * 0.7} ry={fullW * 0.5} fill={soft} />
+        <path
+          d={`M ${ax - fullW / 2},${ay} Q ${mx - fullW * 0.55},${my} ${tx - fullW * 0.6},${ty}
+              Q ${tx},${ty + fullW * 0.75} ${tx + fullW * 0.6},${ty}
+              Q ${mx + fullW * 0.55},${my} ${ax + fullW / 2},${ay} Z`}
+          fill={color}
+        />
+      </g>
     );
   };
 
@@ -286,24 +294,34 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
     case "curly":
     case "afro": {
       // Cloud silhouette built from many overlapping circles around the
-      // head; guarantees no gaps and no helmet edges.
+      // head; fuller and rounder for a fluffy look.
       const puffs: ReactElement[] = [];
-      const ringR = rx + 5;
-      const count = 16;
+      const ringR = rx + 7;
+      const count = 20;
       for (let i = 0; i < count; i++) {
         const a = Math.PI + (Math.PI * i) / (count - 1);
         const px = cx + Math.cos(a) * ringR;
-        const py = cy - 2 + Math.sin(a) * (ringR * 0.95);
-        if (py > browY + 2) continue; // don't cover the face
-        puffs.push(<circle key={`o${i}`} cx={px} cy={py} r={5.5} fill={color} />);
+        const py = cy - 3 + Math.sin(a) * (ringR * 1.0);
+        if (py > browY + 2) continue;
+        puffs.push(<circle key={`o${i}`} cx={px} cy={py} r={6.5} fill={color} />);
+      }
+      // mid ring adds body
+      for (let i = 0; i < 14; i++) {
+        const a = Math.PI + (Math.PI * i) / 13;
+        const px = cx + Math.cos(a) * (rx * 0.85);
+        const py = cy - 5 + Math.sin(a) * (ry * 0.85);
+        if (py > browY + 1) continue;
+        puffs.push(<circle key={`m${i}`} cx={px} cy={py} r={6} fill={color} />);
       }
       // inner ring fills the crown
       for (let i = 0; i < 10; i++) {
         const a = Math.PI + (Math.PI * i) / 9;
-        const px = cx + Math.cos(a) * (rx * 0.65);
-        const py = cy - 6 + Math.sin(a) * (ry * 0.6);
-        puffs.push(<circle key={`i${i}`} cx={px} cy={py} r={5} fill={color} />);
+        const px = cx + Math.cos(a) * (rx * 0.55);
+        const py = cy - 7 + Math.sin(a) * (ry * 0.55);
+        puffs.push(<circle key={`i${i}`} cx={px} cy={py} r={5.5} fill={color} />);
       }
+      // subtle highlight
+      puffs.push(<ellipse key="sh" cx={cx - rx * 0.3} cy={top - 2} rx={rx * 0.35} ry={ry * 0.18} fill={shine} opacity="0.4" />);
       frontNode = <g>{puffs}</g>;
       break;
     }
