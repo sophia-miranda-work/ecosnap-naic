@@ -8,18 +8,6 @@ import {
 } from "@/hooks/use-character";
 import { getItemById } from "@/lib/shop";
 
-import hairBob from "@/assets/hair/solid/bob.png";
-import hairLongBangs from "@/assets/hair/solid/long-bangs.png";
-import hairLowPigtails from "@/assets/hair/solid/low-pigtails.png";
-import hairSpaceBuns from "@/assets/hair/solid/space-buns.png";
-import hairTwinBraids from "@/assets/hair/solid/twin-braids.png";
-import hairAfro from "@/assets/hair/solid/afro.png";
-import hairCurtain from "@/assets/hair/solid/curtain.png";
-import hairTopknot from "@/assets/hair/solid/topknot.png";
-import hairSideSweep from "@/assets/hair/solid/side-sweep.png";
-import hairCurls from "@/assets/hair/solid/curls.png";
-import hairPixie from "@/assets/hair/solid/pixie.png";
-
 import dressFloralPink from "@/assets/dresses/clean/floral-pink.png";
 import dressLavenderParty from "@/assets/dresses/clean/lavender-party.png";
 import dressPinaforePink from "@/assets/dresses/clean/pinafore-pink.png";
@@ -37,22 +25,13 @@ const DRESS_IMAGES: Record<string, string> = {
   "dress-sundress-black": dressSundressBlack,
 };
 
-/** Hairstyles backed by painted PNGs (face masked out). */
-export const HAIR_IMAGES: Partial<Record<HairStyleId, string>> = {
-  "soft-bob": hairBob,
-  "long-bangs": hairLongBangs,
-  "low-pigtails": hairLowPigtails,
-  "space-buns": hairSpaceBuns,
-  "twin-braids": hairTwinBraids,
-  "fluffy-curls": hairCurls,
-  "side-sweep": hairSideSweep,
-  "curtain-cut": hairCurtain,
-  // Extra ids surfaced as new picker options
-  afro: hairAfro,
-  topknot: hairTopknot,
-  // Map a legacy id to pixie so older saves still render
-  fade: hairPixie,
-};
+/**
+ * Hair PNG overlays were causing visible solid-color blocks behind the face
+ * and clipped/geometric edges. We now render hair purely through the
+ * shape-fitted SVG `hairLayers` below — keep this map empty so the SVG
+ * path is taken in the renderer.
+ */
+export const HAIR_IMAGES: Partial<Record<HairStyleId, string>> = {};
 
 export const HEAD_CX = 50;
 export const HEAD_CY = 42;
