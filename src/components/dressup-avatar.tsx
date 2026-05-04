@@ -3,6 +3,8 @@ import {
   type Dressup,
   type FaceShape,
   type HairStyleId,
+  type EyebrowStyle,
+  type FacialHairStyle,
 } from "@/hooks/use-character";
 import { getItemById } from "@/lib/shop";
 
@@ -1090,6 +1092,52 @@ export function DressupAvatar({
         const eyeOffset = rx * 0.33;
         return (
           <>
+            {(() => {
+              const eb: EyebrowStyle = dressup.eyebrows ?? "none";
+              if (eb === "none") return null;
+              const browY = eyeY - 6.2;
+              const browColor = darken(dressup.hair, 0.1);
+              const w = 4.6;
+              if (eb === "straight") {
+                return (
+                  <g fill={browColor}>
+                    <rect x={HEAD_CX - eyeOffset - w} y={browY - 0.6} width={w * 2} height="1.2" rx="0.6" />
+                    <rect x={HEAD_CX + eyeOffset - w} y={browY - 0.6} width={w * 2} height="1.2" rx="0.6" />
+                  </g>
+                );
+              }
+              if (eb === "thick") {
+                return (
+                  <g fill={browColor}>
+                    <path d={`M ${HEAD_CX - eyeOffset - w},${browY + 0.4} Q ${HEAD_CX - eyeOffset},${browY - 2.2} ${HEAD_CX - eyeOffset + w},${browY + 0.4} Q ${HEAD_CX - eyeOffset},${browY - 0.4} ${HEAD_CX - eyeOffset - w},${browY + 0.4} Z`} />
+                    <path d={`M ${HEAD_CX + eyeOffset - w},${browY + 0.4} Q ${HEAD_CX + eyeOffset},${browY - 2.2} ${HEAD_CX + eyeOffset + w},${browY + 0.4} Q ${HEAD_CX + eyeOffset},${browY - 0.4} ${HEAD_CX + eyeOffset - w},${browY + 0.4} Z`} />
+                  </g>
+                );
+              }
+              if (eb === "thin") {
+                return (
+                  <g stroke={browColor} strokeWidth="0.7" fill="none" strokeLinecap="round">
+                    <path d={`M ${HEAD_CX - eyeOffset - w},${browY + 0.3} Q ${HEAD_CX - eyeOffset},${browY - 1.4} ${HEAD_CX - eyeOffset + w},${browY + 0.3}`} />
+                    <path d={`M ${HEAD_CX + eyeOffset - w},${browY + 0.3} Q ${HEAD_CX + eyeOffset},${browY - 1.4} ${HEAD_CX + eyeOffset + w},${browY + 0.3}`} />
+                  </g>
+                );
+              }
+              if (eb === "raised") {
+                return (
+                  <g stroke={browColor} strokeWidth="1.1" fill="none" strokeLinecap="round">
+                    <path d={`M ${HEAD_CX - eyeOffset - w},${browY + 0.6} Q ${HEAD_CX - eyeOffset},${browY - 2.4} ${HEAD_CX - eyeOffset + w},${browY}`} />
+                    <path d={`M ${HEAD_CX + eyeOffset - w},${browY} Q ${HEAD_CX + eyeOffset},${browY - 2.4} ${HEAD_CX + eyeOffset + w},${browY + 0.6}`} />
+                  </g>
+                );
+              }
+              // soft-arch (default)
+              return (
+                <g stroke={browColor} strokeWidth="1.1" fill="none" strokeLinecap="round">
+                  <path d={`M ${HEAD_CX - eyeOffset - w},${browY + 0.4} Q ${HEAD_CX - eyeOffset},${browY - 1.8} ${HEAD_CX - eyeOffset + w},${browY + 0.4}`} />
+                  <path d={`M ${HEAD_CX + eyeOffset - w},${browY + 0.4} Q ${HEAD_CX + eyeOffset},${browY - 1.8} ${HEAD_CX + eyeOffset + w},${browY + 0.4}`} />
+                </g>
+              );
+            })()}
             <ellipse cx={HEAD_CX - eyeOffset} cy={eyeY} rx="4" ry="5.2" fill="#2b1930" />
             <ellipse cx={HEAD_CX + eyeOffset} cy={eyeY} rx="4" ry="5.2" fill="#2b1930" />
             <circle
@@ -1121,6 +1169,57 @@ export function DressupAvatar({
               opacity="0.5"
             />
           </>
+        );
+      })()}
+
+      {(() => {
+        const fh: FacialHairStyle = dressup.facialHair ?? "none";
+        if (fh === "none") return null;
+        const c = darken(dressup.hair, 0.1);
+        const mouthY = HEAD_CY + 15;
+        if (fh === "stubble") {
+          return (
+            <g fill={c} opacity="0.45">
+              {Array.from({ length: 22 }).map((_, i) => {
+                const ang = (i / 22) * Math.PI;
+                const r = rx * 0.62;
+                const x = HEAD_CX + Math.cos(ang) * r * (i % 2 ? 1 : -1) * 0.5 + (i - 11) * 0.6;
+                const y = mouthY + 1 + (i % 3) * 0.8;
+                return <circle key={i} cx={x} cy={y} r="0.45" />;
+              })}
+            </g>
+          );
+        }
+        if (fh === "mustache") {
+          return (
+            <path
+              d={`M ${HEAD_CX - 5},${mouthY - 1.5} Q ${HEAD_CX - 2.5},${mouthY - 3} ${HEAD_CX},${mouthY - 1.2} Q ${HEAD_CX + 2.5},${mouthY - 3} ${HEAD_CX + 5},${mouthY - 1.5} Q ${HEAD_CX + 2.5},${mouthY - 0.4} ${HEAD_CX},${mouthY - 0.8} Q ${HEAD_CX - 2.5},${mouthY - 0.4} ${HEAD_CX - 5},${mouthY - 1.5} Z`}
+              fill={c}
+            />
+          );
+        }
+        if (fh === "goatee") {
+          return (
+            <g fill={c}>
+              <path d={`M ${HEAD_CX - 3.2},${mouthY + 1.5} Q ${HEAD_CX},${mouthY + 5.5} ${HEAD_CX + 3.2},${mouthY + 1.5} Q ${HEAD_CX},${mouthY + 2.5} ${HEAD_CX - 3.2},${mouthY + 1.5} Z`} />
+              <path d={`M ${HEAD_CX - 4},${mouthY - 1.6} Q ${HEAD_CX},${mouthY - 2.6} ${HEAD_CX + 4},${mouthY - 1.6} Q ${HEAD_CX},${mouthY - 0.8} ${HEAD_CX - 4},${mouthY - 1.6} Z`} />
+            </g>
+          );
+        }
+        // full-beard
+        return (
+          <g fill={c}>
+            <path
+              d={`M ${HEAD_CX - rx * 0.85},${HEAD_CY + 8}
+                  Q ${HEAD_CX - rx},${HEAD_CY + ry - 2} ${HEAD_CX},${HEAD_CY + ry + 2}
+                  Q ${HEAD_CX + rx},${HEAD_CY + ry - 2} ${HEAD_CX + rx * 0.85},${HEAD_CY + 8}
+                  Q ${HEAD_CX + 5},${HEAD_CY + 13} ${HEAD_CX},${HEAD_CY + 12}
+                  Q ${HEAD_CX - 5},${HEAD_CY + 13} ${HEAD_CX - rx * 0.85},${HEAD_CY + 8} Z`}
+            />
+            <path
+              d={`M ${HEAD_CX - 5},${mouthY - 1.5} Q ${HEAD_CX},${mouthY - 3} ${HEAD_CX + 5},${mouthY - 1.5} Q ${HEAD_CX},${mouthY - 0.5} ${HEAD_CX - 5},${mouthY - 1.5} Z`}
+            />
+          </g>
         );
       })()}
 
