@@ -6,17 +6,17 @@ import {
 } from "@/hooks/use-character";
 import { getItemById } from "@/lib/shop";
 
-import hairBob from "@/assets/hair/masked/bob.png";
-import hairLongBangs from "@/assets/hair/masked/long-bangs.png";
-import hairLowPigtails from "@/assets/hair/masked/low-pigtails.png";
-import hairSpaceBuns from "@/assets/hair/masked/space-buns.png";
-import hairTwinBraids from "@/assets/hair/masked/twin-braids.png";
-import hairAfro from "@/assets/hair/masked/afro.png";
-import hairCurtain from "@/assets/hair/masked/curtain.png";
-import hairTopknot from "@/assets/hair/masked/topknot.png";
-import hairSideSweep from "@/assets/hair/masked/side-sweep.png";
-import hairCurls from "@/assets/hair/masked/curls.png";
-import hairPixie from "@/assets/hair/masked/pixie.png";
+import hairBob from "@/assets/hair/clean/bob.png";
+import hairLongBangs from "@/assets/hair/clean/long-bangs.png";
+import hairLowPigtails from "@/assets/hair/clean/low-pigtails.png";
+import hairSpaceBuns from "@/assets/hair/clean/space-buns.png";
+import hairTwinBraids from "@/assets/hair/clean/twin-braids.png";
+import hairAfro from "@/assets/hair/clean/afro.png";
+import hairCurtain from "@/assets/hair/clean/curtain.png";
+import hairTopknot from "@/assets/hair/clean/topknot.png";
+import hairSideSweep from "@/assets/hair/clean/side-sweep.png";
+import hairCurls from "@/assets/hair/clean/curls.png";
+import hairPixie from "@/assets/hair/clean/pixie.png";
 
 /** Hairstyles backed by painted PNGs (face masked out). */
 export const HAIR_IMAGES: Partial<Record<HairStyleId, string>> = {
