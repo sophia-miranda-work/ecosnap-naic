@@ -14,6 +14,7 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as QuestsRouteImport } from './routes/quests'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as JournalRouteImport } from './routes/journal'
+import { Route as HairTestRouteImport } from './routes/hair-test'
 import { Route as CastRouteImport } from './routes/cast'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -42,6 +43,11 @@ const JournalRoute = JournalRouteImport.update({
   path: '/journal',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HairTestRoute = HairTestRouteImport.update({
+  id: '/hair-test',
+  path: '/hair-test',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CastRoute = CastRouteImport.update({
   id: '/cast',
   path: '/cast',
@@ -56,6 +62,7 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/cast': typeof CastRoute
+  '/hair-test': typeof HairTestRoute
   '/journal': typeof JournalRoute
   '/profile': typeof ProfileRoute
   '/quests': typeof QuestsRoute
@@ -65,6 +72,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/cast': typeof CastRoute
+  '/hair-test': typeof HairTestRoute
   '/journal': typeof JournalRoute
   '/profile': typeof ProfileRoute
   '/quests': typeof QuestsRoute
@@ -75,6 +83,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/cast': typeof CastRoute
+  '/hair-test': typeof HairTestRoute
   '/journal': typeof JournalRoute
   '/profile': typeof ProfileRoute
   '/quests': typeof QuestsRoute
@@ -86,6 +95,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/cast'
+    | '/hair-test'
     | '/journal'
     | '/profile'
     | '/quests'
@@ -95,6 +105,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/cast'
+    | '/hair-test'
     | '/journal'
     | '/profile'
     | '/quests'
@@ -104,6 +115,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/cast'
+    | '/hair-test'
     | '/journal'
     | '/profile'
     | '/quests'
@@ -114,6 +126,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CastRoute: typeof CastRoute
+  HairTestRoute: typeof HairTestRoute
   JournalRoute: typeof JournalRoute
   ProfileRoute: typeof ProfileRoute
   QuestsRoute: typeof QuestsRoute
@@ -158,6 +171,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JournalRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/hair-test': {
+      id: '/hair-test'
+      path: '/hair-test'
+      fullPath: '/hair-test'
+      preLoaderRoute: typeof HairTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/cast': {
       id: '/cast'
       path: '/cast'
@@ -178,6 +198,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CastRoute: CastRoute,
+  HairTestRoute: HairTestRoute,
   JournalRoute: JournalRoute,
   ProfileRoute: ProfileRoute,
   QuestsRoute: QuestsRoute,
