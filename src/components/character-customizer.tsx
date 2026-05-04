@@ -6,6 +6,8 @@ import {
   type FaceShape,
   type BodyShape,
   type HairStyleId,
+  type EyebrowStyle,
+  type FacialHairStyle,
   DEFAULT_DRESSUP,
 } from "@/hooks/use-character";
 import { SHOP_ITEMS, type ShopSlot, type ShopItem } from "@/lib/shop";
@@ -87,6 +89,23 @@ const FREE_HAIRSTYLES: { id: HairStyleId; label: string }[] = [
 ];
 
 const PREMIUM_HAIRSTYLES: { id: HairStyleId; label: string; price: number }[] = [];
+
+const EYEBROW_STYLES: { id: EyebrowStyle; label: string }[] = [
+  { id: "none", label: "None" },
+  { id: "soft-arch", label: "Soft arch" },
+  { id: "straight", label: "Straight" },
+  { id: "thick", label: "Thick" },
+  { id: "thin", label: "Thin" },
+  { id: "raised", label: "Raised" },
+];
+
+const FACIAL_HAIR_STYLES: { id: FacialHairStyle; label: string }[] = [
+  { id: "none", label: "Clean" },
+  { id: "stubble", label: "Stubble" },
+  { id: "mustache", label: "Mustache" },
+  { id: "goatee", label: "Goatee" },
+  { id: "full-beard", label: "Full beard" },
+];
 
 function premiumHairItemId(style: HairStyleId): string {
   return `hair-${style}`;
@@ -344,6 +363,32 @@ export function CharacterCustomizer({ onClose }: { onClose: () => void }) {
                     </div>
                   </>
                 )}
+              </Section>
+              <Section title="Eyebrows">
+                <div className="grid grid-cols-3 gap-2">
+                  {EYEBROW_STYLES.map((b) => (
+                    <PreviewTile
+                      key={b.id}
+                      label={b.label}
+                      active={(dressup.eyebrows ?? "none") === b.id}
+                      onClick={() => setField({ eyebrows: b.id })}
+                      preview={<MiniAvatar dressup={{ ...dressup, eyebrows: b.id }} />}
+                    />
+                  ))}
+                </div>
+              </Section>
+              <Section title="Facial hair">
+                <div className="grid grid-cols-3 gap-2">
+                  {FACIAL_HAIR_STYLES.map((f) => (
+                    <PreviewTile
+                      key={f.id}
+                      label={f.label}
+                      active={(dressup.facialHair ?? "none") === f.id}
+                      onClick={() => setField({ facialHair: f.id })}
+                      preview={<MiniAvatar dressup={{ ...dressup, facialHair: f.id }} />}
+                    />
+                  ))}
+                </div>
               </Section>
             </>
           )}
