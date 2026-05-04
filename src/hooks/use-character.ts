@@ -41,6 +41,9 @@ export type HairStyleId =
 export type FaceShape = "round" | "oval" | "heart" | "diamond" | "octagon" | "long" | "square";
 export type BodyShape = "slim" | "average" | "stocky";
 
+export type EyebrowStyle = "none" | "soft-arch" | "straight" | "thick" | "thin" | "raised";
+export type FacialHairStyle = "none" | "stubble" | "mustache" | "goatee" | "full-beard";
+
 export type Dressup = {
   skin: string;
   hair: string;
@@ -63,6 +66,8 @@ export type Dressup = {
   facePiercing?: string | null;
   ears?: string | null; // hearing aid / earpods / headphones
   dress?: string | null; // covers top+bottom for dresses
+  eyebrows?: EyebrowStyle;
+  facialHair?: FacialHairStyle;
 };
 
 export const DEFAULT_DRESSUP: Dressup = {
@@ -86,6 +91,8 @@ export const DEFAULT_DRESSUP: Dressup = {
   facePiercing: null,
   ears: null,
   dress: null,
+  eyebrows: "none",
+  facialHair: "none",
 };
 
 export type Character = {
