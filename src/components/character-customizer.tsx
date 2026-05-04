@@ -378,6 +378,19 @@ export function CharacterCustomizer({ onClose }: { onClose: () => void }) {
                 </div>
               </Section>
               <Section title="Facial hair">
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="text-[11px] text-muted-foreground">
+                    Current: {FACIAL_HAIR_STYLES.find((f) => f.id === (dressup.facialHair ?? "none"))?.label}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setField({ facialHair: "none" })}
+                    disabled={(dressup.facialHair ?? "none") === "none"}
+                    className="rounded-full border border-border bg-card px-3 py-1 text-[11px] font-semibold text-foreground hover:bg-muted disabled:opacity-50"
+                  >
+                    Reset
+                  </button>
+                </div>
                 <div className="grid grid-cols-3 gap-2">
                   {FACIAL_HAIR_STYLES.map((f) => (
                     <PreviewTile
