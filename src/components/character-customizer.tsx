@@ -111,6 +111,7 @@ const BANG_STYLES: { id: BangStyle; label: string }[] = [
   { id: "curtain", label: "Curtain" },
   { id: "anime", label: "Anime chunks" },
   { id: "blunt", label: "Blunt" },
+  { id: "curly", label: "Curly" },
 ];
 
 function premiumHairItemId(style: HairStyleId): string {
