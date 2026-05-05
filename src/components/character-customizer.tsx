@@ -47,17 +47,6 @@ const HAIR_COLORS = [
   "#a8a8b0",
   "#e8e8f0",
 ];
-const NAIL_COLORS = [
-  null,
-  "#e83a5a",
-  "#f0a8c0",
-  "#a83af0",
-  "#3a8af0",
-  "#3af0a8",
-  "#f0e83a",
-  "#1a1410",
-];
-
 const FACE_SHAPES: { id: FaceShape; label: string }[] = [
   { id: "round", label: "Round" },
   { id: "oval", label: "Oval" },
@@ -237,18 +226,6 @@ export function CharacterCustomizer({ onClose }: { onClose: () => void }) {
                     active={dressup.bodyShape === b.id}
                     onClick={() => setField({ bodyShape: b.id })}
                     preview={<MiniAvatar dressup={{ ...dressup, bodyShape: b.id }} />}
-                  />
-                ))}
-              </div>
-              <SubTitle>Nail polish</SubTitle>
-              <div className="flex flex-wrap gap-2">
-                {NAIL_COLORS.map((c, i) => (
-                  <Swatch
-                    key={i}
-                    color={c ?? "transparent"}
-                    bare={c === null}
-                    active={dressup.nail === c}
-                    onClick={() => setField({ nail: c })}
                   />
                 ))}
               </div>
