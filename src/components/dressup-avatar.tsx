@@ -111,15 +111,16 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
   const soft = darken(color, 0.08);
 
   // Cap = hugs the head from temple to temple, over the crown.
-  // Slightly inflated on top for fuller volume; soft rounded bang
-  // sweep across the forehead (no center part).
+  // Soft rounded fringe across the forehead — single continuous curve
+  // (no center part, no wavy hairline). Sits attached to the temple
+  // panels and dips slightly at center to feel fluffy and integrated.
   const cap = (drop = browY, lift = 4, bangDip = 2) => `
     M ${sideL - 2},${drop + 1.5}
     C ${sideL - 3.5},${cy - ry * 0.25} ${sideL - 2.5},${top + ry * 0.1} ${cx - rx * 0.6},${top - lift * 0.55}
     C ${cx - rx * 0.3},${top - lift - 1} ${cx + rx * 0.3},${top - lift - 1} ${cx + rx * 0.6},${top - lift * 0.55}
     C ${sideR + 2.5},${top + ry * 0.1} ${sideR + 3.5},${cy - ry * 0.25} ${sideR + 2},${drop + 1.5}
-    C ${sideR - 3},${drop - bangDip * 0.4} ${cx + rx * 0.35},${drop + bangDip + 0.5} ${cx},${drop + bangDip + 0.5}
-    C ${cx - rx * 0.35},${drop + bangDip + 0.5} ${sideL + 3},${drop - bangDip * 0.4} ${sideL - 2},${drop + 1.5} Z`;
+    C ${sideR - 1},${drop + bangDip + 1.2} ${cx + rx * 0.55},${drop + bangDip + 2.6} ${cx},${drop + bangDip + 2.4}
+    C ${cx - rx * 0.55},${drop + bangDip + 2.6} ${sideL + 1},${drop + bangDip + 1.2} ${sideL - 2},${drop + 1.5} Z`;
 
   // Side panels that hang along the cheeks (used for medium/long hair).
   // Smoothly tucked under the chin with a rounded tip.
@@ -346,14 +347,16 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
     }
 
     case "side-sweep": {
-      // Asymmetric swept fringe across the forehead.
-      const d = `
-        M ${sideL - 1},${browY}
-        C ${sideL - 2},${top + 4} ${cx - rx * 0.2},${top - 4} ${cx + rx * 0.2},${top - 4}
-        C ${sideR + 2},${top - 1} ${sideR + 3},${cy - ry * 0.1} ${sideR + 1},${browY + 2}
-        C ${cx + rx * 0.4},${browY - 1} ${cx - rx * 0.2},${browY + 4} ${sideL + rx * 0.2},${browY + 5}
-        Q ${sideL - 1},${browY + 4} ${sideL - 1},${browY} Z`;
-      frontNode = path(d);
+      // Asymmetric swept fringe — base cap with a smooth diagonal
+      // fringe curving across the forehead from one temple to the other.
+      const sweep = `
+        M ${sideL - 2},${browY + 2}
+        C ${sideL - 3.5},${cy - ry * 0.25} ${sideL - 2.5},${top + ry * 0.1} ${cx - rx * 0.6},${top - 2}
+        C ${cx - rx * 0.2},${top - 4} ${cx + rx * 0.4},${top - 4} ${cx + rx * 0.65},${top - 1}
+        C ${sideR + 2.5},${top + ry * 0.1} ${sideR + 3.5},${cy - ry * 0.25} ${sideR + 2},${browY + 2}
+        C ${cx + rx * 0.45},${browY + 4.5} ${cx - rx * 0.05},${browY + 5.5} ${sideL + rx * 0.15},${browY + 5}
+        Q ${sideL - 0.5},${browY + 4} ${sideL - 2},${browY + 2} Z`;
+      frontNode = path(sweep);
       break;
     }
 
