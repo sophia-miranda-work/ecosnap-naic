@@ -37,6 +37,12 @@ const TABS: { id: TabId; label: string; emoji: string }[] = [
 ];
 
 const SKIN_TONES = ["#f7d9bd", "#f1c9a5", "#d9a87a", "#a87651", "#7a5236", "#4a3220", "#2e1c10"];
+const ITEM_COLORS = [
+  "#e89ab8", "#d97a8a", "#c83a5a", "#a04848", "#e0b840", "#d8b87a",
+  "#5b8a3a", "#5b6b3a", "#3a6ea5", "#69a7d8", "#3a4f78", "#5a4a8a",
+  "#8a6fd8", "#b98cf0", "#7a5236", "#5b3a1f", "#2f2a34", "#dcdcdc",
+  "#f2f2f2", "#1a1410",
+];
 const HAIR_COLORS = [
   "#1a1410",
   "#3b2a1a",
