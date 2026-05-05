@@ -153,32 +153,84 @@ export function hairLayers(
     />
   );
 
-  // AfroBase: large round cloud, fully covering sides
+  // AfroBase: large round cloud with chunky outer puffs, surface curl swirls,
+  // and diamond highlights (matches the reference chibi afro look).
   const AfroBase = () => {
-    const baseR = rx + 10;
+    const baseR = rx + 14;
     const els: ReactElement[] = [];
+    const dark = darken(color, 0.18);
+    const light = darken(color, -0.12);
+
+    // main cloud
     els.push(
-      <ellipse key="b" cx={cx} cy={cy - 3} rx={baseR} ry={baseR * 0.95} fill={color} />,
+      <ellipse key="b" cx={cx} cy={cy - 5} rx={baseR} ry={baseR * 1.0} fill={color} />,
     );
-    // outline puffs around top half
-    const n = 22;
+
+    // chunky outer puffs around the upper half (defines the cloud silhouette)
+    const n = 26;
     for (let i = 0; i < n; i++) {
       const a = Math.PI + (Math.PI * i) / (n - 1);
-      const px = cx + Math.cos(a) * (baseR + 1);
-      const py = cy - 3 + Math.sin(a) * (baseR + 1);
-      if (py > browY + 5) continue;
-      els.push(<circle key={`p${i}`} cx={px} cy={py} r={6.5} fill={color} />);
+      const px = cx + Math.cos(a) * (baseR + 2);
+      const py = cy - 5 + Math.sin(a) * (baseR + 2);
+      if (py > browY + 6) continue;
+      const r = 7.5 + (i % 2 ? 1.2 : 0);
+      els.push(<circle key={`p${i}`} cx={px} cy={py} r={r} fill={color} />);
     }
-    // side puffs (ensures ear-level coverage)
-    for (let i = 0; i < 4; i++) {
-      const t = i / 3;
+
+    // side puffs for ear-level coverage
+    for (let i = 0; i < 5; i++) {
+      const t = i / 4;
       els.push(
-        <circle key={`sl${i}`} cx={sideL - 3} cy={browY - 4 + t * 14} r={6.2} fill={color} />,
-        <circle key={`sr${i}`} cx={sideR + 3} cy={browY - 4 + t * 14} r={6.2} fill={color} />,
+        <circle key={`sl${i}`} cx={sideL - 5} cy={browY - 6 + t * 18} r={7} fill={color} />,
+        <circle key={`sr${i}`} cx={sideR + 5} cy={browY - 6 + t * 18} r={7} fill={color} />,
       );
     }
+
+    // surface curl swirls (small spirals on the dome)
+    const swirl = (kx: number, ky: number, r: number, key: string) => (
+      <path
+        key={key}
+        d={`M ${kx + r},${ky}
+            a ${r},${r} 0 1,1 ${-r * 0.05},${-r * 0.95}
+            a ${r * 0.7},${r * 0.7} 0 1,0 ${r * 0.4},${r * 0.6}`}
+        fill="none"
+        stroke={dark}
+        strokeWidth={1.2}
+        strokeLinecap="round"
+      />
+    );
+    els.push(swirl(cx, top + ry * 0.05, rx * 0.18, "sw1"));
+    els.push(swirl(cx - rx * 0.45, top + ry * 0.12, rx * 0.13, "sw2"));
+    els.push(swirl(cx + rx * 0.4, top + ry * 0.18, rx * 0.14, "sw3"));
+    els.push(swirl(cx - rx * 0.18, top - ry * 0.05, rx * 0.1, "sw4"));
+    els.push(swirl(cx + rx * 0.15, top - ry * 0.02, rx * 0.11, "sw5"));
+
+    // diamond highlights (like the reference headband-ish detail)
+    const diamond = (dx: number, dy: number, w: number, key: string) => (
+      <path
+        key={key}
+        d={`M ${dx},${dy - w} L ${dx + w * 0.6},${dy} L ${dx},${dy + w} L ${dx - w * 0.6},${dy} Z`}
+        fill={light}
+        opacity="0.55"
+      />
+    );
+    diamond;
+    els.push(diamond(cx - rx * 0.55, browY - 2, 3.2, "d1"));
+    els.push(diamond(cx - rx * 0.2, browY - 4, 3.2, "d2"));
+    els.push(diamond(cx + rx * 0.2, browY - 4, 3.2, "d3"));
+    els.push(diamond(cx + rx * 0.55, browY - 2, 3.2, "d4"));
+
+    // soft shine
     els.push(
-      <ellipse key="sh" cx={cx - rx * 0.3} cy={top - 3} rx={rx * 0.35} ry={ry * 0.18} fill={shine} opacity="0.4" />,
+      <ellipse
+        key="sh"
+        cx={cx - rx * 0.35}
+        cy={top - 5}
+        rx={rx * 0.4}
+        ry={ry * 0.2}
+        fill={shine}
+        opacity="0.35"
+      />,
     );
     return <g>{els}</g>;
   };
