@@ -8,6 +8,7 @@ import {
   type HairStyleId,
   type EyebrowStyle,
   type FacialHairStyle,
+  type BangStyle,
   DEFAULT_DRESSUP,
 } from "@/hooks/use-character";
 import { SHOP_ITEMS, type ShopSlot, type ShopItem } from "@/lib/shop";
@@ -99,6 +100,17 @@ const FACIAL_HAIR_STYLES: { id: FacialHairStyle; label: string }[] = [
   { id: "mustache", label: "Mustache" },
   { id: "goatee", label: "Goatee" },
   { id: "full-beard", label: "Full beard" },
+];
+
+const BANG_STYLES: { id: BangStyle; label: string }[] = [
+  { id: "default", label: "Style default" },
+  { id: "none", label: "No bangs" },
+  { id: "soft", label: "Soft" },
+  { id: "side-swept", label: "Side-swept" },
+  { id: "wispy", label: "Wispy" },
+  { id: "curtain", label: "Curtain" },
+  { id: "anime", label: "Anime chunks" },
+  { id: "blunt", label: "Blunt" },
 ];
 
 function premiumHairItemId(style: HairStyleId): string {
