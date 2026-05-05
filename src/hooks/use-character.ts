@@ -38,7 +38,6 @@ export type HairStyleId =
   | "topknot"
   | "undercut"
   | "dreads"
-  | "cornrows"
   | "side-pony"
   | "long-pigtails";
 
