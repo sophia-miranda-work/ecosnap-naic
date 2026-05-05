@@ -358,6 +358,22 @@ export function CharacterCustomizer({ onClose }: { onClose: () => void }) {
                   </>
                 )}
               </Section>
+              <Section title="Bangs">
+                <div className="mb-2 text-[11px] text-muted-foreground">
+                  Mix any bangs with any hairstyle.
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  {BANG_STYLES.map((b) => (
+                    <PreviewTile
+                      key={b.id}
+                      label={b.label}
+                      active={(dressup.bangs ?? "default") === b.id}
+                      onClick={() => setField({ bangs: b.id })}
+                      preview={<MiniAvatar dressup={{ ...dressup, bangs: b.id }} />}
+                    />
+                  ))}
+                </div>
+              </Section>
               <Section title="Eyebrows">
                 <div className="mb-2 flex items-center justify-between">
                   <span className="text-[11px] text-muted-foreground">
