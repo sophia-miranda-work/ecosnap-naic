@@ -166,6 +166,13 @@ export function CharacterCustomizer({ onClose }: { onClose: () => void }) {
     return updateAppearance(patch as Partial<Dressup>);
   }
 
+  function setItemColor(itemId: string, color: string | null) {
+    const cur = { ...(dressup.itemColors ?? {}) };
+    if (color === null) delete cur[itemId];
+    else cur[itemId] = color;
+    return updateAppearance({ itemColors: cur });
+  }
+
   return (
     <div
       className="fixed inset-0 z-[80] flex items-end justify-center bg-foreground/40 backdrop-blur-sm sm:items-center"
@@ -443,35 +450,35 @@ export function CharacterCustomizer({ onClose }: { onClose: () => void }) {
                 slot="earrings"
                 current={dressup.earrings}
                 dressup={dressup}
-                {...{ ownedSet, busy, equipItem, buyAndApply }}
+                {...{ ownedSet, busy, equipItem, buyAndApply, setItemColor }}
               />
               <SlotPicker
                 label="Necklace"
                 slot="necklace"
                 current={dressup.necklace}
                 dressup={dressup}
-                {...{ ownedSet, busy, equipItem, buyAndApply }}
+                {...{ ownedSet, busy, equipItem, buyAndApply, setItemColor }}
               />
               <SlotPicker
                 label="Bracelet"
                 slot="bracelet"
                 current={dressup.bracelet}
                 dressup={dressup}
-                {...{ ownedSet, busy, equipItem, buyAndApply }}
+                {...{ ownedSet, busy, equipItem, buyAndApply, setItemColor }}
               />
               <SlotPicker
                 label="Hair clip"
                 slot="hairClip"
                 current={dressup.hairClip}
                 dressup={dressup}
-                {...{ ownedSet, busy, equipItem, buyAndApply }}
+                {...{ ownedSet, busy, equipItem, buyAndApply, setItemColor }}
               />
               <SlotPicker
                 label="Glasses & more"
                 slot="accessory"
                 current={dressup.accessory}
                 dressup={dressup}
-                {...{ ownedSet, busy, equipItem, buyAndApply }}
+                {...{ ownedSet, busy, equipItem, buyAndApply, setItemColor }}
               />
             </>
           )}
@@ -483,35 +490,35 @@ export function CharacterCustomizer({ onClose }: { onClose: () => void }) {
                 slot="top"
                 current={dressup.top}
                 dressup={dressup}
-                {...{ ownedSet, busy, equipItem, buyAndApply }}
+                {...{ ownedSet, busy, equipItem, buyAndApply, setItemColor }}
               />
               <SlotPicker
                 label="Bottoms"
                 slot="bottom"
                 current={dressup.bottom}
                 dressup={dressup}
-                {...{ ownedSet, busy, equipItem, buyAndApply }}
+                {...{ ownedSet, busy, equipItem, buyAndApply, setItemColor }}
               />
               <SlotPicker
                 label="Dresses"
                 slot="dress"
                 current={dressup.dress}
                 dressup={dressup}
-                {...{ ownedSet, busy, equipItem, buyAndApply }}
+                {...{ ownedSet, busy, equipItem, buyAndApply, setItemColor }}
               />
               <SlotPicker
                 label="Shoes"
                 slot="shoes"
                 current={dressup.shoes}
                 dressup={dressup}
-                {...{ ownedSet, busy, equipItem, buyAndApply }}
+                {...{ ownedSet, busy, equipItem, buyAndApply, setItemColor }}
               />
               <SlotPicker
                 label="Hats"
                 slot="hat"
                 current={dressup.hat}
                 dressup={dressup}
-                {...{ ownedSet, busy, equipItem, buyAndApply }}
+                {...{ ownedSet, busy, equipItem, buyAndApply, setItemColor }}
               />
             </>
           )}
@@ -523,21 +530,21 @@ export function CharacterCustomizer({ onClose }: { onClose: () => void }) {
                 slot="earPiercing"
                 current={dressup.earPiercing}
                 dressup={dressup}
-                {...{ ownedSet, busy, equipItem, buyAndApply }}
+                {...{ ownedSet, busy, equipItem, buyAndApply, setItemColor }}
               />
               <SlotPicker
                 label="Face piercings"
                 slot="facePiercing"
                 current={dressup.facePiercing}
                 dressup={dressup}
-                {...{ ownedSet, busy, equipItem, buyAndApply }}
+                {...{ ownedSet, busy, equipItem, buyAndApply, setItemColor }}
               />
               <SlotPicker
                 label="Hearing aids & headphones"
                 slot="ears"
                 current={dressup.ears}
                 dressup={dressup}
-                {...{ ownedSet, busy, equipItem, buyAndApply }}
+                {...{ ownedSet, busy, equipItem, buyAndApply, setItemColor }}
               />
             </>
           )}
