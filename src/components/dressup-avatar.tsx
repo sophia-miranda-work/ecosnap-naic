@@ -99,145 +99,220 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
   const cx = HEAD_CX;
   const cy = HEAD_CY;
   const top = cy - ry;
-  const bottom = cy + ry;
   const sideL = cx - rx;
   const sideR = cx + rx;
 
-  // Forehead hairline — hair sits above this line so the face is never
-  // covered. We never use a face cutout: the cap simply stops at the brow.
   const browY = top + ry * 0.62;
   const dark = darken(color, 0.18);
   const shine = lighten(color, 0.35);
   const soft = darken(color, 0.08);
 
-  // Cap = hugs the head from temple to temple, over the crown.
-  // Soft rounded fringe — single continuous curve, no center part.
-  const cap = (drop = browY, lift = 4, bangDip = 2) => `
-    M ${sideL - 2.5},${drop + 1.5}
-    C ${sideL - 4},${cy - ry * 0.25} ${sideL - 3},${top + ry * 0.05} ${cx - rx * 0.6},${top - lift * 0.55}
-    C ${cx - rx * 0.3},${top - lift - 1} ${cx + rx * 0.3},${top - lift - 1} ${cx + rx * 0.6},${top - lift * 0.55}
-    C ${sideR + 3},${top + ry * 0.05} ${sideR + 4},${cy - ry * 0.25} ${sideR + 2.5},${drop + 1.5}
-    C ${sideR - 1},${drop + bangDip + 1.2} ${cx + rx * 0.55},${drop + bangDip + 2.6} ${cx},${drop + bangDip + 2.4}
-    C ${cx - rx * 0.55},${drop + bangDip + 2.6} ${sideL + 1},${drop + bangDip + 1.2} ${sideL - 2.5},${drop + 1.5} Z`;
+  // ============================================================
+  // MODULAR HAIR SYSTEM
+  // Every hairstyle is BASE + (optional) BANGS + (optional) STYLE
+  // ============================================================
 
-  // Side coverage: hair hugging the head down past the ears so the
-  // sides never look bald. Used by every styled (non-bald) hairstyle.
-  const scalpWrap = (length = ry * 0.85) => (
-    <g>
-      <path
-        d={`M ${sideL - 3},${browY}
-            C ${sideL - 4.5},${cy + length * 0.55} ${sideL - 1.5},${cy + length} ${cx - rx * 0.55},${cy + length + 1.5}
-            L ${cx + rx * 0.55},${cy + length + 1.5}
-            C ${sideR + 1.5},${cy + length} ${sideR + 4.5},${cy + length * 0.55} ${sideR + 3},${browY}
-            C ${sideR + 4},${cy - ry * 0.2} ${sideR + 3},${top + ry * 0.1} ${cx + rx * 0.55},${top - 1}
-            C ${cx + rx * 0.25},${top - 3} ${cx - rx * 0.25},${top - 3} ${cx - rx * 0.55},${top - 1}
-            C ${sideL - 3},${top + ry * 0.1} ${sideL - 4},${cy - ry * 0.2} ${sideL - 3},${browY} Z`}
-        fill={soft}
-      />
-    </g>
+  // ---- BASES -------------------------------------------------
+  // FullBase: covers the entire head — top, crown, AND both sides
+  // down past the ears. No bald spots, ever.
+  const FullBase = (length = ry * 0.9) => (
+    <path
+      d={`M ${sideL - 3.5},${browY + 1}
+          C ${sideL - 5},${cy + length * 0.35} ${sideL - 4},${cy + length * 0.78} ${sideL - 1.5},${cy + length}
+          L ${cx - rx * 0.55},${cy + length + 1}
+          L ${cx + rx * 0.55},${cy + length + 1}
+          L ${sideR + 1.5},${cy + length}
+          C ${sideR + 4},${cy + length * 0.78} ${sideR + 5},${cy + length * 0.35} ${sideR + 3.5},${browY + 1}
+          C ${sideR + 5},${cy - ry * 0.2} ${sideR + 3},${top - 1} ${cx + rx * 0.55},${top - 4}
+          C ${cx + rx * 0.25},${top - 6} ${cx - rx * 0.25},${top - 6} ${cx - rx * 0.55},${top - 4}
+          C ${sideL - 3},${top - 1} ${sideL - 5},${cy - ry * 0.2} ${sideL - 3.5},${browY + 1} Z`}
+      fill={color}
+    />
   );
 
-  // Chunky anime-style bangs — soft separated curved chunks across
-  // the forehead. Sits on top of the cap to add definition.
-  const chunkBangs = () => (
-    <g>
-      <path
-        d={`M ${cx - rx * 0.85},${browY - 2}
-            Q ${cx - rx * 0.7},${browY + 4} ${cx - rx * 0.4},${browY + 3.5}
-            Q ${cx - rx * 0.55},${browY + 1} ${cx - rx * 0.85},${browY - 2} Z`}
-        fill={color}
-      />
-      <path
-        d={`M ${cx - rx * 0.45},${browY - 2.5}
-            Q ${cx - rx * 0.15},${browY + 5} ${cx + rx * 0.05},${browY + 4}
-            Q ${cx - rx * 0.1},${browY + 1} ${cx - rx * 0.45},${browY - 2.5} Z`}
-        fill={color}
-      />
-      <path
-        d={`M ${cx + rx * 0.05},${browY - 2.5}
-            Q ${cx + rx * 0.35},${browY + 4.5} ${cx + rx * 0.55},${browY + 3.5}
-            Q ${cx + rx * 0.4},${browY + 0.5} ${cx + rx * 0.05},${browY - 2.5} Z`}
-        fill={color}
-      />
-      <path
-        d={`M ${cx + rx * 0.55},${browY - 2}
-            Q ${cx + rx * 0.8},${browY + 3} ${cx + rx * 0.9},${browY + 2}
-            Q ${cx + rx * 0.85},${browY - 0.5} ${cx + rx * 0.55},${browY - 2} Z`}
-        fill={color}
-      />
-    </g>
+  // ShortBase: tight to head, ear-length sides
+  const ShortBase = () => (
+    <path
+      d={`M ${sideL - 2},${browY + 2}
+          C ${sideL - 3},${cy + ry * 0.25} ${sideL - 1.5},${cy + ry * 0.5} ${sideL + 1},${cy + ry * 0.55}
+          L ${cx - rx * 0.5},${cy + ry * 0.55}
+          L ${cx + rx * 0.5},${cy + ry * 0.55}
+          L ${sideR - 1},${cy + ry * 0.55}
+          C ${sideR + 1.5},${cy + ry * 0.5} ${sideR + 3},${cy + ry * 0.25} ${sideR + 2},${browY + 2}
+          C ${sideR + 3},${cy - ry * 0.2} ${sideR + 2},${top - 2} ${cx + rx * 0.55},${top - 4}
+          C ${cx + rx * 0.25},${top - 6} ${cx - rx * 0.25},${top - 6} ${cx - rx * 0.55},${top - 4}
+          C ${sideL - 2},${top - 2} ${sideL - 3},${cy - ry * 0.2} ${sideL - 2},${browY + 2} Z`}
+      fill={color}
+    />
   );
 
-  // Side panels that hang along the cheeks (used for medium/long hair).
-  // Smoothly tucked under the chin with a rounded tip.
-  const sidePanel = (sideX: number, dir: 1 | -1, length: number, flare = 0) => {
-    const inX = sideX + dir * 2.2;
-    const tipY = cy + length;
-    return `
-      M ${sideX - dir * 1.2},${browY + 1.5}
-      C ${sideX + dir * 1.2},${cy + length * 0.28} ${sideX + dir * (1 + flare)},${cy + length * 0.72} ${sideX + dir * (2.2 + flare)},${tipY}
-      Q ${sideX + dir * 0.8},${tipY + 2.2} ${inX},${tipY - 1.2}
-      C ${inX - dir * 0.6},${cy + length * 0.6} ${inX - dir * 0.4},${cy + length * 0.22} ${sideX - dir * 1.2},${browY + 1.5} Z`;
+  // AfroBase: large round cloud, fully covering sides
+  const AfroBase = () => {
+    const baseR = rx + 10;
+    const els: ReactElement[] = [];
+    els.push(
+      <ellipse key="b" cx={cx} cy={cy - 3} rx={baseR} ry={baseR * 0.95} fill={color} />,
+    );
+    // outline puffs around top half
+    const n = 22;
+    for (let i = 0; i < n; i++) {
+      const a = Math.PI + (Math.PI * i) / (n - 1);
+      const px = cx + Math.cos(a) * (baseR + 1);
+      const py = cy - 3 + Math.sin(a) * (baseR + 1);
+      if (py > browY + 5) continue;
+      els.push(<circle key={`p${i}`} cx={px} cy={py} r={6.5} fill={color} />);
+    }
+    // side puffs (ensures ear-level coverage)
+    for (let i = 0; i < 4; i++) {
+      const t = i / 3;
+      els.push(
+        <circle key={`sl${i}`} cx={sideL - 3} cy={browY - 4 + t * 14} r={6.2} fill={color} />,
+        <circle key={`sr${i}`} cx={sideR + 3} cy={browY - 4 + t * 14} r={6.2} fill={color} />,
+      );
+    }
+    els.push(
+      <ellipse key="sh" cx={cx - rx * 0.3} cy={top - 3} rx={rx * 0.35} ry={ry * 0.18} fill={shine} opacity="0.4" />,
+    );
+    return <g>{els}</g>;
   };
 
-  // Long flowing hair behind the head (back layer).
-  const backFlow = (length: number, width: number) => `
-    M ${sideL + 2},${cy - 4}
-    C ${sideL - width},${cy + length * 0.4} ${sideL - width * 0.6},${cy + length} ${cx - width * 0.6},${cy + length + 4}
-    Q ${cx},${cy + length + 7} ${cx + width * 0.6},${cy + length + 4}
-    C ${sideR + width * 0.6},${cy + length} ${sideR + width},${cy + length * 0.4} ${sideR - 2},${cy - 4}
-    C ${sideR - 4},${top + 4} ${sideL + 4},${top + 4} ${sideL + 2},${cy - 4} Z`;
+  // ---- BANGS -------------------------------------------------
+  // Soft curved bangs — a smooth single arc across the forehead
+  const SoftBangs = () => (
+    <path
+      d={`M ${cx - rx * 0.95},${browY - 1}
+          C ${cx - rx * 0.6},${browY + 5} ${cx + rx * 0.6},${browY + 5} ${cx + rx * 0.95},${browY - 1}
+          C ${cx + rx * 0.6},${browY + 1} ${cx - rx * 0.6},${browY + 1} ${cx - rx * 0.95},${browY - 1} Z`}
+      fill={color}
+    />
+  );
 
-  // Solid bun anchored to the cap with a soft blended base.
-  const bun = (bx: number, by: number, r: number) => (
+  // Side-swept bangs — diagonal fringe sweeping across forehead
+  const SideSweptBangs = () => (
+    <path
+      d={`M ${cx - rx * 0.95},${browY - 1}
+          C ${cx - rx * 0.5},${browY + 6} ${cx + rx * 0.7},${browY + 4} ${cx + rx * 0.95},${browY - 2}
+          C ${cx + rx * 0.5},${browY - 1} ${cx - rx * 0.4},${browY + 1} ${cx - rx * 0.95},${browY - 1} Z`}
+      fill={color}
+    />
+  );
+
+  // Layered anime bangs — separated chunks
+  const AnimeBangs = () => (
     <g>
-      {/* base blend so the bun never looks floating */}
-      <ellipse cx={bx} cy={by + r * 0.7} rx={r * 0.95} ry={r * 0.45} fill={soft} />
+      <path d={`M ${cx - rx * 0.9},${browY - 2} Q ${cx - rx * 0.7},${browY + 4} ${cx - rx * 0.4},${browY + 3.5} Q ${cx - rx * 0.55},${browY + 1} ${cx - rx * 0.9},${browY - 2} Z`} fill={color} />
+      <path d={`M ${cx - rx * 0.45},${browY - 2.5} Q ${cx - rx * 0.15},${browY + 5} ${cx + rx * 0.05},${browY + 4} Q ${cx - rx * 0.1},${browY + 1} ${cx - rx * 0.45},${browY - 2.5} Z`} fill={color} />
+      <path d={`M ${cx + rx * 0.05},${browY - 2.5} Q ${cx + rx * 0.35},${browY + 4.5} ${cx + rx * 0.55},${browY + 3.5} Q ${cx + rx * 0.4},${browY + 0.5} ${cx + rx * 0.05},${browY - 2.5} Z`} fill={color} />
+      <path d={`M ${cx + rx * 0.55},${browY - 2} Q ${cx + rx * 0.8},${browY + 3} ${cx + rx * 0.95},${browY + 1.5} Q ${cx + rx * 0.85},${browY - 0.5} ${cx + rx * 0.55},${browY - 2} Z`} fill={color} />
+    </g>
+  );
+
+  // ---- ATTACHMENTS -------------------------------------------
+  // Bun anchored at given point with soft base blend
+  const Bun = (bx: number, by: number, r: number) => (
+    <g>
+      <ellipse cx={bx} cy={by + r * 0.7} rx={r * 0.95} ry={r * 0.5} fill={soft} />
       <ellipse cx={bx} cy={by} rx={r} ry={r * 0.95} fill={color} />
       <ellipse cx={bx - r * 0.3} cy={by - r * 0.32} rx={r * 0.4} ry={r * 0.24} fill={shine} opacity="0.5" />
     </g>
   );
 
-  // Pigtail / pony tube anchored to the side or crown — fuller body
-  // with a rounded tip and a soft base blob to hide the seam.
-  const tail = (ax: number, ay: number, tx: number, ty: number, w: number) => {
+  // Tail (pony / pigtail). Anchored to head, falls to tip.
+  const Tail = (ax: number, ay: number, tx: number, ty: number, w: number) => {
     const mx = (ax + tx) / 2;
     const my = (ay + ty) / 2;
-    const fullW = w * 1.25;
+    const fw = w * 1.25;
     return (
       <g>
-        <ellipse cx={ax} cy={ay} rx={fullW * 0.7} ry={fullW * 0.5} fill={soft} />
+        <ellipse cx={ax} cy={ay} rx={fw * 0.7} ry={fw * 0.5} fill={soft} />
         <path
-          d={`M ${ax - fullW / 2},${ay} Q ${mx - fullW * 0.55},${my} ${tx - fullW * 0.6},${ty}
-              Q ${tx},${ty + fullW * 0.75} ${tx + fullW * 0.6},${ty}
-              Q ${mx + fullW * 0.55},${my} ${ax + fullW / 2},${ay} Z`}
+          d={`M ${ax - fw / 2},${ay} Q ${mx - fw * 0.55},${my} ${tx - fw * 0.6},${ty}
+              Q ${tx},${ty + fw * 0.75} ${tx + fw * 0.6},${ty}
+              Q ${mx + fw * 0.55},${my} ${ax + fw / 2},${ay} Z`}
           fill={color}
         />
       </g>
     );
   };
 
-  // Braid: stack of small ovals.
-  const braid = (ax: number, ay: number, tx: number, ty: number, w: number) => {
-    const segs = 5;
+  // Long flowing back hair attached to base
+  const BackFlow = (length: number, width: number) => (
+    <path
+      d={`M ${sideL + 2},${cy - 4}
+          C ${sideL - width},${cy + length * 0.4} ${sideL - width * 0.6},${cy + length} ${cx - width * 0.6},${cy + length + 4}
+          Q ${cx},${cy + length + 7} ${cx + width * 0.6},${cy + length + 4}
+          C ${sideR + width * 0.6},${cy + length} ${sideR + width},${cy + length * 0.4} ${sideR - 2},${cy - 4}
+          C ${sideR - 4},${top + 4} ${sideL + 4},${top + 4} ${sideL + 2},${cy - 4} Z`}
+      fill={color}
+    />
+  );
+
+  // Dreads attached to base — thick rope strands hanging downward
+  const Dreads = () => {
     const els: ReactElement[] = [];
-    for (let i = 0; i <= segs; i++) {
-      const t = i / segs;
-      const x = ax + (tx - ax) * t;
-      const y = ay + (ty - ay) * t;
+    const count = 9;
+    for (let i = 0; i < count; i++) {
+      const t = i / (count - 1);
+      const sx = sideL + 1 + t * (rx * 2 - 2);
+      const sy = cy + ry * 0.3;
+      const ex = sx + (t - 0.5) * 4;
+      const ey = sy + ry * 1.1 + ((i * 7) % 5);
       els.push(
-        <ellipse key={i} cx={x} cy={y} rx={w * 0.55} ry={w * 0.42} fill={i % 2 ? color : darken(color, 0.1)} />,
+        <path
+          key={`d${i}`}
+          d={`M ${sx - 2.4},${sy} Q ${sx - 1.5},${(sy + ey) / 2} ${ex - 2.2},${ey}
+              Q ${ex},${ey + 2.6} ${ex + 2.2},${ey}
+              Q ${sx + 1.5},${(sy + ey) / 2} ${sx + 2.4},${sy} Z`}
+          fill={color}
+        />,
       );
+      for (let s = 1; s < 4; s++) {
+        els.push(
+          <ellipse
+            key={`d${i}s${s}`}
+            cx={sx + (ex - sx) * (s / 4)}
+            cy={sy + (ey - sy) * (s / 4)}
+            rx={2.4}
+            ry={0.7}
+            fill={dark}
+            opacity="0.4"
+          />,
+        );
+      }
     }
-    els.push(
-      <path key="tie" d={`M ${tx - w * 0.5},${ty + w * 0.5} q ${w * 0.5},${w * 0.6} ${w},0`}
-        stroke={dark} strokeWidth="1.2" fill="none" strokeLinecap="round" />,
-    );
     return <g>{els}</g>;
   };
 
-  const path = (d: string, fill = color) => <path d={d} fill={fill} />;
+  // Cornrow lines drawn over a base
+  const CornrowLines = () => {
+    const els: ReactElement[] = [];
+    const rowCount = 7;
+    for (let i = 0; i < rowCount; i++) {
+      const t = i / (rowCount - 1);
+      const x = cx + (t - 0.5) * (rx * 1.7);
+      els.push(
+        <path
+          key={`r${i}`}
+          d={`M ${x},${browY} Q ${x + (t - 0.5) * 3},${cy - ry * 0.4} ${x + (t - 0.5) * 5},${top}`}
+          stroke={dark}
+          strokeWidth="1.1"
+          fill="none"
+          strokeLinecap="round"
+        />,
+      );
+      for (let s = 0; s < 4; s++) {
+        const u = s / 3;
+        const px = x + (t - 0.5) * (3 + u * 2);
+        const py = browY + u * (top - browY);
+        els.push(
+          <ellipse key={`r${i}b${s}`} cx={px} cy={py} rx={1.4} ry={0.7} fill={shine} opacity="0.55" />,
+        );
+      }
+    }
+    return <g>{els}</g>;
+  };
 
+  // ---- STYLE ASSEMBLY ----------------------------------------
   let backNode: React.ReactNode = null;
   let frontNode: React.ReactNode = null;
 
@@ -245,14 +320,10 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
     case "soft-bob":
     case "short":
     case "bob": {
-      // Short rounded bob: cap + small jaw-length side panels.
       frontNode = (
         <g>
-          {scalpWrap(ry * 0.6)}
-          {path(cap(browY, 5, 2))}
-          {path(sidePanel(sideL, -1, ry * 0.55, 0.5))}
-          {path(sidePanel(sideR, 1, ry * 0.55, 0.5))}
-          {chunkBangs()}
+          {FullBase(ry * 0.7)}
+          <SoftBangs />
         </g>
       );
       break;
@@ -263,14 +334,11 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
     case "straight-bangs":
     case "curtain-cut":
     case "wavy": {
-      backNode = path(backFlow(ry * 1.6, rx * 0.55));
+      backNode = BackFlow(ry * 1.6, rx * 0.55);
       frontNode = (
         <g>
-          {scalpWrap(ry * 1.0)}
-          {path(cap(browY - 1, 5, 3))}
-          {path(sidePanel(sideL, -1, ry * 1.05, 1))}
-          {path(sidePanel(sideR, 1, ry * 1.05, 1))}
-          {chunkBangs()}
+          {FullBase(ry * 1.0)}
+          <SoftBangs />
         </g>
       );
       break;
@@ -278,33 +346,28 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
 
     case "high-pony":
     case "ponytail": {
-      // Pony anchored to the crown; tail curves down behind the shoulder.
       const ax = cx + rx * 0.4;
       const ay = top - 1;
-      backNode = tail(ax, ay, sideR + rx * 0.4, cy + ry * 1.4, rx * 0.32);
+      backNode = Tail(ax, ay, sideR + rx * 0.4, cy + ry * 1.4, rx * 0.32);
       frontNode = (
         <g>
-          {scalpWrap(ry * 0.7)}
-          {path(cap(browY, 4, 1.5))}
-          {/* small bump where the pony attaches */}
+          {FullBase(ry * 0.75)}
           <ellipse cx={ax} cy={ay + 2} rx={rx * 0.22} ry={rx * 0.15} fill={dark} />
-          {chunkBangs()}
+          <AnimeBangs />
         </g>
       );
       break;
     }
 
     case "side-pony": {
-      // Ponytail anchored at the side, falling over the shoulder.
       const ax = sideR - 2;
       const ay = cy + 2;
-      backNode = tail(ax, ay, sideR + rx * 0.6, cy + ry * 1.3, rx * 0.34);
+      backNode = Tail(ax, ay, sideR + rx * 0.6, cy + ry * 1.3, rx * 0.34);
       frontNode = (
         <g>
-          {scalpWrap(ry * 0.7)}
-          {path(cap(browY, 4, 2))}
+          {FullBase(ry * 0.8)}
           <ellipse cx={ax - 1} cy={ay} rx={rx * 0.2} ry={rx * 0.16} fill={dark} />
-          {chunkBangs()}
+          <SideSweptBangs />
         </g>
       );
       break;
@@ -312,21 +375,17 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
 
     case "low-pigtails":
     case "pigtails": {
-      // Two tails anchored at the temples, hanging below the jaw.
       const yAnchor = cy + ry * 0.35;
       backNode = (
         <g>
-          {tail(sideL + 2, yAnchor, sideL - rx * 0.15, cy + ry * 1.35, rx * 0.28)}
-          {tail(sideR - 2, yAnchor, sideR + rx * 0.15, cy + ry * 1.35, rx * 0.28)}
+          {Tail(sideL + 2, yAnchor, sideL - rx * 0.15, cy + ry * 1.35, rx * 0.28)}
+          {Tail(sideR - 2, yAnchor, sideR + rx * 0.15, cy + ry * 1.35, rx * 0.28)}
         </g>
       );
       frontNode = (
         <g>
-          {scalpWrap(ry * 0.85)}
-          {path(cap(browY, 4, 2))}
-          {path(sidePanel(sideL, -1, ry * 0.4, 0))}
-          {path(sidePanel(sideR, 1, ry * 0.4, 0))}
-          {chunkBangs()}
+          {FullBase(ry * 0.9)}
+          <SoftBangs />
         </g>
       );
       break;
@@ -336,17 +395,14 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
       const yAnchor = cy + ry * 0.35;
       backNode = (
         <g>
-          {tail(sideL + 2, yAnchor, sideL - rx * 0.25, cy + ry * 1.9, rx * 0.32)}
-          {tail(sideR - 2, yAnchor, sideR + rx * 0.25, cy + ry * 1.9, rx * 0.32)}
+          {Tail(sideL + 2, yAnchor, sideL - rx * 0.25, cy + ry * 1.9, rx * 0.32)}
+          {Tail(sideR - 2, yAnchor, sideR + rx * 0.25, cy + ry * 1.9, rx * 0.32)}
         </g>
       );
       frontNode = (
         <g>
-          {scalpWrap(ry * 0.9)}
-          {path(cap(browY, 4, 2))}
-          {path(sidePanel(sideL, -1, ry * 0.5, 0))}
-          {path(sidePanel(sideR, 1, ry * 0.5, 0))}
-          {chunkBangs()}
+          {FullBase(ry * 0.95)}
+          <SoftBangs />
         </g>
       );
       break;
@@ -354,18 +410,16 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
 
     case "space-buns":
     case "double-bun": {
-      // Mickey-ear buns: positioned slightly above ear level on the
-      // sides of the head, balanced and clearly attached.
+      // Anchored at ear level on each side, like Mickey ears
       const bxL = cx - rx * 0.95;
       const bxR = cx + rx * 0.95;
       const by = top + ry * 0.18;
       frontNode = (
         <g>
-          {scalpWrap(ry * 0.6)}
-          {path(cap(browY, 3, 2))}
-          {bun(bxL, by, rx * 0.3)}
-          {bun(bxR, by, rx * 0.3)}
-          {chunkBangs()}
+          {FullBase(ry * 0.65)}
+          {Bun(bxL, by, rx * 0.3)}
+          {Bun(bxR, by, rx * 0.3)}
+          <SoftBangs />
         </g>
       );
       break;
@@ -378,10 +432,9 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
       const by = top - rx * 0.1;
       frontNode = (
         <g>
-          {scalpWrap(ry * 0.6)}
-          {path(cap(browY, 3, 2))}
-          {bun(bx, by, rx * 0.38)}
-          {chunkBangs()}
+          {FullBase(ry * 0.65)}
+          {Bun(bx, by, rx * 0.38)}
+          <SoftBangs />
         </g>
       );
       break;
@@ -390,192 +443,97 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
     case "fluffy-curls":
     case "curly":
     case "afro": {
-      // Big round cloud silhouette — large, voluminous, extending well
-      // beyond the head on all sides for a true afro look.
-      const puffs: ReactElement[] = [];
-      const baseR = rx + 11;
-      // Big base ellipse for solid mass
-      puffs.push(
-        <ellipse key="base" cx={cx} cy={cy - 4} rx={baseR} ry={baseR * 0.95} fill={color} />,
-      );
-      // Outer ring of fluffy puffs around the entire crown + sides
-      const outer = 26;
-      for (let i = 0; i < outer; i++) {
-        const a = Math.PI * 1.05 + (Math.PI * 0.9 * i) / (outer - 1);
-        const r = baseR + 2 + ((i * 7) % 3);
-        const px = cx + Math.cos(a) * r;
-        const py = cy - 4 + Math.sin(a) * (r * 0.95);
-        if (py > browY + 4) continue;
-        puffs.push(<circle key={`o${i}`} cx={px} cy={py} r={6.8} fill={color} />);
-      }
-      // Side puffs to ensure ear-level coverage
-      for (let i = 0; i < 5; i++) {
-        const t = i / 4;
-        puffs.push(
-          <circle key={`sl${i}`} cx={sideL - 2 + Math.sin(t * 3) * 1.5} cy={browY - 6 + t * 12} r={6.5} fill={color} />,
-          <circle key={`sr${i}`} cx={sideR + 2 - Math.sin(t * 3) * 1.5} cy={browY - 6 + t * 12} r={6.5} fill={color} />,
-        );
-      }
-      // Highlight
-      puffs.push(
-        <ellipse key="sh" cx={cx - rx * 0.35} cy={top - 4} rx={rx * 0.4} ry={ry * 0.2} fill={shine} opacity="0.4" />,
-      );
-      frontNode = <g>{puffs}</g>;
+      frontNode = <AfroBase />;
       break;
     }
 
     case "twin-braids":
     case "braids": {
       const yAnchor = cy + ry * 0.4;
+      const segs = 5;
+      const braidEls = (ax: number, ay: number, tx: number, ty: number, w: number) => {
+        const els: ReactElement[] = [];
+        for (let i = 0; i <= segs; i++) {
+          const t = i / segs;
+          const x = ax + (tx - ax) * t;
+          const y = ay + (ty - ay) * t;
+          els.push(
+            <ellipse key={i} cx={x} cy={y} rx={w * 0.55} ry={w * 0.42} fill={i % 2 ? color : darken(color, 0.1)} />,
+          );
+        }
+        return els;
+      };
       backNode = (
         <g>
-          {braid(sideL + 1, yAnchor, sideL - rx * 0.1, cy + ry * 1.5, rx * 0.22)}
-          {braid(sideR - 1, yAnchor, sideR + rx * 0.1, cy + ry * 1.5, rx * 0.22)}
+          {braidEls(sideL + 1, yAnchor, sideL - rx * 0.1, cy + ry * 1.5, rx * 0.22)}
+          {braidEls(sideR - 1, yAnchor, sideR + rx * 0.1, cy + ry * 1.5, rx * 0.22)}
         </g>
       );
       frontNode = (
         <g>
-          {scalpWrap(ry * 0.85)}
-          {path(cap(browY, 4, 2))}
-          {path(sidePanel(sideL, -1, ry * 0.45, 0))}
-          {path(sidePanel(sideR, 1, ry * 0.45, 0))}
-          {chunkBangs()}
+          {FullBase(ry * 0.85)}
+          <SoftBangs />
         </g>
       );
       break;
     }
 
     case "dreads": {
-      // Thick rope-like strands hanging downward from a base cap.
-      const strands: ReactElement[] = [];
-      const count = 9;
-      for (let i = 0; i < count; i++) {
-        const t = i / (count - 1);
-        const sx = sideL + 2 + t * (rx * 2 - 4);
-        const sy = browY - 2 + Math.sin(t * Math.PI) * -3;
-        const len = ry * 1.3 + ((i * 7) % 5);
-        const ex = sx + (t - 0.5) * 4;
-        const ey = sy + len;
-        strands.push(
-          <path
-            key={`d${i}`}
-            d={`M ${sx - 2.2},${sy} Q ${sx - 1.5},${(sy + ey) / 2} ${ex - 2},${ey}
-                Q ${ex},${ey + 2.5} ${ex + 2},${ey}
-                Q ${sx + 1.5},${(sy + ey) / 2} ${sx + 2.2},${sy} Z`}
-            fill={color}
-          />,
-        );
-        // segment definitions
-        for (let s = 1; s < 4; s++) {
-          strands.push(
-            <ellipse
-              key={`d${i}s${s}`}
-              cx={sx + (ex - sx) * (s / 4)}
-              cy={sy + len * (s / 4)}
-              rx={2.2}
-              ry={0.6}
-              fill={dark}
-              opacity="0.35"
-            />,
-          );
-        }
-      }
-      backNode = <g>{strands}</g>;
+      backNode = <Dreads />;
       frontNode = (
         <g>
-          {scalpWrap(ry * 0.5)}
-          {path(cap(browY, 3, 1.5))}
+          {FullBase(ry * 0.6)}
+          <SoftBangs />
         </g>
       );
       break;
     }
 
     case "cornrows": {
-      // Tight braided rows along the scalp, visible front-to-back.
-      const rows: ReactElement[] = [];
-      // Base cap that hugs the head tightly
-      rows.push(
-        <path key="capbase" d={cap(browY, 2, 1)} fill={color} />,
+      frontNode = (
+        <g>
+          {FullBase(ry * 0.55)}
+          <CornrowLines />
+        </g>
       );
-      const rowCount = 7;
-      for (let i = 0; i < rowCount; i++) {
-        const t = i / (rowCount - 1);
-        const x = cx + (t - 0.5) * (rx * 1.6);
-        // Curved row from front to crown
-        rows.push(
-          <path
-            key={`r${i}`}
-            d={`M ${x},${browY - 1} Q ${x + (t - 0.5) * 3},${cy - ry * 0.4} ${x + (t - 0.5) * 5},${top + 1}`}
-            stroke={dark}
-            strokeWidth="1"
-            fill="none"
-            strokeLinecap="round"
-          />,
-        );
-        // Beaded definition along the row
-        for (let s = 0; s < 4; s++) {
-          const u = s / 3;
-          const px = x + (t - 0.5) * (3 + u * 2);
-          const py = browY - 1 + u * (top - browY + 2);
-          rows.push(
-            <ellipse key={`r${i}b${s}`} cx={px} cy={py} rx={1.4} ry={0.7} fill={shine} opacity="0.5" />,
-          );
-        }
-      }
-      frontNode = <g>{rows}</g>;
       break;
     }
 
     case "fade":
     case "undercut": {
-      // Pixie cut: layered fluffy crown, soft uneven curved bangs,
-      // shorter at the back. Built as a styled cap with extra volume.
-      const pixie = `
-        M ${sideL - 1},${browY + 2}
-        C ${sideL - 3},${cy - ry * 0.3} ${sideL - 1},${top - 2} ${cx - rx * 0.55},${top - 5}
-        C ${cx - rx * 0.2},${top - 7} ${cx + rx * 0.3},${top - 7} ${cx + rx * 0.6},${top - 4}
-        C ${sideR + 2},${top - 1} ${sideR + 2},${cy - ry * 0.3} ${sideR - 1},${browY + 2}
-        C ${cx + rx * 0.7},${browY + 4} ${cx + rx * 0.3},${browY + 6} ${cx + rx * 0.05},${browY + 5}
-        C ${cx - rx * 0.2},${browY + 7} ${cx - rx * 0.55},${browY + 4} ${sideL - 1},${browY + 2} Z`;
+      // Pixie: short base + soft bangs
       frontNode = (
         <g>
-          {scalpWrap(ry * 0.45)}
-          {path(pixie)}
-          {/* layered tufts on top for volume */}
+          <ShortBase />
+          <SoftBangs />
           <ellipse cx={cx - rx * 0.25} cy={top - 4} rx={rx * 0.25} ry={ry * 0.16} fill={shine} opacity="0.45" />
-          <path d={`M ${cx - rx * 0.2},${top - 6} Q ${cx},${top - 9} ${cx + rx * 0.3},${top - 5}`} stroke={soft} strokeWidth="2.2" fill="none" strokeLinecap="round" />
         </g>
       );
       break;
     }
 
     case "side-sweep": {
-      // Asymmetric swept fringe — base cap with a smooth diagonal
-      // fringe curving across the forehead from one temple to the other.
-      const sweep = `
-        M ${sideL - 2},${browY + 2}
-        C ${sideL - 3.5},${cy - ry * 0.25} ${sideL - 2.5},${top + ry * 0.1} ${cx - rx * 0.6},${top - 2}
-        C ${cx - rx * 0.2},${top - 4} ${cx + rx * 0.4},${top - 4} ${cx + rx * 0.65},${top - 1}
-        C ${sideR + 2.5},${top + ry * 0.1} ${sideR + 3.5},${cy - ry * 0.25} ${sideR + 2},${browY + 2}
-        C ${cx + rx * 0.45},${browY + 4.5} ${cx - rx * 0.05},${browY + 5.5} ${sideL + rx * 0.15},${browY + 5}
-        Q ${sideL - 0.5},${browY + 4} ${sideL - 2},${browY + 2} Z`;
       frontNode = (
         <g>
-          {scalpWrap(ry * 0.7)}
-          {path(sweep)}
+          {FullBase(ry * 0.75)}
+          <SideSweptBangs />
         </g>
       );
       break;
     }
 
     case "mohawk": {
-      // Tight crown cap only.
-      frontNode = path(cap(top + ry * 0.45, 3, 0));
+      frontNode = <ShortBase />;
       break;
     }
 
     default:
-      frontNode = path(cap(browY, 4, 2));
+      frontNode = (
+        <g>
+          {FullBase(ry * 0.8)}
+          <SoftBangs />
+        </g>
+      );
       break;
   }
 
