@@ -319,6 +319,30 @@ export function hairLayers(
     />
   );
 
+  // Curly bangs — chunky little curl puffs across the forehead
+  const CurlyBangs = () => {
+    const els: ReactElement[] = [];
+    const count = 7;
+    for (let i = 0; i < count; i++) {
+      const t = i / (count - 1);
+      const px = cx - rx * 0.95 + t * rx * 1.9;
+      const py = browY + 1 + Math.sin(t * Math.PI) * -3;
+      els.push(<circle key={`cb${i}`} cx={px} cy={py} r={6} fill={color} />);
+    }
+    // fill any gaps with a soft band behind the curls
+    els.unshift(
+      <path
+        key="band"
+        d={`M ${cx - rx * 0.98},${crownY}
+            C ${cx - rx * 0.5},${top - 2} ${cx + rx * 0.5},${top - 2} ${cx + rx * 0.98},${crownY}
+            L ${cx + rx * 0.95},${browY + 2}
+            Q ${cx},${browY + 4} ${cx - rx * 0.95},${browY + 2} Z`}
+        fill={color}
+      />,
+    );
+    return <g>{els}</g>;
+  };
+
   // Resolve which bangs node to render based on override.
   // "default" keeps the per-style choice below. "none" hides bangs entirely.
   const resolveBangs = (defaultNode: ReactElement | null): ReactElement | null => {
@@ -339,6 +363,8 @@ export function hairLayers(
         return <AnimeBangs />;
       case "blunt":
         return <BluntBangs />;
+      case "curly":
+        return <CurlyBangs />;
       default:
         return defaultNode;
     }
