@@ -322,7 +322,7 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
     case "bob": {
       frontNode = (
         <g>
-          <FullBase length={ry * 0.7} />
+          {FullBase(ry * 0.7)}
           <SoftBangs />
         </g>
       );
@@ -334,10 +334,10 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
     case "straight-bangs":
     case "curtain-cut":
     case "wavy": {
-      backNode = <BackFlow length={ry * 1.6} width={rx * 0.55} />;
+      backNode = {BackFlow(ry * 1.6, rx * 0.55)};
       frontNode = (
         <g>
-          <FullBase length={ry * 1.0} />
+          {FullBase(ry * 1.0)}
           <SoftBangs />
         </g>
       );
@@ -348,10 +348,10 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
     case "ponytail": {
       const ax = cx + rx * 0.4;
       const ay = top - 1;
-      backNode = <Tail ax={ax} ay={ay} tx={sideR + rx * 0.4} ty={cy + ry * 1.4} w={rx * 0.32} />;
+      backNode = {Tail(ax, ay, sideR + rx * 0.4, cy + ry * 1.4, rx * 0.32)};
       frontNode = (
         <g>
-          <FullBase length={ry * 0.75} />
+          {FullBase(ry * 0.75)}
           <ellipse cx={ax} cy={ay + 2} rx={rx * 0.22} ry={rx * 0.15} fill={dark} />
           <AnimeBangs />
         </g>
@@ -362,10 +362,10 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
     case "side-pony": {
       const ax = sideR - 2;
       const ay = cy + 2;
-      backNode = <Tail ax={ax} ay={ay} tx={sideR + rx * 0.6} ty={cy + ry * 1.3} w={rx * 0.34} />;
+      backNode = {Tail(ax, ay, sideR + rx * 0.6, cy + ry * 1.3, rx * 0.34)};
       frontNode = (
         <g>
-          <FullBase length={ry * 0.8} />
+          {FullBase(ry * 0.8)}
           <ellipse cx={ax - 1} cy={ay} rx={rx * 0.2} ry={rx * 0.16} fill={dark} />
           <SideSweptBangs />
         </g>
@@ -378,13 +378,13 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
       const yAnchor = cy + ry * 0.35;
       backNode = (
         <g>
-          <Tail ax={sideL + 2} ay={yAnchor} tx={sideL - rx * 0.15} ty={cy + ry * 1.35} w={rx * 0.28} />
-          <Tail ax={sideR - 2} ay={yAnchor} tx={sideR + rx * 0.15} ty={cy + ry * 1.35} w={rx * 0.28} />
+          {Tail(sideL + 2, yAnchor, sideL - rx * 0.15, cy + ry * 1.35, rx * 0.28)}
+          {Tail(sideR - 2, yAnchor, sideR + rx * 0.15, cy + ry * 1.35, rx * 0.28)}
         </g>
       );
       frontNode = (
         <g>
-          <FullBase length={ry * 0.9} />
+          {FullBase(ry * 0.9)}
           <SoftBangs />
         </g>
       );
@@ -395,13 +395,13 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
       const yAnchor = cy + ry * 0.35;
       backNode = (
         <g>
-          <Tail ax={sideL + 2} ay={yAnchor} tx={sideL - rx * 0.25} ty={cy + ry * 1.9} w={rx * 0.32} />
-          <Tail ax={sideR - 2} ay={yAnchor} tx={sideR + rx * 0.25} ty={cy + ry * 1.9} w={rx * 0.32} />
+          {Tail(sideL + 2, yAnchor, sideL - rx * 0.25, cy + ry * 1.9, rx * 0.32)}
+          {Tail(sideR - 2, yAnchor, sideR + rx * 0.25, cy + ry * 1.9, rx * 0.32)}
         </g>
       );
       frontNode = (
         <g>
-          <FullBase length={ry * 0.95} />
+          {FullBase(ry * 0.95)}
           <SoftBangs />
         </g>
       );
@@ -416,7 +416,7 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
       const by = top + ry * 0.18;
       frontNode = (
         <g>
-          <FullBase length={ry * 0.65} />
+          {FullBase(ry * 0.65)}
           {Bun(bxL, by, rx * 0.3)}
           {Bun(bxR, by, rx * 0.3)}
           <SoftBangs />
@@ -432,7 +432,7 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
       const by = top - rx * 0.1;
       frontNode = (
         <g>
-          <FullBase length={ry * 0.65} />
+          {FullBase(ry * 0.65)}
           {Bun(bx, by, rx * 0.38)}
           <SoftBangs />
         </g>
@@ -471,7 +471,7 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
       );
       frontNode = (
         <g>
-          <FullBase length={ry * 0.85} />
+          {FullBase(ry * 0.85)}
           <SoftBangs />
         </g>
       );
@@ -482,7 +482,7 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
       backNode = <Dreads />;
       frontNode = (
         <g>
-          <FullBase length={ry * 0.6} />
+          {FullBase(ry * 0.6)}
           <SoftBangs />
         </g>
       );
@@ -492,7 +492,7 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
     case "cornrows": {
       frontNode = (
         <g>
-          <FullBase length={ry * 0.55} />
+          {FullBase(ry * 0.55)}
           <CornrowLines />
         </g>
       );
@@ -515,7 +515,7 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
     case "side-sweep": {
       frontNode = (
         <g>
-          <FullBase length={ry * 0.75} />
+          {FullBase(ry * 0.75)}
           <SideSweptBangs />
         </g>
       );
@@ -530,7 +530,7 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
     default:
       frontNode = (
         <g>
-          <FullBase length={ry * 0.8} />
+          {FullBase(ry * 0.8)}
           <SoftBangs />
         </g>
       );
