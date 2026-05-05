@@ -320,12 +320,8 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
     case "soft-bob":
     case "short":
     case "bob": {
-      frontNode = (
-        <g>
-          {FullBase(ry * 0.7)}
-          <SoftBangs />
-        </g>
-      );
+      backNode = FullBase(ry * 0.7);
+      frontNode = <SoftBangs />;
       break;
     }
 
@@ -334,13 +330,13 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
     case "straight-bangs":
     case "curtain-cut":
     case "wavy": {
-      backNode = BackFlow(ry * 1.6, rx * 0.55);
-      frontNode = (
+      backNode = (
         <g>
+          {BackFlow(ry * 1.6, rx * 0.55)}
           {FullBase(ry * 1.0)}
-          <SoftBangs />
         </g>
       );
+      frontNode = <SoftBangs />;
       break;
     }
 
@@ -348,10 +344,14 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
     case "ponytail": {
       const ax = cx + rx * 0.4;
       const ay = top - 1;
-      backNode = Tail(ax, ay, sideR + rx * 0.4, cy + ry * 1.4, rx * 0.32);
+      backNode = (
+        <g>
+          {Tail(ax, ay, sideR + rx * 0.4, cy + ry * 1.4, rx * 0.32)}
+          {FullBase(ry * 0.75)}
+        </g>
+      );
       frontNode = (
         <g>
-          {FullBase(ry * 0.75)}
           <ellipse cx={ax} cy={ay + 2} rx={rx * 0.22} ry={rx * 0.15} fill={dark} />
           <AnimeBangs />
         </g>
@@ -362,10 +362,14 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
     case "side-pony": {
       const ax = sideR - 2;
       const ay = cy + 2;
-      backNode = Tail(ax, ay, sideR + rx * 0.6, cy + ry * 1.3, rx * 0.34);
+      backNode = (
+        <g>
+          {Tail(ax, ay, sideR + rx * 0.6, cy + ry * 1.3, rx * 0.34)}
+          {FullBase(ry * 0.8)}
+        </g>
+      );
       frontNode = (
         <g>
-          {FullBase(ry * 0.8)}
           <ellipse cx={ax - 1} cy={ay} rx={rx * 0.2} ry={rx * 0.16} fill={dark} />
           <SideSweptBangs />
         </g>
@@ -380,14 +384,10 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
         <g>
           {Tail(sideL + 2, yAnchor, sideL - rx * 0.15, cy + ry * 1.35, rx * 0.28)}
           {Tail(sideR - 2, yAnchor, sideR + rx * 0.15, cy + ry * 1.35, rx * 0.28)}
-        </g>
-      );
-      frontNode = (
-        <g>
           {FullBase(ry * 0.9)}
-          <SoftBangs />
         </g>
       );
+      frontNode = <SoftBangs />;
       break;
     }
 
@@ -397,14 +397,10 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
         <g>
           {Tail(sideL + 2, yAnchor, sideL - rx * 0.25, cy + ry * 1.9, rx * 0.32)}
           {Tail(sideR - 2, yAnchor, sideR + rx * 0.25, cy + ry * 1.9, rx * 0.32)}
-        </g>
-      );
-      frontNode = (
-        <g>
           {FullBase(ry * 0.95)}
-          <SoftBangs />
         </g>
       );
+      frontNode = <SoftBangs />;
       break;
     }
 
@@ -414,9 +410,9 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
       const bxL = cx - rx * 0.95;
       const bxR = cx + rx * 0.95;
       const by = top + ry * 0.18;
+      backNode = FullBase(ry * 0.65);
       frontNode = (
         <g>
-          {FullBase(ry * 0.65)}
           {Bun(bxL, by, rx * 0.3)}
           {Bun(bxR, by, rx * 0.3)}
           <SoftBangs />
@@ -430,9 +426,9 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
     case "topknot": {
       const bx = style === "side-bun" ? cx + rx * 0.55 : cx;
       const by = top - rx * 0.1;
+      backNode = FullBase(ry * 0.65);
       frontNode = (
         <g>
-          {FullBase(ry * 0.65)}
           {Bun(bx, by, rx * 0.38)}
           <SoftBangs />
         </g>
@@ -443,7 +439,8 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
     case "fluffy-curls":
     case "curly":
     case "afro": {
-      frontNode = <AfroBase />;
+      backNode = <AfroBase />;
+      frontNode = null;
       break;
     }
 
@@ -467,44 +464,36 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
         <g>
           {braidEls(sideL + 1, yAnchor, sideL - rx * 0.1, cy + ry * 1.5, rx * 0.22)}
           {braidEls(sideR - 1, yAnchor, sideR + rx * 0.1, cy + ry * 1.5, rx * 0.22)}
-        </g>
-      );
-      frontNode = (
-        <g>
           {FullBase(ry * 0.85)}
-          <SoftBangs />
         </g>
       );
+      frontNode = <SoftBangs />;
       break;
     }
 
     case "dreads": {
-      backNode = <Dreads />;
-      frontNode = (
+      backNode = (
         <g>
+          <Dreads />
           {FullBase(ry * 0.6)}
-          <SoftBangs />
         </g>
       );
+      frontNode = <SoftBangs />;
       break;
     }
 
     case "cornrows": {
-      frontNode = (
-        <g>
-          {FullBase(ry * 0.55)}
-          <CornrowLines />
-        </g>
-      );
+      backNode = FullBase(ry * 0.55);
+      frontNode = <CornrowLines />;
       break;
     }
 
     case "fade":
     case "undercut": {
       // Pixie: short base + soft bangs
+      backNode = <ShortBase />;
       frontNode = (
         <g>
-          <ShortBase />
           <SoftBangs />
           <ellipse cx={cx - rx * 0.25} cy={top - 4} rx={rx * 0.25} ry={ry * 0.16} fill={shine} opacity="0.45" />
         </g>
@@ -513,27 +502,20 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
     }
 
     case "side-sweep": {
-      frontNode = (
-        <g>
-          {FullBase(ry * 0.75)}
-          <SideSweptBangs />
-        </g>
-      );
+      backNode = FullBase(ry * 0.75);
+      frontNode = <SideSweptBangs />;
       break;
     }
 
     case "mohawk": {
-      frontNode = <ShortBase />;
+      backNode = <ShortBase />;
+      frontNode = null;
       break;
     }
 
     default:
-      frontNode = (
-        <g>
-          {FullBase(ry * 0.8)}
-          <SoftBangs />
-        </g>
-      );
+      backNode = FullBase(ry * 0.8);
+      frontNode = <SoftBangs />;
       break;
   }
 
