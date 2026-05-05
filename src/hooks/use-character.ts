@@ -36,7 +36,11 @@ export type HairStyleId =
   | "bob"
   | "wavy"
   | "topknot"
-  | "undercut";
+  | "undercut"
+  | "dreads"
+  | "cornrows"
+  | "side-pony"
+  | "long-pigtails";
 
 export type FaceShape = "round" | "oval" | "heart" | "diamond" | "octagon" | "long" | "square";
 export type BodyShape = "slim" | "average" | "stocky";
