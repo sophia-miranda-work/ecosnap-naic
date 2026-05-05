@@ -155,8 +155,8 @@ export function hairLayers(
 
   // AfroBase: large round cloud with chunky outer puffs, surface curl swirls,
   // and diamond highlights (matches the reference chibi afro look).
-  const AfroBase = () => {
-    const baseR = rx + 14;
+  const AfroBase = ({ size = 1 }: { size?: number } = {}) => {
+    const baseR = rx + 14 * size;
     const els: ReactElement[] = [];
     const dark = darken(color, 0.18);
     const light = darken(color, -0.12);
