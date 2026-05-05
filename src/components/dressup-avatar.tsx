@@ -184,66 +184,90 @@ export function hairLayers(
   };
 
   // ---- BANGS -------------------------------------------------
-  // Soft curved bangs — a smooth single arc across the forehead
+  // All bangs anchor at the hair crown (near `top`) and flow down to the
+  // brow, so the entire forehead is covered instead of a thin strip.
+  const crownY = top + ry * 0.05; // attach to hair mass at the crown
+
+  // Soft curved bangs — full forehead coverage with a gentle arc at the brow
   const SoftBangs = () => (
     <path
-      d={`M ${cx - rx * 0.95},${browY - 1}
-          C ${cx - rx * 0.6},${browY + 5} ${cx + rx * 0.6},${browY + 5} ${cx + rx * 0.95},${browY - 1}
-          C ${cx + rx * 0.6},${browY + 1} ${cx - rx * 0.6},${browY + 1} ${cx - rx * 0.95},${browY - 1} Z`}
+      d={`M ${cx - rx * 0.98},${crownY}
+          C ${cx - rx * 1.05},${browY - 2} ${cx - rx * 0.7},${browY + 4} ${cx - rx * 0.2},${browY + 3}
+          C ${cx + rx * 0.2},${browY + 2} ${cx + rx * 0.7},${browY + 4} ${cx + rx * 1.05},${browY - 2}
+          C ${cx + rx * 0.98},${crownY} ${cx + rx * 0.5},${top - 2} ${cx},${top - 2}
+          C ${cx - rx * 0.5},${top - 2} ${cx - rx * 0.98},${crownY} ${cx - rx * 0.98},${crownY} Z`}
       fill={color}
     />
   );
 
-  // Side-swept bangs — diagonal fringe sweeping across forehead
+  // Side-swept bangs — diagonal sweep across the full forehead
   const SideSweptBangs = () => (
     <path
-      d={`M ${cx - rx * 0.95},${browY - 1}
-          C ${cx - rx * 0.5},${browY + 6} ${cx + rx * 0.7},${browY + 4} ${cx + rx * 0.95},${browY - 2}
-          C ${cx + rx * 0.5},${browY - 1} ${cx - rx * 0.4},${browY + 1} ${cx - rx * 0.95},${browY - 1} Z`}
+      d={`M ${cx - rx * 0.98},${crownY}
+          C ${cx - rx * 1.0},${browY} ${cx - rx * 0.3},${browY + 6} ${cx + rx * 0.5},${browY + 4}
+          C ${cx + rx * 0.85},${browY + 2} ${cx + rx * 1.05},${browY - 2} ${cx + rx * 0.98},${crownY}
+          C ${cx + rx * 0.5},${top - 2} ${cx - rx * 0.5},${top - 2} ${cx - rx * 0.98},${crownY} Z`}
       fill={color}
     />
   );
 
-  // Layered anime bangs — separated chunks
+  // Anime bangs — chunky separated strands from crown to brow
   const AnimeBangs = () => (
-    <g>
-      <path d={`M ${cx - rx * 0.9},${browY - 2} Q ${cx - rx * 0.7},${browY + 4} ${cx - rx * 0.4},${browY + 3.5} Q ${cx - rx * 0.55},${browY + 1} ${cx - rx * 0.9},${browY - 2} Z`} fill={color} />
-      <path d={`M ${cx - rx * 0.45},${browY - 2.5} Q ${cx - rx * 0.15},${browY + 5} ${cx + rx * 0.05},${browY + 4} Q ${cx - rx * 0.1},${browY + 1} ${cx - rx * 0.45},${browY - 2.5} Z`} fill={color} />
-      <path d={`M ${cx + rx * 0.05},${browY - 2.5} Q ${cx + rx * 0.35},${browY + 4.5} ${cx + rx * 0.55},${browY + 3.5} Q ${cx + rx * 0.4},${browY + 0.5} ${cx + rx * 0.05},${browY - 2.5} Z`} fill={color} />
-      <path d={`M ${cx + rx * 0.55},${browY - 2} Q ${cx + rx * 0.8},${browY + 3} ${cx + rx * 0.95},${browY + 1.5} Q ${cx + rx * 0.85},${browY - 0.5} ${cx + rx * 0.55},${browY - 2} Z`} fill={color} />
+    <g fill={color}>
+      <path d={`M ${cx - rx * 0.95},${crownY}
+               C ${cx - rx * 0.95},${browY - 2} ${cx - rx * 0.85},${browY + 3} ${cx - rx * 0.5},${browY + 4}
+               Q ${cx - rx * 0.55},${browY - 2} ${cx - rx * 0.6},${top - 1} Z`} />
+      <path d={`M ${cx - rx * 0.55},${top - 2}
+               C ${cx - rx * 0.4},${browY} ${cx - rx * 0.3},${browY + 4} ${cx - rx * 0.05},${browY + 5}
+               Q ${cx - rx * 0.15},${browY - 2} ${cx - rx * 0.2},${top - 2} Z`} />
+      <path d={`M ${cx + rx * 0.2},${top - 2}
+               C ${cx + rx * 0.15},${browY} ${cx + rx * 0.3},${browY + 4} ${cx + rx * 0.55},${browY + 4.5}
+               Q ${cx + rx * 0.5},${browY - 2} ${cx + rx * 0.55},${top - 2} Z`} />
+      <path d={`M ${cx + rx * 0.6},${top - 1}
+               C ${cx + rx * 0.7},${browY} ${cx + rx * 0.95},${browY + 2} ${cx + rx * 0.95},${browY + 3}
+               Q ${cx + rx * 0.95},${browY - 2} ${cx + rx * 0.95},${crownY} Z`} />
     </g>
   );
 
-  // Wispy bangs — thin, see-through strands
+  // Wispy bangs — solid soft base with thin strands suggesting wisps
   const WispyBangs = () => (
-    <g stroke={color} strokeWidth="1.4" strokeLinecap="round" fill="none" opacity="0.95">
-      <path d={`M ${cx - rx * 0.85},${browY - 2} Q ${cx - rx * 0.6},${browY + 2} ${cx - rx * 0.45},${browY + 4}`} />
-      <path d={`M ${cx - rx * 0.45},${browY - 2.5} Q ${cx - rx * 0.25},${browY + 2} ${cx - rx * 0.15},${browY + 4.5}`} />
-      <path d={`M ${cx},${browY - 3} Q ${cx + rx * 0.1},${browY + 2} ${cx + rx * 0.18},${browY + 4.5}`} />
-      <path d={`M ${cx + rx * 0.4},${browY - 2.5} Q ${cx + rx * 0.55},${browY + 2} ${cx + rx * 0.65},${browY + 4}`} />
-      <path d={`M ${cx + rx * 0.8},${browY - 2} Q ${cx + rx * 0.85},${browY + 1} ${cx + rx * 0.9},${browY + 3}`} />
+    <g>
+      <path
+        d={`M ${cx - rx * 0.95},${crownY}
+            C ${cx - rx * 1.0},${browY - 1} ${cx - rx * 0.6},${browY + 3} ${cx},${browY + 2}
+            C ${cx + rx * 0.6},${browY + 3} ${cx + rx * 1.0},${browY - 1} ${cx + rx * 0.95},${crownY}
+            C ${cx + rx * 0.5},${top - 2} ${cx - rx * 0.5},${top - 2} ${cx - rx * 0.95},${crownY} Z`}
+        fill={color}
+      />
+      <g stroke={color} strokeWidth="1.2" strokeLinecap="round" fill="none">
+        <path d={`M ${cx - rx * 0.55},${browY + 1} Q ${cx - rx * 0.45},${browY + 4} ${cx - rx * 0.35},${browY + 5.5}`} />
+        <path d={`M ${cx - rx * 0.15},${browY + 1} Q ${cx - rx * 0.05},${browY + 4} ${cx + rx * 0.02},${browY + 5.8}`} />
+        <path d={`M ${cx + rx * 0.3},${browY + 1} Q ${cx + rx * 0.4},${browY + 4} ${cx + rx * 0.5},${browY + 5.5}`} />
+      </g>
     </g>
   );
 
-  // Curtain bangs — center part, two soft swoops framing the face
+  // Curtain bangs — middle part with two swoops, full coverage on each side
   const CurtainBangs = () => (
     <g fill={color}>
-      <path d={`M ${cx - 1},${browY - 4}
-              C ${cx - rx * 0.5},${browY - 2} ${cx - rx * 0.95},${browY + 2} ${cx - rx * 0.95},${browY + 5}
-              C ${cx - rx * 0.7},${browY + 3} ${cx - rx * 0.35},${browY + 1} ${cx - 1},${browY + 1} Z`} />
-      <path d={`M ${cx + 1},${browY - 4}
-              C ${cx + rx * 0.5},${browY - 2} ${cx + rx * 0.95},${browY + 2} ${cx + rx * 0.95},${browY + 5}
-              C ${cx + rx * 0.7},${browY + 3} ${cx + rx * 0.35},${browY + 1} ${cx + 1},${browY + 1} Z`} />
+      <path d={`M ${cx - 1},${top - 1}
+              C ${cx - rx * 0.4},${top - 2} ${cx - rx * 0.98},${crownY} ${cx - rx * 0.98},${crownY}
+              C ${cx - rx * 1.0},${browY} ${cx - rx * 0.85},${browY + 5} ${cx - rx * 0.55},${browY + 5}
+              C ${cx - rx * 0.5},${browY + 1} ${cx - rx * 0.25},${browY - 2} ${cx - 1},${browY - 3} Z`} />
+      <path d={`M ${cx + 1},${top - 1}
+              C ${cx + rx * 0.4},${top - 2} ${cx + rx * 0.98},${crownY} ${cx + rx * 0.98},${crownY}
+              C ${cx + rx * 1.0},${browY} ${cx + rx * 0.85},${browY + 5} ${cx + rx * 0.55},${browY + 5}
+              C ${cx + rx * 0.5},${browY + 1} ${cx + rx * 0.25},${browY - 2} ${cx + 1},${browY - 3} Z`} />
     </g>
   );
 
-  // Blunt bangs — thick, straight cut across forehead
+  // Blunt bangs — thick straight-cut fringe covering the whole forehead
   const BluntBangs = () => (
     <path
-      d={`M ${cx - rx * 0.92},${browY - 3}
-          L ${cx + rx * 0.92},${browY - 3}
-          L ${cx + rx * 0.95},${browY + 4}
-          Q ${cx},${browY + 5.5} ${cx - rx * 0.95},${browY + 4} Z`}
+      d={`M ${cx - rx * 0.98},${crownY}
+          C ${cx - rx * 0.5},${top - 3} ${cx + rx * 0.5},${top - 3} ${cx + rx * 0.98},${crownY}
+          L ${cx + rx * 0.98},${browY + 3}
+          Q ${cx},${browY + 5} ${cx - rx * 0.98},${browY + 3} Z`}
       fill={color}
     />
   );
