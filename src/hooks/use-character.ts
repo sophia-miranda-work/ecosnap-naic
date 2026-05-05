@@ -48,6 +48,16 @@ export type BodyShape = "slim" | "average" | "stocky";
 export type EyebrowStyle = "none" | "soft-arch" | "straight" | "thick" | "thin" | "raised";
 export type FacialHairStyle = "none" | "stubble" | "mustache" | "goatee" | "full-beard";
 
+export type BangStyle =
+  | "default"
+  | "none"
+  | "soft"
+  | "side-swept"
+  | "wispy"
+  | "curtain"
+  | "anime"
+  | "blunt";
+
 export type Dressup = {
   skin: string;
   hair: string;
@@ -72,6 +82,7 @@ export type Dressup = {
   dress?: string | null; // covers top+bottom for dresses
   eyebrows?: EyebrowStyle;
   facialHair?: FacialHairStyle;
+  bangs?: BangStyle;
 };
 
 export const DEFAULT_DRESSUP: Dressup = {
@@ -97,6 +108,7 @@ export const DEFAULT_DRESSUP: Dressup = {
   dress: null,
   eyebrows: "none",
   facialHair: "none",
+  bangs: "default",
 };
 
 export type Character = {

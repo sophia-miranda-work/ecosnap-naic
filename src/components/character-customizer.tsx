@@ -8,6 +8,7 @@ import {
   type HairStyleId,
   type EyebrowStyle,
   type FacialHairStyle,
+  type BangStyle,
   DEFAULT_DRESSUP,
 } from "@/hooks/use-character";
 import { SHOP_ITEMS, type ShopSlot, type ShopItem } from "@/lib/shop";
@@ -99,6 +100,17 @@ const FACIAL_HAIR_STYLES: { id: FacialHairStyle; label: string }[] = [
   { id: "mustache", label: "Mustache" },
   { id: "goatee", label: "Goatee" },
   { id: "full-beard", label: "Full beard" },
+];
+
+const BANG_STYLES: { id: BangStyle; label: string }[] = [
+  { id: "default", label: "Style default" },
+  { id: "none", label: "No bangs" },
+  { id: "soft", label: "Soft" },
+  { id: "side-swept", label: "Side-swept" },
+  { id: "wispy", label: "Wispy" },
+  { id: "curtain", label: "Curtain" },
+  { id: "anime", label: "Anime chunks" },
+  { id: "blunt", label: "Blunt" },
 ];
 
 function premiumHairItemId(style: HairStyleId): string {
@@ -345,6 +357,22 @@ export function CharacterCustomizer({ onClose }: { onClose: () => void }) {
                     </div>
                   </>
                 )}
+              </Section>
+              <Section title="Bangs">
+                <div className="mb-2 text-[11px] text-muted-foreground">
+                  Mix any bangs with any hairstyle.
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  {BANG_STYLES.map((b) => (
+                    <PreviewTile
+                      key={b.id}
+                      label={b.label}
+                      active={(dressup.bangs ?? "default") === b.id}
+                      onClick={() => setField({ bangs: b.id })}
+                      preview={<MiniAvatar dressup={{ ...dressup, bangs: b.id }} />}
+                    />
+                  ))}
+                </div>
               </Section>
               <Section title="Eyebrows">
                 <div className="mb-2 flex items-center justify-between">

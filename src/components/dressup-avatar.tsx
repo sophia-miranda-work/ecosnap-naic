@@ -5,6 +5,7 @@ import {
   type HairStyleId,
   type EyebrowStyle,
   type FacialHairStyle,
+  type BangStyle,
 } from "@/hooks/use-character";
 import type { ReactElement } from "react";
 import { getItemById } from "@/lib/shop";
@@ -93,7 +94,13 @@ function darken(hex: string, amount = 0.25): string {
   return `rgb(${mix(parseInt(m[1], 16))}, ${mix(parseInt(m[2], 16))}, ${mix(parseInt(m[3], 16))})`;
 }
 
-export function hairLayers(style: HairStyleId, color: string, rx: number, ry: number) {
+export function hairLayers(
+  style: HairStyleId,
+  color: string,
+  rx: number,
+  ry: number,
+  bangsOverride: BangStyle = "default",
+) {
   if (style === "bald") return { back: null, front: null };
 
   const cx = HEAD_CX;
@@ -207,6 +214,65 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
     </g>
   );
 
+  // Wispy bangs — thin, see-through strands
+  const WispyBangs = () => (
+    <g stroke={color} strokeWidth="1.4" strokeLinecap="round" fill="none" opacity="0.95">
+      <path d={`M ${cx - rx * 0.85},${browY - 2} Q ${cx - rx * 0.6},${browY + 2} ${cx - rx * 0.45},${browY + 4}`} />
+      <path d={`M ${cx - rx * 0.45},${browY - 2.5} Q ${cx - rx * 0.25},${browY + 2} ${cx - rx * 0.15},${browY + 4.5}`} />
+      <path d={`M ${cx},${browY - 3} Q ${cx + rx * 0.1},${browY + 2} ${cx + rx * 0.18},${browY + 4.5}`} />
+      <path d={`M ${cx + rx * 0.4},${browY - 2.5} Q ${cx + rx * 0.55},${browY + 2} ${cx + rx * 0.65},${browY + 4}`} />
+      <path d={`M ${cx + rx * 0.8},${browY - 2} Q ${cx + rx * 0.85},${browY + 1} ${cx + rx * 0.9},${browY + 3}`} />
+    </g>
+  );
+
+  // Curtain bangs — center part, two soft swoops framing the face
+  const CurtainBangs = () => (
+    <g fill={color}>
+      <path d={`M ${cx - 1},${browY - 4}
+              C ${cx - rx * 0.5},${browY - 2} ${cx - rx * 0.95},${browY + 2} ${cx - rx * 0.95},${browY + 5}
+              C ${cx - rx * 0.7},${browY + 3} ${cx - rx * 0.35},${browY + 1} ${cx - 1},${browY + 1} Z`} />
+      <path d={`M ${cx + 1},${browY - 4}
+              C ${cx + rx * 0.5},${browY - 2} ${cx + rx * 0.95},${browY + 2} ${cx + rx * 0.95},${browY + 5}
+              C ${cx + rx * 0.7},${browY + 3} ${cx + rx * 0.35},${browY + 1} ${cx + 1},${browY + 1} Z`} />
+    </g>
+  );
+
+  // Blunt bangs — thick, straight cut across forehead
+  const BluntBangs = () => (
+    <path
+      d={`M ${cx - rx * 0.92},${browY - 3}
+          L ${cx + rx * 0.92},${browY - 3}
+          L ${cx + rx * 0.95},${browY + 4}
+          Q ${cx},${browY + 5.5} ${cx - rx * 0.95},${browY + 4} Z`}
+      fill={color}
+    />
+  );
+
+  // Resolve which bangs node to render based on override.
+  // "default" keeps the per-style choice below. "none" hides bangs entirely.
+  const resolveBangs = (defaultNode: ReactElement | null): ReactElement | null => {
+    switch (bangsOverride) {
+      case "default":
+        return defaultNode;
+      case "none":
+        return null;
+      case "soft":
+        return <SoftBangs />;
+      case "side-swept":
+        return <SideSweptBangs />;
+      case "wispy":
+        return <WispyBangs />;
+      case "curtain":
+        return <CurtainBangs />;
+      case "anime":
+        return <AnimeBangs />;
+      case "blunt":
+        return <BluntBangs />;
+      default:
+        return defaultNode;
+    }
+  };
+
   // ---- ATTACHMENTS -------------------------------------------
   // Bun anchored at given point with soft base blend
   const Bun = (bx: number, by: number, r: number) => (
@@ -314,14 +380,15 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
 
   // ---- STYLE ASSEMBLY ----------------------------------------
   let backNode: React.ReactNode = null;
-  let frontNode: React.ReactNode = null;
+  let frontAttachments: React.ReactNode = null;
+  let defaultBangsNode: React.ReactNode = null;
 
   switch (style) {
     case "soft-bob":
     case "short":
     case "bob": {
       backNode = FullBase(ry * 0.7);
-      frontNode = <SoftBangs />;
+      defaultBangsNode = <SoftBangs />;
       break;
     }
 
@@ -336,7 +403,7 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
           {FullBase(ry * 1.0)}
         </g>
       );
-      frontNode = <SoftBangs />;
+      defaultBangsNode = style === "curtain-cut" ? <CurtainBangs /> : <SoftBangs />;
       break;
     }
 
@@ -350,12 +417,10 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
           {FullBase(ry * 0.75)}
         </g>
       );
-      frontNode = (
-        <g>
-          <ellipse cx={ax} cy={ay + 2} rx={rx * 0.22} ry={rx * 0.15} fill={dark} />
-          <AnimeBangs />
-        </g>
+      frontAttachments = (
+        <ellipse cx={ax} cy={ay + 2} rx={rx * 0.22} ry={rx * 0.15} fill={dark} />
       );
+      defaultBangsNode = <AnimeBangs />;
       break;
     }
 
@@ -368,12 +433,10 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
           {FullBase(ry * 0.8)}
         </g>
       );
-      frontNode = (
-        <g>
-          <ellipse cx={ax - 1} cy={ay} rx={rx * 0.2} ry={rx * 0.16} fill={dark} />
-          <SideSweptBangs />
-        </g>
+      frontAttachments = (
+        <ellipse cx={ax - 1} cy={ay} rx={rx * 0.2} ry={rx * 0.16} fill={dark} />
       );
+      defaultBangsNode = <SideSweptBangs />;
       break;
     }
 
@@ -387,7 +450,7 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
           {FullBase(ry * 0.9)}
         </g>
       );
-      frontNode = <SoftBangs />;
+      defaultBangsNode = <SoftBangs />;
       break;
     }
 
@@ -400,7 +463,7 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
           {FullBase(ry * 0.95)}
         </g>
       );
-      frontNode = <SoftBangs />;
+      defaultBangsNode = <SoftBangs />;
       break;
     }
 
@@ -411,13 +474,13 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
       const bxR = cx + rx * 0.95;
       const by = top + ry * 0.18;
       backNode = FullBase(ry * 0.65);
-      frontNode = (
+      frontAttachments = (
         <g>
           {Bun(bxL, by, rx * 0.3)}
           {Bun(bxR, by, rx * 0.3)}
-          <SoftBangs />
         </g>
       );
+      defaultBangsNode = <SoftBangs />;
       break;
     }
 
@@ -427,12 +490,8 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
       const bx = style === "side-bun" ? cx + rx * 0.55 : cx;
       const by = top - rx * 0.1;
       backNode = FullBase(ry * 0.65);
-      frontNode = (
-        <g>
-          {Bun(bx, by, rx * 0.38)}
-          <SoftBangs />
-        </g>
-      );
+      frontAttachments = Bun(bx, by, rx * 0.38);
+      defaultBangsNode = <SoftBangs />;
       break;
     }
 
@@ -440,7 +499,6 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
     case "curly":
     case "afro": {
       backNode = <AfroBase />;
-      frontNode = null;
       break;
     }
 
@@ -467,7 +525,7 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
           {FullBase(ry * 0.85)}
         </g>
       );
-      frontNode = <SoftBangs />;
+      defaultBangsNode = <SoftBangs />;
       break;
     }
 
@@ -478,13 +536,13 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
           {FullBase(ry * 0.6)}
         </g>
       );
-      frontNode = <SoftBangs />;
+      defaultBangsNode = <SoftBangs />;
       break;
     }
 
     case "cornrows": {
       backNode = FullBase(ry * 0.55);
-      frontNode = <CornrowLines />;
+      frontAttachments = <CornrowLines />;
       break;
     }
 
@@ -492,32 +550,38 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
     case "undercut": {
       // Pixie: short base + soft bangs
       backNode = <ShortBase />;
-      frontNode = (
-        <g>
-          <SoftBangs />
-          <ellipse cx={cx - rx * 0.25} cy={top - 4} rx={rx * 0.25} ry={ry * 0.16} fill={shine} opacity="0.45" />
-        </g>
+      frontAttachments = (
+        <ellipse cx={cx - rx * 0.25} cy={top - 4} rx={rx * 0.25} ry={ry * 0.16} fill={shine} opacity="0.45" />
       );
+      defaultBangsNode = <SoftBangs />;
       break;
     }
 
     case "side-sweep": {
       backNode = FullBase(ry * 0.75);
-      frontNode = <SideSweptBangs />;
+      defaultBangsNode = <SideSweptBangs />;
       break;
     }
 
     case "mohawk": {
       backNode = <ShortBase />;
-      frontNode = null;
       break;
     }
 
     default:
       backNode = FullBase(ry * 0.8);
-      frontNode = <SoftBangs />;
+      defaultBangsNode = <SoftBangs />;
       break;
   }
+
+  // Apply optional bangs override (replaces per-style default bangs).
+  const bangsNode = resolveBangs(defaultBangsNode as ReactElement | null);
+  const frontNode = (frontAttachments || bangsNode) ? (
+    <g>
+      {frontAttachments}
+      {bangsNode}
+    </g>
+  ) : null;
 
   return { back: backNode, front: frontNode };
 }
@@ -1086,7 +1150,13 @@ export function DressupAvatar({
   const topColor = dress?.color ?? top?.color ?? "#e89ab8";
   const bottomColor = dress?.color ?? bottom?.color ?? "#3a4f78";
   const shoesColor = shoes?.color ?? "#5b3a1f";
-  const hair = hairLayers(dressup.hairstyle as HairStyleId, dressup.hair, rx, ry);
+  const hair = hairLayers(
+    dressup.hairstyle as HairStyleId,
+    dressup.hair,
+    rx,
+    ry,
+    (dressup.bangs ?? "default") as BangStyle,
+  );
 
   const neckTop = HEAD_CY + ry - 2;
   const torsoTop = neckTop + 4;
