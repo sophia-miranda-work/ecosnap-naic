@@ -334,7 +334,7 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
     case "straight-bangs":
     case "curtain-cut":
     case "wavy": {
-      backNode = {BackFlow(ry * 1.6, rx * 0.55)};
+      backNode = BackFlow(ry * 1.6, rx * 0.55);
       frontNode = (
         <g>
           {FullBase(ry * 1.0)}
