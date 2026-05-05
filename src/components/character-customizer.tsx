@@ -75,7 +75,6 @@ const FREE_HAIRSTYLES: { id: HairStyleId; label: string }[] = [
   { id: "side-sweep", label: "Side sweep" },
   { id: "afro-short", label: "Afro (short)" },
   { id: "afro", label: "Afro (medium)" },
-  { id: "afro-tall", label: "Afro (tall)" },
   { id: "dreads", label: "Dreads" },
   { id: "topknot", label: "Topknot bun" },
   { id: "high-pony", label: "High ponytail" },
