@@ -39,7 +39,9 @@ export type HairStyleId =
   | "undercut"
   | "dreads"
   | "side-pony"
-  | "long-pigtails";
+  | "long-pigtails"
+  | "afro-short"
+  | "afro-tall";
 
 export type FaceShape = "round" | "oval" | "heart" | "diamond" | "octagon" | "long" | "square";
 export type BodyShape = "slim" | "average" | "stocky";
