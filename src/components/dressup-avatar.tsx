@@ -1061,9 +1061,6 @@ export function DressupAvatar({
               stroke={skinDark}
               strokeWidth="0.3"
             />
-            {dressup.nail && (
-              <circle cx={handX} cy={handY + 1.5} r="1" fill={dressup.nail} opacity="0.9" />
-            )}
             {bracelet && (
               <rect
                 x={handX - 4}
