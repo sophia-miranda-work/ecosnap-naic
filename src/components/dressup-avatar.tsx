@@ -600,10 +600,34 @@ export function hairLayers(
 
   // Apply optional bangs override (replaces per-style default bangs).
   const bangsNode = resolveBangs(defaultBangsNode as ReactElement | null);
-  const frontNode = (frontAttachments || bangsNode) ? (
+  // Face-protection clip: bangs render everywhere EXCEPT an oval covering
+  // eyes, nose, and mouth — guaranteeing facial features stay visible
+  // regardless of which bangs variant is selected.
+  const clipId = `face-protect-${style}-${bangsOverride}`;
+  const faceMaskCx = cx;
+  const faceMaskCy = cy + ry * 0.18;
+  const faceMaskRx = rx * 0.78;
+  const faceMaskRy = ry * 0.5;
+  const protectedBangs = bangsNode ? (
+    <>
+      <defs>
+        <clipPath id={clipId} clipPathUnits="userSpaceOnUse">
+          <path
+            clipRule="evenodd"
+            d={`M 0,0 H 100 V 100 H 0 Z
+                M ${faceMaskCx},${faceMaskCy - faceMaskRy}
+                a ${faceMaskRx},${faceMaskRy} 0 1,0 0,${faceMaskRy * 2}
+                a ${faceMaskRx},${faceMaskRy} 0 1,0 0,${-faceMaskRy * 2} Z`}
+          />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${clipId})`}>{bangsNode}</g>
+    </>
+  ) : null;
+  const frontNode = (frontAttachments || protectedBangs) ? (
     <g>
       {frontAttachments}
-      {bangsNode}
+      {protectedBangs}
     </g>
   ) : null;
 
