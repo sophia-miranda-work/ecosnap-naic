@@ -616,12 +616,6 @@ export function hairLayers(
       break;
     }
 
-    case "cornrows": {
-      backNode = FullBase(ry * 0.55);
-      frontAttachments = <CornrowLines />;
-      break;
-    }
-
     case "fade":
     case "undercut": {
       // Pixie: short base + soft bangs
