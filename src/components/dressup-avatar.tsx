@@ -1150,7 +1150,13 @@ export function DressupAvatar({
   const topColor = dress?.color ?? top?.color ?? "#e89ab8";
   const bottomColor = dress?.color ?? bottom?.color ?? "#3a4f78";
   const shoesColor = shoes?.color ?? "#5b3a1f";
-  const hair = hairLayers(dressup.hairstyle as HairStyleId, dressup.hair, rx, ry);
+  const hair = hairLayers(
+    dressup.hairstyle as HairStyleId,
+    dressup.hair,
+    rx,
+    ry,
+    (dressup.bangs ?? "default") as BangStyle,
+  );
 
   const neckTop = HEAD_CY + ry - 2;
   const torsoTop = neckTop + 4;
