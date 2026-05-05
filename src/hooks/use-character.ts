@@ -84,6 +84,8 @@ export type Dressup = {
   eyebrows?: EyebrowStyle;
   facialHair?: FacialHairStyle;
   bangs?: BangStyle;
+  /** Per-item color overrides keyed by shop item id (hex). */
+  itemColors?: Record<string, string>;
 };
 
 export const DEFAULT_DRESSUP: Dressup = {
@@ -110,6 +112,7 @@ export const DEFAULT_DRESSUP: Dressup = {
   eyebrows: "none",
   facialHair: "none",
   bangs: "default",
+  itemColors: {},
 };
 
 export type Character = {
