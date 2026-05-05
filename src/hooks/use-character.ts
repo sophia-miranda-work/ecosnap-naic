@@ -40,8 +40,7 @@ export type HairStyleId =
   | "dreads"
   | "side-pony"
   | "long-pigtails"
-  | "afro-short"
-  | "afro-tall";
+  | "afro-short";
 
 export type FaceShape = "round" | "oval" | "heart" | "diamond" | "octagon" | "long" | "square";
 export type BodyShape = "slim" | "average" | "stocky";
@@ -57,7 +56,8 @@ export type BangStyle =
   | "wispy"
   | "curtain"
   | "anime"
-  | "blunt";
+  | "blunt"
+  | "curly";
 
 export type Dressup = {
   skin: string;

@@ -156,37 +156,32 @@ export function hairLayers(
   // AfroBase: large round cloud with chunky outer puffs, surface curl swirls,
   // and diamond highlights (matches the reference chibi afro look).
   const AfroBase = ({ size = 1 }: { size?: number } = {}) => {
-    const baseR = rx + 14 * size;
+    // Big round cloud centered on the head — perfectly circular silhouette.
+    const baseR = rx + 12 * size;
+    const cxA = cx;
+    const cyA = cy - ry * 0.15;
     const els: ReactElement[] = [];
     const dark = darken(color, 0.18);
     const light = darken(color, -0.12);
 
-    // main cloud
+    // main round cloud (true circle so back of head is fully covered)
     els.push(
-      <ellipse key="b" cx={cx} cy={cy - 5} rx={baseR} ry={baseR * 1.0} fill={color} />,
+      <circle key="b" cx={cxA} cy={cyA} r={baseR} fill={color} />,
     );
 
-    // chunky outer puffs around the upper half (defines the cloud silhouette)
-    const n = 26;
+    // even chunky puffs around the FULL ring — uniform cloud edge
+    const n = 30;
     for (let i = 0; i < n; i++) {
-      const a = Math.PI + (Math.PI * i) / (n - 1);
-      const px = cx + Math.cos(a) * (baseR + 2);
-      const py = cy - 5 + Math.sin(a) * (baseR + 2);
-      if (py > browY + 6) continue;
+      const a = (Math.PI * 2 * i) / n;
+      const px = cxA + Math.cos(a) * baseR;
+      const py = cyA + Math.sin(a) * baseR;
+      // skip the bottom slice that would cover the face/neck
+      if (py > browY + 8) continue;
       const r = 7.5 + (i % 2 ? 1.2 : 0);
       els.push(<circle key={`p${i}`} cx={px} cy={py} r={r} fill={color} />);
     }
 
-    // side puffs for ear-level coverage
-    for (let i = 0; i < 5; i++) {
-      const t = i / 4;
-      els.push(
-        <circle key={`sl${i}`} cx={sideL - 5} cy={browY - 6 + t * 18} r={7} fill={color} />,
-        <circle key={`sr${i}`} cx={sideR + 5} cy={browY - 6 + t * 18} r={7} fill={color} />,
-      );
-    }
-
-    // surface curl swirls (small spirals on the dome)
+    // surface curl swirls
     const swirl = (kx: number, ky: number, r: number, key: string) => (
       <path
         key={key}
@@ -324,6 +319,30 @@ export function hairLayers(
     />
   );
 
+  // Curly bangs — chunky little curl puffs across the forehead
+  const CurlyBangs = () => {
+    const els: ReactElement[] = [];
+    const count = 7;
+    for (let i = 0; i < count; i++) {
+      const t = i / (count - 1);
+      const px = cx - rx * 0.95 + t * rx * 1.9;
+      const py = browY + 1 + Math.sin(t * Math.PI) * -3;
+      els.push(<circle key={`cb${i}`} cx={px} cy={py} r={6} fill={color} />);
+    }
+    // fill any gaps with a soft band behind the curls
+    els.unshift(
+      <path
+        key="band"
+        d={`M ${cx - rx * 0.98},${crownY}
+            C ${cx - rx * 0.5},${top - 2} ${cx + rx * 0.5},${top - 2} ${cx + rx * 0.98},${crownY}
+            L ${cx + rx * 0.95},${browY + 2}
+            Q ${cx},${browY + 4} ${cx - rx * 0.95},${browY + 2} Z`}
+        fill={color}
+      />,
+    );
+    return <g>{els}</g>;
+  };
+
   // Resolve which bangs node to render based on override.
   // "default" keeps the per-style choice below. "none" hides bangs entirely.
   const resolveBangs = (defaultNode: ReactElement | null): ReactElement | null => {
@@ -344,6 +363,8 @@ export function hairLayers(
         return <AnimeBangs />;
       case "blunt":
         return <BluntBangs />;
+      case "curly":
+        return <CurlyBangs />;
       default:
         return defaultNode;
     }
@@ -575,16 +596,13 @@ export function hairLayers(
     case "curly":
     case "afro": {
       backNode = <AfroBase />;
+      defaultBangsNode = <CurlyBangs />;
       break;
     }
 
     case "afro-short": {
       backNode = <AfroBase size={0.55} />;
-      break;
-    }
-
-    case "afro-tall": {
-      backNode = <AfroBase size={1.5} />;
+      defaultBangsNode = <CurlyBangs />;
       break;
     }
 
