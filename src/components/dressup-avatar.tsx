@@ -348,7 +348,7 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
     case "ponytail": {
       const ax = cx + rx * 0.4;
       const ay = top - 1;
-      backNode = {Tail(ax, ay, sideR + rx * 0.4, cy + ry * 1.4, rx * 0.32)};
+      backNode = Tail(ax, ay, sideR + rx * 0.4, cy + ry * 1.4, rx * 0.32);
       frontNode = (
         <g>
           {FullBase(ry * 0.75)}
@@ -362,7 +362,7 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
     case "side-pony": {
       const ax = sideR - 2;
       const ay = cy + 2;
-      backNode = {Tail(ax, ay, sideR + rx * 0.6, cy + ry * 1.3, rx * 0.34)};
+      backNode = Tail(ax, ay, sideR + rx * 0.6, cy + ry * 1.3, rx * 0.34);
       frontNode = (
         <g>
           {FullBase(ry * 0.8)}
