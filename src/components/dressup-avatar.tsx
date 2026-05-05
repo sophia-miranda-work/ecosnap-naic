@@ -583,11 +583,6 @@ export function hairLayers(
       break;
     }
 
-    case "afro-tall": {
-      backNode = <AfroBase size={1.5} />;
-      break;
-    }
-
     case "twin-braids":
     case "braids": {
       const yAnchor = cy + ry * 0.4;
