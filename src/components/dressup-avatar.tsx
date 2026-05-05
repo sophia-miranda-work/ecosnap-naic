@@ -380,14 +380,15 @@ export function hairLayers(
 
   // ---- STYLE ASSEMBLY ----------------------------------------
   let backNode: React.ReactNode = null;
-  let frontNode: React.ReactNode = null;
+  let frontAttachments: React.ReactNode = null;
+  let defaultBangsNode: React.ReactNode = null;
 
   switch (style) {
     case "soft-bob":
     case "short":
     case "bob": {
       backNode = FullBase(ry * 0.7);
-      frontNode = <SoftBangs />;
+      defaultBangsNode = <SoftBangs />;
       break;
     }
 
@@ -402,7 +403,7 @@ export function hairLayers(
           {FullBase(ry * 1.0)}
         </g>
       );
-      frontNode = <SoftBangs />;
+      defaultBangsNode = style === "curtain-cut" ? <CurtainBangs /> : <SoftBangs />;
       break;
     }
 
@@ -416,12 +417,10 @@ export function hairLayers(
           {FullBase(ry * 0.75)}
         </g>
       );
-      frontNode = (
-        <g>
-          <ellipse cx={ax} cy={ay + 2} rx={rx * 0.22} ry={rx * 0.15} fill={dark} />
-          <AnimeBangs />
-        </g>
+      frontAttachments = (
+        <ellipse cx={ax} cy={ay + 2} rx={rx * 0.22} ry={rx * 0.15} fill={dark} />
       );
+      defaultBangsNode = <AnimeBangs />;
       break;
     }
 
@@ -434,12 +433,10 @@ export function hairLayers(
           {FullBase(ry * 0.8)}
         </g>
       );
-      frontNode = (
-        <g>
-          <ellipse cx={ax - 1} cy={ay} rx={rx * 0.2} ry={rx * 0.16} fill={dark} />
-          <SideSweptBangs />
-        </g>
+      frontAttachments = (
+        <ellipse cx={ax - 1} cy={ay} rx={rx * 0.2} ry={rx * 0.16} fill={dark} />
       );
+      defaultBangsNode = <SideSweptBangs />;
       break;
     }
 
@@ -453,7 +450,7 @@ export function hairLayers(
           {FullBase(ry * 0.9)}
         </g>
       );
-      frontNode = <SoftBangs />;
+      defaultBangsNode = <SoftBangs />;
       break;
     }
 
@@ -466,7 +463,7 @@ export function hairLayers(
           {FullBase(ry * 0.95)}
         </g>
       );
-      frontNode = <SoftBangs />;
+      defaultBangsNode = <SoftBangs />;
       break;
     }
 
@@ -477,13 +474,13 @@ export function hairLayers(
       const bxR = cx + rx * 0.95;
       const by = top + ry * 0.18;
       backNode = FullBase(ry * 0.65);
-      frontNode = (
+      frontAttachments = (
         <g>
           {Bun(bxL, by, rx * 0.3)}
           {Bun(bxR, by, rx * 0.3)}
-          <SoftBangs />
         </g>
       );
+      defaultBangsNode = <SoftBangs />;
       break;
     }
 
@@ -493,12 +490,8 @@ export function hairLayers(
       const bx = style === "side-bun" ? cx + rx * 0.55 : cx;
       const by = top - rx * 0.1;
       backNode = FullBase(ry * 0.65);
-      frontNode = (
-        <g>
-          {Bun(bx, by, rx * 0.38)}
-          <SoftBangs />
-        </g>
-      );
+      frontAttachments = Bun(bx, by, rx * 0.38);
+      defaultBangsNode = <SoftBangs />;
       break;
     }
 
@@ -506,7 +499,6 @@ export function hairLayers(
     case "curly":
     case "afro": {
       backNode = <AfroBase />;
-      frontNode = null;
       break;
     }
 
