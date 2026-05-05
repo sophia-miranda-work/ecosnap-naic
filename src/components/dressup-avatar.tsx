@@ -1280,6 +1280,26 @@ export function DressupAvatar({
   const earPiercing = getItemById(dressup.earPiercing);
   const facePiercing = getItemById(dressup.facePiercing);
 
+  // Apply per-item color overrides chosen by the user.
+  const overrides = dressup.itemColors ?? {};
+  const withColor = <T extends { id: string; color?: string } | null | undefined>(it: T): T => {
+    if (!it) return it;
+    const c = overrides[it.id];
+    return c ? ({ ...it, color: c } as T) : it;
+  };
+  const hatX = withColor(hat);
+  const topX = withColor(top);
+  const bottomX = withColor(bottom);
+  const shoesX = withColor(shoes);
+  const accessoryX = withColor(accessory);
+  const dressX = withColor(dress);
+  const earringsX = withColor(earrings);
+  const necklaceX = withColor(necklace);
+  const braceletX = withColor(bracelet);
+  const hairClipX = withColor(hairClip);
+  const earPiercingX = withColor(earPiercing);
+  const facePiercingX = withColor(facePiercing);
+
   const faceShape: FaceShape = dressup.faceShape ?? "oval";
   const bodyShape: BodyShape = dressup.bodyShape ?? "average";
   const headScale = clamp(dressup.headSize ?? 1, 0.86, 1.12);
