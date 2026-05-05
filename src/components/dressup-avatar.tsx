@@ -324,27 +324,45 @@ export function hairLayers(
     />
   );
 
-  // Curly bangs — chunky little curl puffs across the forehead
+  // Curly bangs — soft rounded curl puffs across the forehead.
+  // Looks like little fluffy clouds, not a flat fringe.
   const CurlyBangs = () => {
     const els: ReactElement[] = [];
-    const count = 7;
-    for (let i = 0; i < count; i++) {
-      const t = i / (count - 1);
-      const px = cx - rx * 0.95 + t * rx * 1.9;
-      const py = browY + 1 + Math.sin(t * Math.PI) * -3;
-      els.push(<circle key={`cb${i}`} cx={px} cy={py} r={6} fill={color} />);
-    }
-    // fill any gaps with a soft band behind the curls
-    els.unshift(
+    const dark = darken(color, 0.18);
+    // soft band behind the curls so no scalp shows through
+    els.push(
       <path
         key="band"
         d={`M ${cx - rx * 0.98},${crownY}
             C ${cx - rx * 0.5},${top - 2} ${cx + rx * 0.5},${top - 2} ${cx + rx * 0.98},${crownY}
-            L ${cx + rx * 0.95},${browY + 2}
-            Q ${cx},${browY + 4} ${cx - rx * 0.95},${browY + 2} Z`}
+            L ${cx + rx * 0.95},${browY - 1}
+            Q ${cx},${browY + 1} ${cx - rx * 0.95},${browY - 1} Z`}
         fill={color}
       />,
     );
+    // front row of chunky curl puffs (the main bangs)
+    const count = 6;
+    for (let i = 0; i < count; i++) {
+      const t = i / (count - 1);
+      const px = cx - rx * 0.85 + t * rx * 1.7;
+      const py = browY - 1 + ((i % 2) ? 1.5 : -1.5);
+      els.push(<circle key={`cb${i}`} cx={px} cy={py} r={6.5} fill={color} />);
+    }
+    // staggered second row above for depth
+    for (let i = 0; i < count - 1; i++) {
+      const t = (i + 0.5) / (count - 1);
+      const px = cx - rx * 0.85 + t * rx * 1.7;
+      const py = browY - 6;
+      els.push(<circle key={`cb2-${i}`} cx={px} cy={py} r={5.5} fill={color} />);
+    }
+    // tiny shadow dots for curl texture
+    for (let i = 0; i < count; i++) {
+      const t = i / (count - 1);
+      const px = cx - rx * 0.85 + t * rx * 1.7;
+      els.push(
+        <circle key={`cs${i}`} cx={px} cy={browY - 2} r={1.3} fill={dark} opacity="0.4" />,
+      );
+    }
     return <g>{els}</g>;
   };
 
