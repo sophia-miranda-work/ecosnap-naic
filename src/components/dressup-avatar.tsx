@@ -596,11 +596,13 @@ export function hairLayers(
     case "curly":
     case "afro": {
       backNode = <AfroBase />;
+      defaultBangsNode = <CurlyBangs />;
       break;
     }
 
     case "afro-short": {
       backNode = <AfroBase size={0.55} />;
+      defaultBangsNode = <CurlyBangs />;
       break;
     }
 
