@@ -525,7 +525,7 @@ export function hairLayers(
           {FullBase(ry * 0.85)}
         </g>
       );
-      frontNode = <SoftBangs />;
+      defaultBangsNode = <SoftBangs />;
       break;
     }
 
@@ -536,13 +536,13 @@ export function hairLayers(
           {FullBase(ry * 0.6)}
         </g>
       );
-      frontNode = <SoftBangs />;
+      defaultBangsNode = <SoftBangs />;
       break;
     }
 
     case "cornrows": {
       backNode = FullBase(ry * 0.55);
-      frontNode = <CornrowLines />;
+      frontAttachments = <CornrowLines />;
       break;
     }
 
@@ -550,51 +550,38 @@ export function hairLayers(
     case "undercut": {
       // Pixie: short base + soft bangs
       backNode = <ShortBase />;
-      frontNode = (
-        <g>
-          <SoftBangs />
-          <ellipse cx={cx - rx * 0.25} cy={top - 4} rx={rx * 0.25} ry={ry * 0.16} fill={shine} opacity="0.45" />
-        </g>
+      frontAttachments = (
+        <ellipse cx={cx - rx * 0.25} cy={top - 4} rx={rx * 0.25} ry={ry * 0.16} fill={shine} opacity="0.45" />
       );
+      defaultBangsNode = <SoftBangs />;
       break;
     }
 
     case "side-sweep": {
       backNode = FullBase(ry * 0.75);
-      frontNode = <SideSweptBangs />;
+      defaultBangsNode = <SideSweptBangs />;
       break;
     }
 
     case "mohawk": {
       backNode = <ShortBase />;
-      frontNode = null;
       break;
     }
 
     default:
       backNode = FullBase(ry * 0.8);
-      frontNode = <SoftBangs />;
+      defaultBangsNode = <SoftBangs />;
       break;
   }
 
-  // Apply optional bangs override on top of the per-style frontNode.
-  // We swap any existing default bangs by rebuilding frontNode with the
-  // selected variant when bangsOverride !== "default".
-  if (bangsOverride !== "default") {
-    const overrideNode = resolveBangs(null);
-    // Re-extract non-bangs front decorations by keeping per-style frontNode
-    // intact when style places attachments there (buns, pony anchors, etc.)
-    // Simple approach: render overrideNode AFTER frontNode-without-bangs.
-    // Per-style frontNode includes bangs in many cases — to keep it simple
-    // and avoid covering attachments, we render the overrideNode last so it
-    // appears on top.
-    frontNode = (
-      <g>
-        {frontNode}
-        {overrideNode}
-      </g>
-    );
-  }
+  // Apply optional bangs override (replaces per-style default bangs).
+  const bangsNode = resolveBangs(defaultBangsNode as ReactElement | null);
+  const frontNode = (frontAttachments || bangsNode) ? (
+    <g>
+      {frontAttachments}
+      {bangsNode}
+    </g>
+  ) : null;
 
   return { back: backNode, front: frontNode };
 }
