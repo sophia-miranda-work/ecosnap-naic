@@ -37,6 +37,12 @@ const TABS: { id: TabId; label: string; emoji: string }[] = [
 ];
 
 const SKIN_TONES = ["#f7d9bd", "#f1c9a5", "#d9a87a", "#a87651", "#7a5236", "#4a3220", "#2e1c10"];
+const ITEM_COLORS = [
+  "#e89ab8", "#d97a8a", "#c83a5a", "#a04848", "#e0b840", "#d8b87a",
+  "#5b8a3a", "#5b6b3a", "#3a6ea5", "#69a7d8", "#3a4f78", "#5a4a8a",
+  "#8a6fd8", "#b98cf0", "#7a5236", "#5b3a1f", "#2f2a34", "#dcdcdc",
+  "#f2f2f2", "#1a1410",
+];
 const HAIR_COLORS = [
   "#1a1410",
   "#3b2a1a",
@@ -158,6 +164,13 @@ export function CharacterCustomizer({ onClose }: { onClose: () => void }) {
 
   function setField<K extends keyof Dressup>(patch: Partial<Pick<Dressup, K>>) {
     return updateAppearance(patch as Partial<Dressup>);
+  }
+
+  function setItemColor(itemId: string, color: string | null) {
+    const cur = { ...(dressup.itemColors ?? {}) };
+    if (color === null) delete cur[itemId];
+    else cur[itemId] = color;
+    return updateAppearance({ itemColors: cur });
   }
 
   return (
@@ -437,35 +450,35 @@ export function CharacterCustomizer({ onClose }: { onClose: () => void }) {
                 slot="earrings"
                 current={dressup.earrings}
                 dressup={dressup}
-                {...{ ownedSet, busy, equipItem, buyAndApply }}
+                {...{ ownedSet, busy, equipItem, buyAndApply, setItemColor }}
               />
               <SlotPicker
                 label="Necklace"
                 slot="necklace"
                 current={dressup.necklace}
                 dressup={dressup}
-                {...{ ownedSet, busy, equipItem, buyAndApply }}
+                {...{ ownedSet, busy, equipItem, buyAndApply, setItemColor }}
               />
               <SlotPicker
                 label="Bracelet"
                 slot="bracelet"
                 current={dressup.bracelet}
                 dressup={dressup}
-                {...{ ownedSet, busy, equipItem, buyAndApply }}
+                {...{ ownedSet, busy, equipItem, buyAndApply, setItemColor }}
               />
               <SlotPicker
                 label="Hair clip"
                 slot="hairClip"
                 current={dressup.hairClip}
                 dressup={dressup}
-                {...{ ownedSet, busy, equipItem, buyAndApply }}
+                {...{ ownedSet, busy, equipItem, buyAndApply, setItemColor }}
               />
               <SlotPicker
                 label="Glasses & more"
                 slot="accessory"
                 current={dressup.accessory}
                 dressup={dressup}
-                {...{ ownedSet, busy, equipItem, buyAndApply }}
+                {...{ ownedSet, busy, equipItem, buyAndApply, setItemColor }}
               />
             </>
           )}
@@ -477,35 +490,35 @@ export function CharacterCustomizer({ onClose }: { onClose: () => void }) {
                 slot="top"
                 current={dressup.top}
                 dressup={dressup}
-                {...{ ownedSet, busy, equipItem, buyAndApply }}
+                {...{ ownedSet, busy, equipItem, buyAndApply, setItemColor }}
               />
               <SlotPicker
                 label="Bottoms"
                 slot="bottom"
                 current={dressup.bottom}
                 dressup={dressup}
-                {...{ ownedSet, busy, equipItem, buyAndApply }}
+                {...{ ownedSet, busy, equipItem, buyAndApply, setItemColor }}
               />
               <SlotPicker
                 label="Dresses"
                 slot="dress"
                 current={dressup.dress}
                 dressup={dressup}
-                {...{ ownedSet, busy, equipItem, buyAndApply }}
+                {...{ ownedSet, busy, equipItem, buyAndApply, setItemColor }}
               />
               <SlotPicker
                 label="Shoes"
                 slot="shoes"
                 current={dressup.shoes}
                 dressup={dressup}
-                {...{ ownedSet, busy, equipItem, buyAndApply }}
+                {...{ ownedSet, busy, equipItem, buyAndApply, setItemColor }}
               />
               <SlotPicker
                 label="Hats"
                 slot="hat"
                 current={dressup.hat}
                 dressup={dressup}
-                {...{ ownedSet, busy, equipItem, buyAndApply }}
+                {...{ ownedSet, busy, equipItem, buyAndApply, setItemColor }}
               />
             </>
           )}
@@ -517,21 +530,21 @@ export function CharacterCustomizer({ onClose }: { onClose: () => void }) {
                 slot="earPiercing"
                 current={dressup.earPiercing}
                 dressup={dressup}
-                {...{ ownedSet, busy, equipItem, buyAndApply }}
+                {...{ ownedSet, busy, equipItem, buyAndApply, setItemColor }}
               />
               <SlotPicker
                 label="Face piercings"
                 slot="facePiercing"
                 current={dressup.facePiercing}
                 dressup={dressup}
-                {...{ ownedSet, busy, equipItem, buyAndApply }}
+                {...{ ownedSet, busy, equipItem, buyAndApply, setItemColor }}
               />
               <SlotPicker
                 label="Hearing aids & headphones"
                 slot="ears"
                 current={dressup.ears}
                 dressup={dressup}
-                {...{ ownedSet, busy, equipItem, buyAndApply }}
+                {...{ ownedSet, busy, equipItem, buyAndApply, setItemColor }}
               />
             </>
           )}
@@ -815,6 +828,7 @@ function SlotPicker({
   busy,
   equipItem,
   buyAndApply,
+  setItemColor,
 }: {
   label: string;
   slot: ShopSlot;
@@ -824,10 +838,16 @@ function SlotPicker({
   busy: string | null;
   equipItem: (slot: ShopSlot, itemId: string | null) => Promise<void>;
   buyAndApply: (itemId: string, price: number, apply: () => Promise<void> | void) => Promise<void>;
+  setItemColor: (itemId: string, color: string | null) => Promise<void> | void;
 }) {
   const items = SHOP_ITEMS.filter((i) => i.slot === slot);
   if (items.length === 0) return null;
   const useAvatarPreview = AVATAR_PREVIEW_SLOTS.has(slot);
+  const currentItem = items.find((i) => i.id === current);
+  const overrides = dressup.itemColors ?? {};
+  const currentColor = currentItem
+    ? (overrides[currentItem.id] ?? currentItem.color ?? null)
+    : null;
 
   return (
     <Section title={label}>
@@ -884,6 +904,39 @@ function SlotPicker({
           );
         })}
       </div>
+      {currentItem && currentColor && (
+        <div className="mt-3">
+          <h4 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Color · {currentItem.name}
+          </h4>
+          <div className="flex flex-wrap gap-1.5">
+            {ITEM_COLORS.map((c) => (
+              <button
+                key={c}
+                type="button"
+                onClick={() => setItemColor(currentItem.id, c)}
+                aria-label={`Color ${c}`}
+                aria-pressed={currentColor.toLowerCase() === c.toLowerCase()}
+                className={`h-7 w-7 rounded-full border-2 transition-transform active:scale-90 ${
+                  currentColor.toLowerCase() === c.toLowerCase()
+                    ? "border-foreground"
+                    : "border-transparent"
+                }`}
+                style={{ backgroundColor: c }}
+              />
+            ))}
+            {overrides[currentItem.id] && (
+              <button
+                type="button"
+                onClick={() => setItemColor(currentItem.id, null)}
+                className="rounded-full border border-border bg-card px-2.5 py-1 text-[10px] font-semibold text-foreground hover:bg-muted"
+              >
+                Reset
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     </Section>
   );
 }
