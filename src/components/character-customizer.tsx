@@ -828,6 +828,7 @@ function SlotPicker({
   busy,
   equipItem,
   buyAndApply,
+  setItemColor,
 }: {
   label: string;
   slot: ShopSlot;
@@ -837,10 +838,16 @@ function SlotPicker({
   busy: string | null;
   equipItem: (slot: ShopSlot, itemId: string | null) => Promise<void>;
   buyAndApply: (itemId: string, price: number, apply: () => Promise<void> | void) => Promise<void>;
+  setItemColor: (itemId: string, color: string | null) => Promise<void> | void;
 }) {
   const items = SHOP_ITEMS.filter((i) => i.slot === slot);
   if (items.length === 0) return null;
   const useAvatarPreview = AVATAR_PREVIEW_SLOTS.has(slot);
+  const currentItem = items.find((i) => i.id === current);
+  const overrides = dressup.itemColors ?? {};
+  const currentColor = currentItem
+    ? (overrides[currentItem.id] ?? currentItem.color ?? null)
+    : null;
 
   return (
     <Section title={label}>
@@ -897,6 +904,39 @@ function SlotPicker({
           );
         })}
       </div>
+      {currentItem && currentColor && (
+        <div className="mt-3">
+          <h4 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Color · {currentItem.name}
+          </h4>
+          <div className="flex flex-wrap gap-1.5">
+            {ITEM_COLORS.map((c) => (
+              <button
+                key={c}
+                type="button"
+                onClick={() => setItemColor(currentItem.id, c)}
+                aria-label={`Color ${c}`}
+                aria-pressed={currentColor.toLowerCase() === c.toLowerCase()}
+                className={`h-7 w-7 rounded-full border-2 transition-transform active:scale-90 ${
+                  currentColor.toLowerCase() === c.toLowerCase()
+                    ? "border-foreground"
+                    : "border-transparent"
+                }`}
+                style={{ backgroundColor: c }}
+              />
+            ))}
+            {overrides[currentItem.id] && (
+              <button
+                type="button"
+                onClick={() => setItemColor(currentItem.id, null)}
+                className="rounded-full border border-border bg-card px-2.5 py-1 text-[10px] font-semibold text-foreground hover:bg-muted"
+              >
+                Reset
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     </Section>
   );
 }
