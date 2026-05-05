@@ -1267,38 +1267,25 @@ export function DressupAvatar({
   size?: number;
   className?: string;
 }) {
-  const hat = getItemById(dressup.hat);
-  const top = getItemById(dressup.top);
-  const bottom = getItemById(dressup.bottom);
-  const shoes = getItemById(dressup.shoes);
-  const accessory = getItemById(dressup.accessory);
-  const dress = getItemById(dressup.dress);
-  const earrings = getItemById(dressup.earrings);
-  const necklace = getItemById(dressup.necklace);
-  const bracelet = getItemById(dressup.bracelet);
-  const hairClip = getItemById(dressup.hairClip);
-  const earPiercing = getItemById(dressup.earPiercing);
-  const facePiercing = getItemById(dressup.facePiercing);
-
   // Apply per-item color overrides chosen by the user.
   const overrides = dressup.itemColors ?? {};
   const withColor = <T extends { id: string; color?: string } | null | undefined>(it: T): T => {
     if (!it) return it;
-    const c = overrides[it.id];
+    const c = overrides[(it as { id: string }).id];
     return c ? ({ ...it, color: c } as T) : it;
   };
-  const hatX = withColor(hat);
-  const topX = withColor(top);
-  const bottomX = withColor(bottom);
-  const shoesX = withColor(shoes);
-  const accessoryX = withColor(accessory);
-  const dressX = withColor(dress);
-  const earringsX = withColor(earrings);
-  const necklaceX = withColor(necklace);
-  const braceletX = withColor(bracelet);
-  const hairClipX = withColor(hairClip);
-  const earPiercingX = withColor(earPiercing);
-  const facePiercingX = withColor(facePiercing);
+  const hat = withColor(getItemById(dressup.hat));
+  const top = withColor(getItemById(dressup.top));
+  const bottom = withColor(getItemById(dressup.bottom));
+  const shoes = withColor(getItemById(dressup.shoes));
+  const accessory = withColor(getItemById(dressup.accessory));
+  const dress = withColor(getItemById(dressup.dress));
+  const earrings = withColor(getItemById(dressup.earrings));
+  const necklace = withColor(getItemById(dressup.necklace));
+  const bracelet = withColor(getItemById(dressup.bracelet));
+  const hairClip = withColor(getItemById(dressup.hairClip));
+  const earPiercing = withColor(getItemById(dressup.earPiercing));
+  const facePiercing = withColor(getItemById(dressup.facePiercing));
 
   const faceShape: FaceShape = dressup.faceShape ?? "oval";
   const bodyShape: BodyShape = dressup.bodyShape ?? "average";
