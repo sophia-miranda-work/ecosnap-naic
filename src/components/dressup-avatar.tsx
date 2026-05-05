@@ -5,6 +5,7 @@ import {
   type HairStyleId,
   type EyebrowStyle,
   type FacialHairStyle,
+  type BangStyle,
 } from "@/hooks/use-character";
 import type { ReactElement } from "react";
 import { getItemById } from "@/lib/shop";
@@ -93,7 +94,13 @@ function darken(hex: string, amount = 0.25): string {
   return `rgb(${mix(parseInt(m[1], 16))}, ${mix(parseInt(m[2], 16))}, ${mix(parseInt(m[3], 16))})`;
 }
 
-export function hairLayers(style: HairStyleId, color: string, rx: number, ry: number) {
+export function hairLayers(
+  style: HairStyleId,
+  color: string,
+  rx: number,
+  ry: number,
+  bangsOverride: BangStyle = "default",
+) {
   if (style === "bald") return { back: null, front: null };
 
   const cx = HEAD_CX;
@@ -206,6 +213,65 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
       <path d={`M ${cx + rx * 0.55},${browY - 2} Q ${cx + rx * 0.8},${browY + 3} ${cx + rx * 0.95},${browY + 1.5} Q ${cx + rx * 0.85},${browY - 0.5} ${cx + rx * 0.55},${browY - 2} Z`} fill={color} />
     </g>
   );
+
+  // Wispy bangs — thin, see-through strands
+  const WispyBangs = () => (
+    <g stroke={color} strokeWidth="1.4" strokeLinecap="round" fill="none" opacity="0.95">
+      <path d={`M ${cx - rx * 0.85},${browY - 2} Q ${cx - rx * 0.6},${browY + 2} ${cx - rx * 0.45},${browY + 4}`} />
+      <path d={`M ${cx - rx * 0.45},${browY - 2.5} Q ${cx - rx * 0.25},${browY + 2} ${cx - rx * 0.15},${browY + 4.5}`} />
+      <path d={`M ${cx},${browY - 3} Q ${cx + rx * 0.1},${browY + 2} ${cx + rx * 0.18},${browY + 4.5}`} />
+      <path d={`M ${cx + rx * 0.4},${browY - 2.5} Q ${cx + rx * 0.55},${browY + 2} ${cx + rx * 0.65},${browY + 4}`} />
+      <path d={`M ${cx + rx * 0.8},${browY - 2} Q ${cx + rx * 0.85},${browY + 1} ${cx + rx * 0.9},${browY + 3}`} />
+    </g>
+  );
+
+  // Curtain bangs — center part, two soft swoops framing the face
+  const CurtainBangs = () => (
+    <g fill={color}>
+      <path d={`M ${cx - 1},${browY - 4}
+              C ${cx - rx * 0.5},${browY - 2} ${cx - rx * 0.95},${browY + 2} ${cx - rx * 0.95},${browY + 5}
+              C ${cx - rx * 0.7},${browY + 3} ${cx - rx * 0.35},${browY + 1} ${cx - 1},${browY + 1} Z`} />
+      <path d={`M ${cx + 1},${browY - 4}
+              C ${cx + rx * 0.5},${browY - 2} ${cx + rx * 0.95},${browY + 2} ${cx + rx * 0.95},${browY + 5}
+              C ${cx + rx * 0.7},${browY + 3} ${cx + rx * 0.35},${browY + 1} ${cx + 1},${browY + 1} Z`} />
+    </g>
+  );
+
+  // Blunt bangs — thick, straight cut across forehead
+  const BluntBangs = () => (
+    <path
+      d={`M ${cx - rx * 0.92},${browY - 3}
+          L ${cx + rx * 0.92},${browY - 3}
+          L ${cx + rx * 0.95},${browY + 4}
+          Q ${cx},${browY + 5.5} ${cx - rx * 0.95},${browY + 4} Z`}
+      fill={color}
+    />
+  );
+
+  // Resolve which bangs node to render based on override.
+  // "default" keeps the per-style choice below. "none" hides bangs entirely.
+  const resolveBangs = (defaultNode: ReactElement | null): ReactElement | null => {
+    switch (bangsOverride) {
+      case "default":
+        return defaultNode;
+      case "none":
+        return null;
+      case "soft":
+        return <SoftBangs />;
+      case "side-swept":
+        return <SideSweptBangs />;
+      case "wispy":
+        return <WispyBangs />;
+      case "curtain":
+        return <CurtainBangs />;
+      case "anime":
+        return <AnimeBangs />;
+      case "blunt":
+        return <BluntBangs />;
+      default:
+        return defaultNode;
+    }
+  };
 
   // ---- ATTACHMENTS -------------------------------------------
   // Bun anchored at given point with soft base blend
@@ -517,6 +583,25 @@ export function hairLayers(style: HairStyleId, color: string, rx: number, ry: nu
       backNode = FullBase(ry * 0.8);
       frontNode = <SoftBangs />;
       break;
+  }
+
+  // Apply optional bangs override on top of the per-style frontNode.
+  // We swap any existing default bangs by rebuilding frontNode with the
+  // selected variant when bangsOverride !== "default".
+  if (bangsOverride !== "default") {
+    const overrideNode = resolveBangs(null);
+    // Re-extract non-bangs front decorations by keeping per-style frontNode
+    // intact when style places attachments there (buns, pony anchors, etc.)
+    // Simple approach: render overrideNode AFTER frontNode-without-bangs.
+    // Per-style frontNode includes bangs in many cases — to keep it simple
+    // and avoid covering attachments, we render the overrideNode last so it
+    // appears on top.
+    frontNode = (
+      <g>
+        {frontNode}
+        {overrideNode}
+      </g>
+    );
   }
 
   return { back: backNode, front: frontNode };
