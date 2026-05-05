@@ -153,78 +153,83 @@ export function hairLayers(
     />
   );
 
-  // AfroBase: large round cloud with chunky outer puffs, surface curl swirls,
-  // and diamond highlights (matches the reference chibi afro look).
+  // AfroBase: big fluffy cloud — dense overlapping puffs that extend
+  // up, sideways and behind the head. Always covers the sides (no bald
+  // patches near the ears) and stops above the eyes so the face is clear.
   const AfroBase = ({ size = 1 }: { size?: number } = {}) => {
-    // Big round cloud centered on the head — perfectly circular silhouette.
-    const baseR = rx + 12 * size;
-    const cxA = cx;
-    const cyA = cy - ry * 0.15;
     const els: ReactElement[] = [];
     const dark = darken(color, 0.18);
-    const light = darken(color, -0.12);
+    const light = lighten(color, 0.18);
 
-    // main round cloud (true circle so back of head is fully covered)
-    els.push(
-      <circle key="b" cx={cxA} cy={cyA} r={baseR} fill={color} />,
-    );
+    // Big round silhouette, centered slightly above head center so the
+    // afro extends well above the crown while still hugging the sides.
+    const baseR = rx + 18 * size;
+    const cxA = cx;
+    const cyA = cy - ry * 0.25;
 
-    // even chunky puffs around the FULL ring — uniform cloud edge
-    const n = 30;
-    for (let i = 0; i < n; i++) {
-      const a = (Math.PI * 2 * i) / n;
-      const px = cxA + Math.cos(a) * baseR;
-      const py = cyA + Math.sin(a) * baseR;
-      // skip the bottom slice that would cover the face/neck
-      if (py > browY + 8) continue;
-      const r = 7.5 + (i % 2 ? 1.2 : 0);
-      els.push(<circle key={`p${i}`} cx={px} cy={py} r={r} fill={color} />);
-    }
+    // Solid cloud body — filled disc so no gaps show through.
+    els.push(<circle key="body" cx={cxA} cy={cyA} r={baseR} fill={color} />);
+    // Side fillers so the hair clearly covers the ears/temples.
+    els.push(<ellipse key="sideL" cx={cx - rx * 0.6} cy={cy + ry * 0.15} rx={rx * 0.7} ry={ry * 0.65} fill={color} />);
+    els.push(<ellipse key="sideR" cx={cx + rx * 0.6} cy={cy + ry * 0.15} rx={rx * 0.7} ry={ry * 0.65} fill={color} />);
 
-    // surface curl swirls
-    const swirl = (kx: number, ky: number, r: number, key: string) => (
-      <path
-        key={key}
-        d={`M ${kx + r},${ky}
-            a ${r},${r} 0 1,1 ${-r * 0.05},${-r * 0.95}
-            a ${r * 0.7},${r * 0.7} 0 1,0 ${r * 0.4},${r * 0.6}`}
-        fill="none"
-        stroke={dark}
-        strokeWidth={1.2}
-        strokeLinecap="round"
-      />
-    );
-    els.push(swirl(cx, top + ry * 0.05, rx * 0.18, "sw1"));
-    els.push(swirl(cx - rx * 0.45, top + ry * 0.12, rx * 0.13, "sw2"));
-    els.push(swirl(cx + rx * 0.4, top + ry * 0.18, rx * 0.14, "sw3"));
-    els.push(swirl(cx - rx * 0.18, top - ry * 0.05, rx * 0.1, "sw4"));
-    els.push(swirl(cx + rx * 0.15, top - ry * 0.02, rx * 0.11, "sw5"));
+    // Outer fluff ring — chunky overlapping puffs around the whole top
+    // and sides. We skip the lower face area so the eyes stay visible.
+    const ring = (radius: number, count: number, puff: number, jitter = 0) => {
+      for (let i = 0; i < count; i++) {
+        const a = (Math.PI * 2 * i) / count;
+        const r = radius + (jitter ? ((i * 37) % 5) - 2 : 0);
+        const px = cxA + Math.cos(a) * r;
+        const py = cyA + Math.sin(a) * r;
+        // keep face clear: cut puffs below the brow line
+        if (py > browY - 2) continue;
+        els.push(<circle key={`o${radius}-${i}`} cx={px} cy={py} r={puff} fill={color} />);
+      }
+    };
+    ring(baseR, 26, 9, 1);          // outermost fluff
+    ring(baseR - 6, 22, 8);         // second layer for density
+    ring(baseR - 14, 18, 7);        // inner layer
 
-    // diamond highlights (like the reference headband-ish detail)
-    const diamond = (dx: number, dy: number, w: number, key: string) => (
-      <path
-        key={key}
-        d={`M ${dx},${dy - w} L ${dx + w * 0.6},${dy} L ${dx},${dy + w} L ${dx - w * 0.6},${dy} Z`}
-        fill={light}
-        opacity="0.55"
-      />
-    );
-    diamond;
-    els.push(diamond(cx - rx * 0.55, browY - 2, 3.2, "d1"));
-    els.push(diamond(cx - rx * 0.2, browY - 4, 3.2, "d2"));
-    els.push(diamond(cx + rx * 0.2, browY - 4, 3.2, "d3"));
-    els.push(diamond(cx + rx * 0.55, browY - 2, 3.2, "d4"));
+    // Side puff clusters — guarantees the sides look full next to the ears.
+    const sideCluster = (sx: number, key: string) => {
+      const pts = [
+        [sx, cy - ry * 0.1, 9],
+        [sx, cy + ry * 0.15, 8.5],
+        [sx + (sx < cx ? -2 : 2), cy + ry * 0.4, 7.5],
+      ] as const;
+      pts.forEach(([px, py, r], i) => {
+        els.push(<circle key={`${key}-${i}`} cx={px} cy={py} r={r} fill={color} />);
+      });
+    };
+    sideCluster(cx - rx - 2, "scL");
+    sideCluster(cx + rx + 2, "scR");
 
-    // soft shine
+    // Subtle curl shading — small dark dots scattered for texture.
+    const curlDots = [
+      [cx - rx * 0.5, top - ry * 0.1],
+      [cx, top - ry * 0.2],
+      [cx + rx * 0.5, top - ry * 0.1],
+      [cx - rx * 0.75, cy - ry * 0.2],
+      [cx + rx * 0.75, cy - ry * 0.2],
+      [cx - rx * 0.25, top - ry * 0.05],
+      [cx + rx * 0.25, top - ry * 0.05],
+    ];
+    curlDots.forEach(([dx, dy], i) => {
+      els.push(
+        <circle key={`cd${i}`} cx={dx} cy={dy} r={2.2} fill={dark} opacity="0.45" />,
+      );
+    });
+
+    // Soft highlight on the upper-left for a cute cartoon shine.
     els.push(
       <ellipse
-        key="sh"
-        cx={cx - rx * 0.35}
-        cy={top - 5}
-        rx={rx * 0.4}
-        ry={ry * 0.2}
-        fill={shine}
-        opacity="0.35"
+        key="shine"
+        cx={cx - rx * 0.4}
+        cy={cyA - baseR * 0.55}
+        rx={rx * 0.45}
+        ry={ry * 0.22}
+        fill={light}
+        opacity="0.45"
       />,
     );
     return <g>{els}</g>;
