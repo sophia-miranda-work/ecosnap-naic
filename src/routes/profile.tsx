@@ -55,7 +55,7 @@ function ProfilePage() {
     { icon: Flame, label: t("Day streak"), value: "7" },
     { icon: Sparkles, label: t("Quests done"), value: "23" },
     { icon: Footprints, label: t("Total km"), value: "48.2" },
-    { icon: Trophy, label: t("Badges"), value: "4" },
+    { icon: Trophy, label: t("Badges"), value: String(earnedBadges.length) },
   ];
 
   const accent = character ? ACCENT_SWATCHES[character.accent] ?? ACCENT_SWATCHES.moss : ACCENT_SWATCHES.moss;
