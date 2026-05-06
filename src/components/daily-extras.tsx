@@ -194,7 +194,7 @@ export function DailyExtras({
           >
             <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-primary">
               <Icon className="h-3.5 w-3.5" />
-              {g.bonusLabel} · from {g.name} {g.avatar}
+              {t(g.bonusLabel)} · {t("from")} {t(g.name)} {g.avatar}
             </div>
             <div className="mt-2 flex items-start gap-3">
               <span
@@ -205,10 +205,10 @@ export function DailyExtras({
               </span>
               <div className="flex-1">
                 <p className="text-base font-bold leading-snug text-foreground">
-                  {q.label}
+                  {t(q.label)}
                 </p>
                 <p className="mt-0.5 text-xs italic text-muted-foreground">
-                  "{q.flavor}"
+                  "{t(q.flavor)}"
                 </p>
               </div>
               <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-foreground px-2.5 py-1 text-[10px] font-bold text-background">
@@ -221,14 +221,14 @@ export function DailyExtras({
       })()}
 
       <ul className="mt-3 space-y-2">
-        {tasks.map((t) => {
-          const done = state.done.includes(t.id);
-          const isBusy = busy === t.id;
+        {tasks.map((task) => {
+          const done = state.done.includes(task.id);
+          const isBusy = busy === task.id;
           return (
-            <li key={t.id}>
+            <li key={task.id}>
               <button
                 type="button"
-                onClick={() => completeTask(t)}
+                onClick={() => completeTask(task)}
                 disabled={done || isBusy || !character}
                 className={`parchment-card flex w-full items-center gap-3 p-3 text-left transition-transform active:scale-[0.99] ${
                   done ? "opacity-70" : ""
@@ -240,14 +240,14 @@ export function DailyExtras({
                   }`}
                   aria-hidden
                 >
-                  {done ? <Check className="h-5 w-5 text-primary" /> : t.emoji}
+                  {done ? <Check className="h-5 w-5 text-primary" /> : task.emoji}
                 </span>
                 <span className="flex-1 text-sm font-semibold text-foreground">
-                  {t.label}
+                  {t(task.label)}
                 </span>
                 <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-foreground/90 px-2 py-1 text-[10px] font-bold text-background">
                   <Coins className="h-3 w-3 text-accent" />
-                  {done ? "+0" : `+${t.coins}`}
+                  {done ? "+0" : `+${task.coins}`}
                 </span>
               </button>
             </li>
@@ -261,7 +261,7 @@ export function DailyExtras({
           <NotebookPen className="h-3.5 w-3.5" />
           {t("Today's reflection")}
         </div>
-        <p className="mt-1 text-sm font-bold text-foreground">{reflection.prompt}</p>
+        <p className="mt-1 text-sm font-bold text-foreground">{t(reflection.prompt)}</p>
         <textarea
           value={state.reflection}
           onChange={(e) => setState((s) => ({ ...s, reflection: e.target.value }))}
