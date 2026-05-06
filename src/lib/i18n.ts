@@ -1168,6 +1168,12 @@ const MS: Record<string, string> = {
   "Floral Sundress": "Gaun Musim Panas Bunga",
   "Starlight Gown": "Gaun Cahaya Bintang",
   "Meadow Dress": "Gaun Padang",
+
+  // Profile badges
+  "🌱 First Step": "🌱 Langkah Pertama",
+  "🌸 7-day streak": "🌸 Rentetan 7 hari",
+  "🍄 Forager": "🍄 Pencari Hutan",
+  "🐦 Bird spotter": "🐦 Pengintai Burung",
 };
 
 const DICTIONARIES: Record<Language, Record<string, string>> = {

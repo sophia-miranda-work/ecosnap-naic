@@ -135,7 +135,7 @@ function ProfilePage() {
               key={b}
               className="parchment-card whitespace-nowrap px-4 py-2 text-sm font-semibold text-foreground"
             >
-              {b}
+              {t(b)}
             </div>
           ))}
         </div>
