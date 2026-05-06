@@ -5,6 +5,7 @@ import {
   Camera,
   Leaf,
   Mic,
+  Music,
   Settings as SettingsIcon,
   Sparkles,
   Volume2,
@@ -181,6 +182,13 @@ function SettingsPage() {
             if (v) setTimeout(() => playChime("success"), 50);
           }}
           icon={<Volume2 className="h-4 w-4" />}
+        />
+        <ToggleRow
+          label={t("Background music")}
+          help={t("Loop a soft music track while you explore the app.")}
+          checked={settings.backgroundMusic}
+          onChange={(v) => update({ backgroundMusic: v })}
+          icon={<Music className="h-4 w-4" />}
         />
         <ToggleRow
           label={t("Nature sounds while reflecting")}
