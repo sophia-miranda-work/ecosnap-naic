@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { X } from "lucide-react";
+import { useSettings } from "@/hooks/use-settings";
 
 type Season = "spring" | "summer" | "autumn" | "winter";
 
@@ -260,6 +261,7 @@ type ModalProps = {
 
 export function StreakTreeModal({ streak, open, onClose }: ModalProps) {
   const season = currentSeason();
+  const { t } = useSettings();
   // Lock body scroll while modal is open.
   useEffect(() => {
     if (!open) return;
@@ -291,13 +293,13 @@ export function StreakTreeModal({ streak, open, onClose }: ModalProps) {
 
   if (!open) return null;
 
-  const stage = stageLabel(streak);
+  const stage = t(stageLabel(streak));
 
   return (
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="Your streak tree"
+      aria-label={t("Your streak tree")}
       className="fixed inset-0 z-[90] flex items-center justify-center bg-foreground/40 px-5 backdrop-blur-sm"
       onClick={onClose}
     >
@@ -310,7 +312,7 @@ export function StreakTreeModal({ streak, open, onClose }: ModalProps) {
         <button
           type="button"
           onClick={onClose}
-          aria-label="Close"
+          aria-label={t("Close")}
           className="absolute right-3 top-3 rounded-full border border-border bg-card p-1.5 text-foreground hover:bg-muted"
         >
           <X className="h-4 w-4" />
@@ -318,13 +320,13 @@ export function StreakTreeModal({ streak, open, onClose }: ModalProps) {
 
         <div className="text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-            Your streak tree
+            {t("Your streak tree")}
           </p>
           <h2 className="mt-1 text-2xl font-bold text-foreground">
-            {streak} day{streak === 1 ? "" : "s"}
+            {t("{x} day", { x: streak })}{streak === 1 ? "" : t("s_plural")}
           </h2>
           <p className="mt-0.5 text-sm capitalize text-muted-foreground">
-            {stage} · {season}
+            {stage} · {t(season)}
           </p>
         </div>
 
@@ -333,9 +335,7 @@ export function StreakTreeModal({ streak, open, onClose }: ModalProps) {
         </div>
 
         <p className="mt-3 text-center text-sm leading-relaxed text-muted-foreground">
-          Every day you complete a quest, your tree grows a little. Miss a day?
-          That's okay — your tree just rests. It will keep growing the next time
-          you return.
+          {t("Every day you complete a quest, your tree grows a little. Miss a day? That's okay — your tree just rests. It will keep growing the next time you return.")}
         </p>
       </div>
     </div>
