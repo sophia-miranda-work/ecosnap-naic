@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { QUEST_GIVERS, pickDailyGiver } from "@/lib/quest-givers";
+import { useSettings } from "@/hooks/use-settings";
 
 export const Route = createFileRoute("/cast")({
   head: () => ({
@@ -16,6 +17,7 @@ export const Route = createFileRoute("/cast")({
 
 function CastPage() {
   const todays = pickDailyGiver();
+  const { t } = useSettings();
   return (
     <div className="px-5 pt-8 pb-8">
       <header className="mb-5">
@@ -24,11 +26,11 @@ function CastPage() {
           className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="h-3 w-3" />
-          Back home
+          {t("Back home")}
         </Link>
-        <h1 className="mt-2 text-3xl font-bold text-foreground">The Cast</h1>
+        <h1 className="mt-2 text-3xl font-bold text-foreground">{t("The Cast")}</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          A handful of woodland friends who take turns handing out quests.
+          {t("A handful of woodland friends who take turns handing out quests.")}
         </p>
       </header>
 
@@ -39,7 +41,7 @@ function CastPage() {
             <li key={g.id} className="parchment-card relative p-5">
               {isToday && (
                 <span className="absolute right-3 top-3 rounded-full bg-primary px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary-foreground">
-                  Today
+                  {t("Today")}
                 </span>
               )}
               <div className="flex items-start gap-4">

@@ -4,6 +4,7 @@ import { Sparkles, X } from "lucide-react";
 import { useJournal, type JournalEntry } from "@/hooks/use-journal";
 import { CATEGORIES, CATEGORY_BY_ID, type CategoryId } from "@/lib/journal-categories";
 import { getGiverById } from "@/lib/quest-givers";
+import { useSettings } from "@/hooks/use-settings";
 
 export const Route = createFileRoute("/journal")({
   head: () => ({
@@ -21,6 +22,7 @@ type Filter = "all" | CategoryId;
 
 function JournalPage() {
   const { entries, loading, error } = useJournal();
+  const { t } = useSettings();
   const [filter, setFilter] = useState<Filter>("all");
   const [open, setOpen] = useState<JournalEntry | null>(null);
 
@@ -47,11 +49,13 @@ function JournalPage() {
     <div className="px-5 pt-8">
       <header className="mb-5">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-          Field Records
+          {t("Field Records")}
         </p>
-        <h1 className="mt-1 text-3xl font-bold text-foreground">Your Journal</h1>
+        <h1 className="mt-1 text-3xl font-bold text-foreground">{t("Your Journal")}</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          {entries.length} {entries.length === 1 ? "discovery" : "discoveries"} collected
+          {entries.length === 1
+            ? t("{x} discovery collected", { x: entries.length })
+            : t("{x} discoveries collected", { x: entries.length })}
         </p>
       </header>
 
@@ -61,7 +65,7 @@ function JournalPage() {
           <FilterChip
             active={filter === "all"}
             onClick={() => setFilter("all")}
-            label={`All · ${entries.length}`}
+            label={`${t("All")} · ${entries.length}`}
             emoji="📔"
           />
           {CATEGORIES.map((c) => {
@@ -71,7 +75,7 @@ function JournalPage() {
                 key={c.id}
                 active={filter === c.id}
                 onClick={() => setFilter(c.id)}
-                label={`${c.label} · ${n}`}
+                label={`${t(c.label)} · ${n}`}
                 emoji={c.emoji}
                 dim={n === 0}
               />
@@ -102,11 +106,11 @@ function JournalPage() {
           </span>
           <p className="mt-3 text-sm font-semibold text-foreground">
             {filter === "all"
-              ? "Your journal is empty"
-              : `No ${CATEGORY_BY_ID[filter as CategoryId].label.toLowerCase()} sketches yet`}
+              ? t("Your journal is empty")
+              : `${t("No")} ${t(CATEGORY_BY_ID[filter as CategoryId].label).toLowerCase()} ${t("sketches yet")}`}
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Head outside, complete a quest, and snap your first proof.
+            {t("Head outside, complete a quest, and snap your first proof.")}
           </p>
         </div>
       ) : (
@@ -152,7 +156,7 @@ function JournalPage() {
         </div>
       )}
 
-      {open && <EntryModal entry={open} onClose={() => setOpen(null)} />}
+      {open && <EntryModal entry={open} onClose={() => setOpen(null)} t={t} />}
     </div>
   );
 }
@@ -189,7 +193,15 @@ function FilterChip({
   );
 }
 
-function EntryModal({ entry, onClose }: { entry: JournalEntry; onClose: () => void }) {
+function EntryModal({
+  entry,
+  onClose,
+  t,
+}: {
+  entry: JournalEntry;
+  onClose: () => void;
+  t: (key: string, vars?: Record<string, string | number>) => string;
+}) {
   const cat = CATEGORY_BY_ID[entry.category];
   const date = new Date(entry.created_at).toLocaleDateString(undefined, {
     weekday: "short",
@@ -213,13 +225,13 @@ function EntryModal({ entry, onClose }: { entry: JournalEntry; onClose: () => vo
             type="button"
             onClick={onClose}
             className="absolute right-2 top-2 rounded-full bg-background/90 p-1.5 text-foreground shadow-sm hover:bg-background"
-            aria-label="Close"
+            aria-label={t("Close")}
           >
             <X className="h-4 w-4" />
           </button>
           <span className="absolute left-2 top-2 inline-flex items-center gap-1.5 rounded-full bg-background/90 px-2.5 py-1 text-xs font-semibold text-foreground shadow-sm">
             <span aria-hidden>{cat.emoji}</span>
-            {cat.label}
+            {t(cat.label)}
           </span>
         </div>
         <div className="p-5">
@@ -229,7 +241,7 @@ function EntryModal({ entry, onClose }: { entry: JournalEntry; onClose: () => vo
           <h2 className="mt-1 text-xl font-bold text-foreground">{entry.title}</h2>
           {entry.quest_title && entry.quest_title !== entry.title && (
             <p className="mt-1 text-xs text-muted-foreground">
-              From quest: <span className="font-medium">{entry.quest_title}</span>
+              {t("From quest:")} <span className="font-medium">{entry.quest_title}</span>
             </p>
           )}
           {entry.quest_giver_id && entry.quest_giver_line && (() => {
@@ -255,7 +267,7 @@ function EntryModal({ entry, onClose }: { entry: JournalEntry; onClose: () => vo
             <div className="mt-4 rounded-2xl border border-border bg-muted/40 p-3">
               <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                 <Sparkles className="h-3 w-3" />
-                Did you know?
+                {t("Did you know?")}
               </div>
               <p className="mt-1 text-sm leading-snug text-foreground">{entry.fun_fact}</p>
             </div>

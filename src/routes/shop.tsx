@@ -4,6 +4,7 @@ import { Coins, Check, Sparkles, Lock, ShoppingBag } from "lucide-react";
 import { useCharacter } from "@/hooks/use-character";
 import { SHOP_ITEMS, type ShopItem } from "@/lib/shop";
 import { QUEST_GIVERS, getGiverById } from "@/lib/quest-givers";
+import { useSettings } from "@/hooks/use-settings";
 
 export const Route = createFileRoute("/shop")({
   head: () => ({
@@ -21,6 +22,7 @@ type SetTab = "all" | "basic" | "willow" | "professor-hoot" | "pip" | "mossback"
 
 function ShopPage() {
   const { character, ownedItems, purchase, equipItem } = useCharacter();
+  const { t } = useSettings();
   const [tab, setTab] = useState<SetTab>("all");
   const [busy, setBusy] = useState<string | null>(null);
   const [flash, setFlash] = useState<{ kind: "ok" | "err"; msg: string } | null>(null);
@@ -45,10 +47,10 @@ function ShopPage() {
     setFlash(null);
     try {
       await purchase(item.id, item.price);
-      setFlash({ kind: "ok", msg: `Got it — ${item.name}!` });
+      setFlash({ kind: "ok", msg: t("Got it — {x}!", { x: item.name }) });
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Couldn't buy that.";
-      setFlash({ kind: "err", msg: msg.includes("not enough") ? "Not enough coins yet." : msg });
+      const msg = e instanceof Error ? e.message : t("Couldn't buy that.");
+      setFlash({ kind: "err", msg: msg.includes("not enough") ? t("Not enough coins yet.") : msg });
     } finally {
       setBusy(null);
       setTimeout(() => setFlash(null), 2200);
@@ -68,8 +70,8 @@ function ShopPage() {
   }
 
   const TABS: { id: SetTab; label: string; emoji: string }[] = [
-    { id: "all", label: "All", emoji: "🛍️" },
-    { id: "basic", label: "Basics", emoji: "🧺" },
+    { id: "all", label: t("All"), emoji: "🛍️" },
+    { id: "basic", label: t("Basics"), emoji: "🧺" },
     ...QUEST_GIVERS.map((g) => ({
       id: g.id as SetTab,
       label: g.name,
@@ -93,11 +95,11 @@ function ShopPage() {
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              Welcome to the den
+              {t("Welcome to the den")}
             </p>
-            <h1 className="text-2xl font-bold text-foreground">Björn's Shop</h1>
+            <h1 className="text-2xl font-bold text-foreground">{t("Björn's Shop")}</h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              "Pick something warm. The forest gets chilly."
+              {t("\"Pick something warm. The forest gets chilly.\"")}
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-1.5 rounded-full bg-foreground px-3 py-1.5 text-background shadow-sm">
@@ -187,7 +189,7 @@ function ShopPage() {
                 <div className="mt-2 space-y-1.5">
                   <span className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-primary/15 px-2 py-1.5 text-xs font-bold text-primary">
                     <ShoppingBag className="h-3 w-3" />
-                    Bought
+                    {t("Bought")}
                   </span>
                   <button
                     type="button"
@@ -202,12 +204,12 @@ function ShopPage() {
                     {isEquipped ? (
                       <>
                         <Check className="h-3 w-3" />
-                        Wearing
+                        {t("Wearing")}
                       </>
                     ) : (
                       <>
                         <Sparkles className="h-3 w-3" />
-                        Wear it
+                        {t("Wear it")}
                       </>
                     )}
                   </button>
@@ -238,7 +240,7 @@ function ShopPage() {
       </ul>
 
       <p className="mt-6 text-center text-xs text-muted-foreground">
-        Earn coins by saving sketches in your journal. 🌿
+        {t("Earn coins by saving sketches in your journal. 🌿")}
       </p>
     </div>
   );

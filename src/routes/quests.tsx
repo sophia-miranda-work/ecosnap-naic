@@ -8,6 +8,7 @@ import {
   type QuestTier,
 } from "@/lib/quests";
 import { useCharacter } from "@/hooks/use-character";
+import { useSettings } from "@/hooks/use-settings";
 
 export const Route = createFileRoute("/quests")({
   head: () => ({
@@ -24,6 +25,7 @@ export const Route = createFileRoute("/quests")({
 function QuestsPage() {
   const { statuses, loading, claim } = useQuests();
   const { character } = useCharacter();
+  const { t } = useSettings();
   const [busy, setBusy] = useState<string | null>(null);
   const [flash, setFlash] = useState<{ kind: "ok" | "err"; msg: string } | null>(null);
 
@@ -33,12 +35,12 @@ function QuestsPage() {
     try {
       const res = await claim(s.quest);
       if (res.alreadyClaimed) {
-        setFlash({ kind: "ok", msg: "Already claimed earlier — nice work!" });
+        setFlash({ kind: "ok", msg: t("Already claimed earlier — nice work!") });
       } else {
-        setFlash({ kind: "ok", msg: `+${s.reward} coins! ${TIER_META[s.quest.tier].emoji}` });
+        setFlash({ kind: "ok", msg: `${t("+{x} coins!", { x: s.reward })} ${TIER_META[s.quest.tier].emoji}` });
       }
     } catch (e) {
-      setFlash({ kind: "err", msg: e instanceof Error ? e.message : "Couldn't claim that." });
+      setFlash({ kind: "err", msg: e instanceof Error ? e.message : t("Couldn't claim that.") });
     } finally {
       setBusy(null);
       setTimeout(() => setFlash(null), 2400);
@@ -62,11 +64,11 @@ function QuestsPage() {
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              The Quest Board
+              {t("The Quest Board")}
             </p>
-            <h1 className="text-2xl font-bold text-foreground">Quests</h1>
+            <h1 className="text-2xl font-bold text-foreground">{t("Quests")}</h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Bronze & Silver rotate weekly. Gold takes a whole month.
+              {t("Bronze & Silver rotate weekly. Gold takes a whole month.")}
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-1.5 rounded-full bg-foreground px-3 py-1.5 text-background shadow-sm">
@@ -88,7 +90,7 @@ function QuestsPage() {
       )}
 
       {loading ? (
-        <p className="mt-8 text-center text-sm text-muted-foreground">Loading the board…</p>
+        <p className="mt-8 text-center text-sm text-muted-foreground">{t("Loading the board…")}</p>
       ) : (
         <div className="mt-6 space-y-7">
           {tiers.map((tier) => {
@@ -103,13 +105,13 @@ function QuestsPage() {
                     className="flex items-center gap-2 text-lg font-bold text-foreground"
                   >
                     <span aria-hidden>{meta.emoji}</span>
-                    {meta.label} Quests
+                    {t(`${meta.label} Quests`)}
                   </h2>
                   <span className="inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
                     <Clock className="h-3 w-3" />
                     {meta.rotation === "monthly"
-                      ? `New month in ${days}d`
-                      : `New batch in ${days}d`}
+                      ? t("New month in {x}d", { x: days })
+                      : t("New batch in {x}d", { x: days })}
                   </span>
                 </div>
                 <ul className="mt-3 space-y-3">
@@ -119,6 +121,7 @@ function QuestsPage() {
                       status={s}
                       busy={busy === s.quest.id}
                       onClaim={() => handleClaim(s)}
+                      t={t}
                     />
                   ))}
                 </ul>
@@ -129,7 +132,7 @@ function QuestsPage() {
       )}
 
       <p className="mt-8 text-center text-xs text-muted-foreground">
-        Sketch matching subjects in your journal to make progress. 🌿
+        {t("Sketch matching subjects in your journal to make progress. 🌿")}
       </p>
     </div>
   );
@@ -139,10 +142,12 @@ function QuestCard({
   status,
   busy,
   onClaim,
+  t,
 }: {
   status: QuestStatus;
   busy: boolean;
   onClaim: () => void;
+  t: (key: string, vars?: Record<string, string | number>) => string;
 }) {
   const { quest, progress, goal, reward, claimed, ready } = status;
   const meta = TIER_META[quest.tier];
@@ -162,7 +167,7 @@ function QuestCard({
             <h3 className="text-sm font-bold leading-tight text-foreground">{quest.title}</h3>
             <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${meta.chip}`}>
               <span aria-hidden>{meta.emoji}</span>
-              {meta.label}
+              {t(meta.label)}
             </span>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">{quest.description}</p>
@@ -182,12 +187,12 @@ function QuestCard({
           <div className="mt-3 flex items-center justify-between gap-2">
             <span className="inline-flex items-center gap-1 text-xs font-bold text-foreground">
               <Coins className="h-3.5 w-3.5 text-accent" />
-              {reward} coins
+              {t("{x} coins", { x: reward })}
             </span>
             {claimed ? (
               <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/15 px-3 py-1.5 text-xs font-bold text-primary">
                 <Check className="h-3.5 w-3.5" />
-                Claimed
+                {t("Claimed")}
               </span>
             ) : ready ? (
               <button
@@ -197,11 +202,11 @@ function QuestCard({
                 className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-3 py-1.5 text-xs font-bold text-background transition-transform active:scale-95 disabled:opacity-50"
               >
                 <Sparkles className="h-3.5 w-3.5" />
-                Claim
+                {t("Claim")}
               </button>
             ) : (
               <span className="text-[11px] font-medium text-muted-foreground">
-                Sketch {goal - progress} more
+                {t("Sketch {x} more", { x: goal - progress })}
               </span>
             )}
           </div>
