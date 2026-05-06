@@ -12,9 +12,11 @@ import {
   loadSettings,
   saveSettings,
   type AdventureStyle,
+  type Language,
   type Settings,
   type TtsVoice,
 } from "@/lib/settings";
+import { t as translate } from "@/lib/i18n";
 import { AmbiencePlayer, pickAmbienceForHour, type AmbienceKind } from "@/lib/ambience";
 
 type Ctx = {
@@ -22,6 +24,9 @@ type Ctx = {
   ready: boolean;
   update: (patch: Partial<Settings>) => void;
   setStyle: (style: AdventureStyle) => void;
+  setLanguage: (language: Language) => void;
+  /** Translate a string using the current language. */
+  t: (key: string, vars?: Record<string, string | number>) => string;
   reset: () => void;
   /** Convenience: should we suppress motion (animate-bounce / pulse)? */
   reduceMotion: boolean;
@@ -126,6 +131,16 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const setStyle = useCallback((style: AdventureStyle) => {
     setSettings((s) => ({ ...s, style }));
   }, []);
+
+  const setLanguage = useCallback((language: Language) => {
+    setSettings((s) => ({ ...s, language }));
+  }, []);
+
+  const t = useCallback(
+    (key: string, vars?: Record<string, string | number>) =>
+      translate(settings.language, key, vars),
+    [settings.language],
+  );
 
   const reset = useCallback(() => setSettings(DEFAULT_SETTINGS), []);
 
@@ -282,6 +297,8 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       ready,
       update,
       setStyle,
+      setLanguage,
+      t,
       reset,
       reduceMotion,
       playChime,
@@ -296,6 +313,8 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       ready,
       update,
       setStyle,
+      setLanguage,
+      t,
       reset,
       reduceMotion,
       playChime,
