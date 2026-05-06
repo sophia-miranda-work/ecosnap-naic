@@ -22,9 +22,9 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Today — Explorer's Notebook" },
+      { title: "Today — EcoSnap" },
       { name: "description", content: "Your daily nature quest awaits. Log your mood, head outside, and collect a sketch." },
-      { property: "og:title", content: "Today — Explorer's Notebook" },
+      { property: "og:title", content: "Today — EcoSnap" },
       { property: "og:description", content: "A new nature-themed adventure every day. Walk, wonder, and sketch." },
     ],
   }),

@@ -61,7 +61,7 @@ export const identifyNature = createServerFn({ method: "POST" })
     }
 
     const systemPrompt =
-      "You are a friendly nature guide for a cozy walking app called Explorer's Notebook. " +
+      "You are a friendly nature guide for a cozy walking app called EcoSnap. " +
       "Given a photo, identify the main natural subject (a plant, flower, tree, bird, insect, " +
       "mushroom, stone, body of water, or sky feature). Be specific where possible (e.g. 'Dandelion' " +
       "rather than 'flower'). If the photo is blurry, indoors, of a person, of a screen, or has no " +
