@@ -52,20 +52,20 @@ function CastPage() {
                   {g.avatar}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h2 className="text-xl font-bold leading-tight text-foreground">{g.name}</h2>
+                  <h2 className="text-xl font-bold leading-tight text-foreground">{t(g.name)}</h2>
                   <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    {g.role}
+                    {t(g.role)}
                   </p>
                   <p className="mt-1 text-[11px] text-muted-foreground">
-                    📍 {g.habitat}
+                    📍 {t(g.habitat)}
                   </p>
                 </div>
               </div>
 
-              <p className="mt-3 text-sm leading-snug text-foreground/85">{g.bio}</p>
+              <p className="mt-3 text-sm leading-snug text-foreground/85">{t(g.bio)}</p>
 
               <blockquote className="mt-3 rounded-2xl border-l-4 border-primary bg-muted/40 px-3 py-2 text-sm italic text-foreground/80">
-                "{g.catchphrase}"
+                "{t(g.catchphrase)}"
               </blockquote>
             </li>
           );

@@ -305,7 +305,7 @@ function Index() {
           <div className="relative">
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground/80">
               <Compass className="h-3.5 w-3.5" />
-              {giver.name} · {giver.role}
+              {t(giver.name)} · {t(giver.role)}
               {isObserver && (
                 <span className="ml-1 rounded-full bg-primary-foreground/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider">
                   {t("Window quest")}
@@ -327,20 +327,20 @@ function Index() {
                   aria-hidden
                 />
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  {greeting}
+                  {t(greeting)}
                 </p>
                 {questIntro && (
                   <p className="mt-1 text-sm italic leading-snug text-foreground/80">
-                    "{questIntro}"
+                    "{t(questIntro)}"
                   </p>
                 )}
               </div>
             </div>
 
             <h2 className="mt-4 text-2xl font-bold leading-tight text-primary-foreground">
-              {quest.title}
+              {t(quest.title)}
             </h2>
-            <p className="mt-1 text-sm text-primary-foreground/80">{quest.hint}</p>
+            <p className="mt-1 text-sm text-primary-foreground/80">{t(quest.hint)}</p>
 
             {settings.readToMe && (
               <div className="mt-3">
@@ -587,7 +587,7 @@ function Index() {
           <div className="parchment-card flex items-center gap-2 px-4 py-2.5">
             <Coins className="h-5 w-5 text-accent" />
             <span className="text-sm font-bold text-foreground">
-              {t("+{x} coins!", { x: coinFlash })} {giver.name}
+              {t("+{x} coins!", { x: coinFlash })} {t(giver.name)}
             </span>
           </div>
         </div>
