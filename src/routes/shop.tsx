@@ -9,9 +9,9 @@ import { useSettings } from "@/hooks/use-settings";
 export const Route = createFileRoute("/shop")({
   head: () => ({
     meta: [
-      { title: "Björn's Shop — Explorer's Notebook" },
+      { title: "Björn's Shop — EcoSnap" },
       { name: "description", content: "Spend your hard-earned coins on cozy clothes for your dress-up explorer." },
-      { property: "og:title", content: "Björn's Shop — Explorer's Notebook" },
+      { property: "og:title", content: "Björn's Shop — EcoSnap" },
       { property: "og:description", content: "Hats, jackets, and themed outfits from the woodland cast — picked out by Björn the bear." },
     ],
   }),

@@ -6,9 +6,9 @@ import { useSettings } from "@/hooks/use-settings";
 export const Route = createFileRoute("/cast")({
   head: () => ({
     meta: [
-      { title: "The Cast — Explorer's Notebook" },
+      { title: "The Cast — EcoSnap" },
       { name: "description", content: "Meet the woodland quest-givers who guide your daily walks." },
-      { property: "og:title", content: "The Cast — Explorer's Notebook" },
+      { property: "og:title", content: "The Cast — EcoSnap" },
       { property: "og:description", content: "A small storybook crew of quest-givers: a witch, an owl, a fox, a toad, and a bunny." },
     ],
   }),

@@ -17,9 +17,9 @@ import { useTotalDistance } from "@/hooks/use-total-distance";
 export const Route = createFileRoute("/profile")({
   head: () => ({
     meta: [
-      { title: "Profile — Explorer's Notebook" },
+      { title: "Profile — EcoSnap" },
       { name: "description", content: "Your explorer stats, streak, and achievements." },
-      { property: "og:title", content: "Profile — Explorer's Notebook" },
+      { property: "og:title", content: "Profile — EcoSnap" },
       { property: "og:description", content: "Track your streak, total distance, and quests completed." },
     ],
   }),

@@ -23,9 +23,9 @@ import type { Language } from "@/lib/settings";
 export const Route = createFileRoute("/settings")({
   head: () => ({
     meta: [
-      { title: "Settings — Explorer's Notebook" },
+      { title: "Settings — EcoSnap" },
       { name: "description", content: "Adventure style, accessibility, sound, and visual preferences." },
-      { property: "og:title", content: "Settings — Explorer's Notebook" },
+      { property: "og:title", content: "Settings — EcoSnap" },
       { property: "og:description", content: "Tune your explorer experience for accessibility and comfort." },
     ],
   }),

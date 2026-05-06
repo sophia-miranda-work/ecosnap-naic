@@ -9,9 +9,9 @@ import { useSettings } from "@/hooks/use-settings";
 export const Route = createFileRoute("/journal")({
   head: () => ({
     meta: [
-      { title: "Journal — Explorer's Notebook" },
+      { title: "Journal — EcoSnap" },
       { name: "description", content: "Your collected sketches from completed nature quests, sorted by category." },
-      { property: "og:title", content: "Journal — Explorer's Notebook" },
+      { property: "og:title", content: "Journal — EcoSnap" },
       { property: "og:description", content: "A Pokédex-style grid of every sketch you've collected on your walks." },
     ],
   }),

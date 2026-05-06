@@ -13,9 +13,9 @@ import { useSettings } from "@/hooks/use-settings";
 export const Route = createFileRoute("/quests")({
   head: () => ({
     meta: [
-      { title: "Quests — Explorer's Notebook" },
+      { title: "Quests — EcoSnap" },
       { name: "description", content: "Bronze, Silver and Gold nature quests with coin rewards. New quests every week, big challenges every month." },
-      { property: "og:title", content: "Quests — Explorer's Notebook" },
+      { property: "og:title", content: "Quests — EcoSnap" },
       { property: "og:description", content: "Take on weekly Bronze and Silver quests, and stretch into a monthly Gold challenge." },
     ],
   }),
