@@ -129,6 +129,7 @@ const AVATAR_PREVIEW_SLOTS = new Set<ShopSlot>(["top", "bottom", "shoes", "dress
 
 export function CharacterCustomizer({ onClose }: { onClose: () => void }) {
   const { character, ownedItems, updateAppearance, equipItem, purchase, refresh } = useCharacter();
+  const { t } = useSettings();
   const [tab, setTab] = useState<TabId>("skin");
   const [busy, setBusy] = useState<string | null>(null);
   const [flash, setFlash] = useState<string | null>(null);
