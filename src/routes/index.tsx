@@ -264,10 +264,11 @@ function Index() {
 
   const todayLabel = useMemo(() => {
     const d = new Date();
-    const day = d.toLocaleDateString(undefined, { weekday: "long" });
-    const month = d.toLocaleDateString(undefined, { month: "short" });
+    const locale = settings.language === "ms" ? "ms-MY" : undefined;
+    const day = d.toLocaleDateString(locale, { weekday: "long" });
+    const month = d.toLocaleDateString(locale, { month: "short" });
     return `${day} · ${month} ${d.getDate()}`.toUpperCase();
-  }, []);
+  }, [settings.language]);
 
   return (
     <div className="px-5 pt-8">
