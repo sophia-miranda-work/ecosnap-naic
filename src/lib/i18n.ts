@@ -1050,6 +1050,124 @@ const MS: Record<string, string> = {
   "Acorn nose. Twig arms. Pip will visit.": "Hidung biji ek. Tangan ranting. Pip akan datang melawat.",
   "Look for animal tracks in the snow": "Cari tapak haiwan di atas salji",
   "Bird, cat, mystery — log them in your journal.": "Burung, kucing, misteri — catat dalam jurnal anda.",
+
+  // Shop / customizer common
+  "None": "Tiada",
+  "Color": "Warna",
+
+  // Shop item names — basics
+  "Moss Tee": "Baju-T Lumut",
+  "Bloom Tee": "Baju-T Bunga",
+  "Field Jacket": "Jaket Padang",
+  "Knit Sweater": "Sweater Tenun",
+  "Yellow Raincoat": "Baju Hujan Kuning",
+  "Flannel Shirt": "Kemeja Flanel",
+  "Walking Jeans": "Seluar Jeans",
+  "Meadow Shorts": "Seluar Pendek Padang",
+  "Cargo Trousers": "Seluar Kargo",
+  "Garden Overalls": "Seluar Overall Taman",
+  "Hiking Boots": "But Mendaki",
+  "Soft Sneakers": "Kasut Sukan Lembut",
+  "Brook Sandals": "Selipar Anak Sungai",
+  "Rain Wellies": "But Hujan",
+  "Blush Crop Top": "Atasan Pendek Merah Jambu",
+  "Sky Tank Top": "Singlet Langit",
+  "Long Sleeve Top": "Atasan Lengan Panjang",
+  "Pleated Skirt": "Skirt Berlipat",
+  "Denim Skirt": "Skirt Denim",
+  "Cozy Leggings": "Legging Selesa",
+  "Cloud Slippers": "Selipar Awan",
+  "Mary Janes": "Kasut Mary Jane",
+  "High Sneakers": "Kasut Sukan Tinggi",
+  "Pinafore Dress": "Gaun Pinafore",
+  "Party Dress": "Gaun Pesta",
+  "Floral Pink Dress": "Gaun Bunga Merah Jambu",
+  "Lavender Party Dress": "Gaun Pesta Lavender",
+  "Pink Pinafore": "Pinafore Merah Jambu",
+  "Sailor Dress": "Gaun Kelasi",
+  "Bear Sweater Dress": "Gaun Sweater Beruang",
+  "Black Floral Sundress": "Gaun Musim Panas Bunga Hitam",
+  "Canvas Cap": "Topi Kanvas",
+  "Wool Beanie": "Topi Bulu",
+  "Straw Sunhat": "Topi Jerami",
+  "Trail Bandana": "Bandana Denai",
+  "Cozy Scarf": "Selendang Selesa",
+  "Round Glasses": "Cermin Mata Bulat",
+  "Pocket Binoculars": "Teropong Saku",
+  "Canvas Backpack": "Beg Galas Kanvas",
+  "Brass Compass": "Kompas Tembaga",
+
+  // Willow set
+  "Hedge Witch Hat": "Topi Ahli Sihir",
+  "Herbwitch Cloak": "Jubah Ahli Sihir Herba",
+  "Bramble Skirt": "Skirt Semak",
+  "Moonstone Amulet": "Tangkal Batu Bulan",
+  "Witch's Boots": "But Ahli Sihir",
+
+  // Professor Hoot set
+  "Feather Cloak": "Jubah Bulu",
+  "Sage Spectacles": "Cermin Mata Bijaksana",
+  "Scholar's Cap": "Topi Sarjana",
+  "Tweed Trousers": "Seluar Tweed",
+  "Library Loafers": "Kasut Perpustakaan",
+
+  // Pip set
+  "Fox-Tail Scarf": "Selendang Ekor Musang",
+  "Scout Sneakers": "Kasut Sukan Pengakap",
+  "Russet Hoodie": "Hoodie Jingga",
+  "Fox-Ear Cap": "Topi Telinga Musang",
+  "Trail Shorts": "Seluar Pendek Denai",
+
+  // Mossback set
+  "Lily-Pad Hat": "Topi Daun Teratai",
+  "Pond Wellies": "But Kolam",
+  "Reed Poncho": "Poncho Buluh",
+  "Marsh Trousers": "Seluar Paya",
+  "Pond-Stone Pendant": "Loket Batu Kolam",
+
+  // Clover set
+  "Daisy Crown": "Mahkota Bunga Daisi",
+  "Sunshine Smock": "Gaun Mentari",
+  "Petal Cardigan": "Kardigan Kelopak",
+  "Meadow Skirt": "Skirt Padang",
+  "Hop-Along Shoes": "Kasut Lompat-lompat",
+  "Four-Leaf Charm": "Tangkal Daun Empat",
+
+  // Premium jewelry
+  "Gold Hoops": "Subang Bulat Emas",
+  "Pearl Studs": "Subang Mutiara",
+  "Star Drops": "Subang Bintang",
+  "Heart Pendant": "Loket Hati",
+  "Crescent Necklace": "Rantai Bulan Sabit",
+  "Bead Bracelet": "Gelang Manik",
+  "Charm Bracelet": "Gelang Tangkal",
+
+  // Hair clips
+  "Velvet Bow": "Reben Baldu",
+  "Flower Clip": "Klip Bunga",
+  "Pearl Pin": "Pin Mutiara",
+
+  // Piercings
+  "Tiny Ear Stud": "Subang Telinga Kecil",
+  "Silver Ear Cuff": "Cuff Telinga Perak",
+  "Nose Stud": "Subang Hidung",
+  "Lip Ring": "Cincin Bibir",
+  "Brow Bar": "Bar Kening",
+
+  // Ear extras
+  "Hearing Aid": "Alat Bantuan Pendengaran",
+  "Wireless Earpods": "Fon Telinga Wayarles",
+  "Big Headphones": "Fon Kepala Besar",
+
+  // Premium dresses & shoes
+  "Princess Gown": "Gaun Puteri",
+  "Rose Ballgown": "Gaun Pesta Mawar",
+  "Ribbon Tutu": "Tutu Reben",
+  "Sparkle Sneakers": "Kasut Sukan Berkilau",
+  "Bow Sandals": "Selipar Reben",
+  "Floral Sundress": "Gaun Musim Panas Bunga",
+  "Starlight Gown": "Gaun Cahaya Bintang",
+  "Meadow Dress": "Gaun Padang",
 };
 
 const DICTIONARIES: Record<Language, Record<string, string>> = {

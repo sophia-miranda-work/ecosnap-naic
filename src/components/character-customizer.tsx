@@ -13,6 +13,7 @@ import {
 } from "@/hooks/use-character";
 import { SHOP_ITEMS, type ShopSlot, type ShopItem } from "@/lib/shop";
 import { DressupAvatar } from "@/components/dressup-avatar";
+import { useSettings } from "@/hooks/use-settings";
 
 /**
  * Tabbed customization panel.
@@ -840,6 +841,7 @@ function SlotPicker({
   buyAndApply: (itemId: string, price: number, apply: () => Promise<void> | void) => Promise<void>;
   setItemColor: (itemId: string, color: string | null) => Promise<void> | void;
 }) {
+  const { t } = useSettings();
   const items = SHOP_ITEMS.filter((i) => i.slot === slot);
   if (items.length === 0) return null;
   const useAvatarPreview = AVATAR_PREVIEW_SLOTS.has(slot);
@@ -854,7 +856,7 @@ function SlotPicker({
       <div className="grid grid-cols-3 gap-2">
         {/* "None" tile */}
         <PreviewTile
-          label="None"
+          label={t("None")}
           active={!current}
           onClick={() => equipItem(slot, null)}
           preview={
@@ -875,7 +877,7 @@ function SlotPicker({
           return (
             <PreviewTile
               key={item.id}
-              label={item.name}
+              label={t(item.name)}
               active={active}
               disabled={busy === item.id}
               onClick={() =>
@@ -907,7 +909,7 @@ function SlotPicker({
       {currentItem && currentColor && (
         <div className="mt-3">
           <h4 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-            Color · {currentItem.name}
+            {t("Color")} · {t(currentItem.name)}
           </h4>
           <div className="flex flex-wrap gap-1.5">
             {ITEM_COLORS.map((c) => (
@@ -931,7 +933,7 @@ function SlotPicker({
                 onClick={() => setItemColor(currentItem.id, null)}
                 className="rounded-full border border-border bg-card px-2.5 py-1 text-[10px] font-semibold text-foreground hover:bg-muted"
               >
-                Reset
+                {t("Reset")}
               </button>
             )}
           </div>

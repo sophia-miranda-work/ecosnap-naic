@@ -47,7 +47,7 @@ function ShopPage() {
     setFlash(null);
     try {
       await purchase(item.id, item.price);
-      setFlash({ kind: "ok", msg: t("Got it — {x}!", { x: item.name }) });
+      setFlash({ kind: "ok", msg: t("Got it — {x}!", { x: t(item.name) }) });
     } catch (e) {
       const msg = e instanceof Error ? e.message : t("Couldn't buy that.");
       setFlash({ kind: "err", msg: msg.includes("not enough") ? t("Not enough coins yet.") : msg });
@@ -179,7 +179,7 @@ function ShopPage() {
                 {item.emoji}
               </div>
               <p className="mt-2 text-sm font-bold leading-tight text-foreground line-clamp-1">
-                {item.name}
+                {t(item.name)}
               </p>
               <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
                 {item.slot}
