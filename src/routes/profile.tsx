@@ -12,6 +12,7 @@ import { BADGES, type BadgeContext } from "@/lib/badges";
 import { useJournal } from "@/hooks/use-journal";
 import { useStreak } from "@/hooks/use-streak";
 import { useQuests } from "@/hooks/use-quests";
+import { useTotalDistance } from "@/hooks/use-total-distance";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -44,6 +45,7 @@ function ProfilePage() {
   const { entries } = useJournal();
   const { streak } = useStreak();
   const { statuses } = useQuests();
+  const { km: totalKm } = useTotalDistance();
   const claimedQuests =
     statuses.bronze.filter((s) => s.claimed).length +
     statuses.silver.filter((s) => s.claimed).length +
@@ -61,7 +63,7 @@ function ProfilePage() {
   const stats = [
     { icon: Flame, label: t("Day streak"), value: String(streak) },
     { icon: Sparkles, label: t("Quests done"), value: String(questsDone) },
-    { icon: Footprints, label: t("Total km"), value: "48.2" },
+    { icon: Footprints, label: t("Total km"), value: totalKm.toFixed(2) },
     { icon: Trophy, label: t("Badges"), value: String(earnedBadges.length) },
   ];
 
