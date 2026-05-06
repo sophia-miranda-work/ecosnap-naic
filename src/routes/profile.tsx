@@ -7,6 +7,10 @@ import { CharacterCreator } from "@/components/character-creator";
 import { DressupAvatar } from "@/components/dressup-avatar";
 import { CharacterCustomizer } from "@/components/character-customizer";
 import { useSettings } from "@/hooks/use-settings";
+import { BadgesDialog } from "@/components/badges-dialog";
+import { BADGES, type BadgeContext } from "@/lib/badges";
+import { useJournal } from "@/hooks/use-journal";
+import { useStreak } from "@/hooks/use-streak";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -35,12 +39,23 @@ function ProfilePage() {
   const { t } = useSettings();
   const [editing, setEditing] = useState(false);
   const [customizing, setCustomizing] = useState(false);
+  const [badgesOpen, setBadgesOpen] = useState(false);
+  const { entries } = useJournal();
+  const { streak } = useStreak();
+
+  const badgeCtx: BadgeContext = {
+    entries: entries.map((e) => ({ category: e.category, created_at: e.created_at })),
+    streak,
+  };
+  const earnedBadges = BADGES.map((b) => ({ badge: b, ...b.evaluate(badgeCtx) })).filter(
+    (e) => e.earned,
+  );
 
   const stats = [
     { icon: Flame, label: t("Day streak"), value: "7" },
     { icon: Sparkles, label: t("Quests done"), value: "23" },
     { icon: Footprints, label: t("Total km"), value: "48.2" },
-    { icon: Trophy, label: t("Badges"), value: "4" },
+    { icon: Trophy, label: t("Badges"), value: String(earnedBadges.length) },
   ];
 
   const accent = character ? ACCENT_SWATCHES[character.accent] ?? ACCENT_SWATCHES.moss : ACCENT_SWATCHES.moss;
@@ -128,17 +143,36 @@ function ProfilePage() {
       </div>
 
       <section className="mt-8">
-        <h2 className="text-lg font-bold text-foreground">{t("Recent badges")}</h2>
-        <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
-          {["🌱 First Step", "🌸 7-day streak", "🍄 Forager", "🐦 Bird spotter"].map((b) => (
-            <div
-              key={b}
-              className="parchment-card whitespace-nowrap px-4 py-2 text-sm font-semibold text-foreground"
-            >
-              {t(b)}
-            </div>
-          ))}
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-bold text-foreground">{t("Recent badges")}</h2>
+          <button
+            type="button"
+            onClick={() => setBadgesOpen(true)}
+            className="rounded-full bg-primary px-3 py-1 text-xs font-bold text-primary-foreground"
+          >
+            {t("View all")}
+          </button>
         </div>
+        <button
+          type="button"
+          onClick={() => setBadgesOpen(true)}
+          className="mt-3 flex w-full gap-3 overflow-x-auto pb-2 text-left"
+        >
+          {earnedBadges.length === 0 ? (
+            <div className="parchment-card flex-1 px-4 py-3 text-sm text-muted-foreground">
+              {t("No badges yet — start sketching to earn your first one!")}
+            </div>
+          ) : (
+            earnedBadges.slice(0, 6).map(({ badge }) => (
+              <div
+                key={badge.id}
+                className="parchment-card whitespace-nowrap px-4 py-2 text-sm font-semibold text-foreground"
+              >
+                {badge.emoji} {t(badge.name)}
+              </div>
+            ))
+          )}
+        </button>
       </section>
 
       {/* Settings entry */}
@@ -171,6 +205,8 @@ function ProfilePage() {
       )}
 
       {customizing && <CharacterCustomizer onClose={() => setCustomizing(false)} />}
+
+      <BadgesDialog open={badgesOpen} onClose={() => setBadgesOpen(false)} />
     </div>
   );
 }
