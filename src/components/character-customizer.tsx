@@ -209,7 +209,7 @@ export function CharacterCustomizer({ onClose }: { onClose: () => void }) {
 
         {/* Sticky live preview */}
         <div className="flex shrink-0 items-center justify-center border-b border-border bg-gradient-to-b from-primary/10 to-transparent py-1">
-          <DressupAvatar dressup={dressup} size={104} />
+          <DressupAvatar dressup={dressup} size={128} />
         </div>
 
         {/* Tabs */}
