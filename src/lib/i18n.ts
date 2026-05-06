@@ -236,7 +236,7 @@ const MS: Record<string, string> = {
   "Custom walking goal (meters)": "Sasaran berjalan tersuai (meter)",
   "Any number works — even 0. Set 0 to use this style's default":
     "Sebarang nombor — termasuk 0. Tetapkan 0 untuk menggunakan default gaya ini",
-  "Visual & Audio": "Visual & Audio",
+  "Visual & Audio": "Visual & Bunyi",
   "Quest celebration": "Sambutan misi",
   "Switch between confetti animations and a clean static message.":
     "Tukar antara animasi konfeti dan mesej statik bersih.",
