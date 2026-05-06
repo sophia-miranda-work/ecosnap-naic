@@ -7,6 +7,7 @@ import { CharacterCreator } from "@/components/character-creator";
 import { SettingsProvider, useSettings } from "@/hooks/use-settings";
 import { AdventureStylePicker } from "@/components/adventure-style-picker";
 import { LanguagePicker } from "@/components/language-picker";
+import { SplashScreen } from "@/components/splash-screen";
 
 function NotFoundComponent() {
   return (
@@ -97,7 +98,7 @@ function OnboardingGates() {
   const { character, loading } = useCharacter();
   const { settings, ready: settingsReady } = useSettings();
   const navigate = useNavigate();
-  if (loading || !settingsReady) return null;
+  if (loading || !settingsReady) return <SplashScreen />;
   // Step 1: pick a language.
   if (!settings.language) {
     return <LanguagePicker dismissible={false} />;
