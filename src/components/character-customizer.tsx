@@ -13,6 +13,7 @@ import {
 } from "@/hooks/use-character";
 import { SHOP_ITEMS, type ShopSlot, type ShopItem } from "@/lib/shop";
 import { DressupAvatar } from "@/components/dressup-avatar";
+import { useSettings } from "@/hooks/use-settings";
 
 /**
  * Tabbed customization panel.
