@@ -120,6 +120,8 @@ const MS: Record<string, string> = {
   "Nice walk! You went from": "Perjalanan yang baik! Anda berubah dari",
   "to": "kepada",
   "day streak": "hari berturut",
+  "{x} day": "{x} hari",
+  "{x} days": "{x} hari",
 
   // Daily extras
   "Today's extras": "Tambahan hari ini",

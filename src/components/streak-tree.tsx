@@ -323,7 +323,7 @@ export function StreakTreeModal({ streak, open, onClose }: ModalProps) {
             {t("Your streak tree")}
           </p>
           <h2 className="mt-1 text-2xl font-bold text-foreground">
-            {t("{x} day", { x: streak })}{streak === 1 ? "" : t("s_plural")}
+            {streak === 1 ? t("{x} day", { x: streak }) : t("{x} days", { x: streak })}
           </h2>
           <p className="mt-0.5 text-sm capitalize text-muted-foreground">
             {stage} · {t(season)}
