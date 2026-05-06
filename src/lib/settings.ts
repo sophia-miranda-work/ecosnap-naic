@@ -26,6 +26,8 @@ export type Settings = {
   voiceNoteQuests: boolean;
   /** Big tap-anywhere shutter banner on the camera. */
   autoSnap: boolean;
+  /** Loop a soft music track in the background while the app is open. */
+  backgroundMusic: boolean;
 };
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -39,6 +41,7 @@ export const DEFAULT_SETTINGS: Settings = {
   ttsVoice: "warm",
   voiceNoteQuests: false,
   autoSnap: false,
+  backgroundMusic: true,
 };
 
 export const STORAGE_KEY = "explorer-settings:v1";
