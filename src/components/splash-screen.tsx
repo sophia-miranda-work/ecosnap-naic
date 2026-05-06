@@ -13,7 +13,7 @@ export function SplashScreen() {
       </div>
       <div className="text-center">
         <h1 className="font-serif text-2xl font-semibold text-foreground">
-          EcoSnap
+          Just a moment...
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">Packing your satchel…</p>
       </div>
