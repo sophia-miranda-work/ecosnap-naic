@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { X, Sparkles, Loader2 } from "lucide-react";
 import { useCharacter, type Character, type CharacterDraft } from "@/hooks/use-character";
+import { useSettings } from "@/hooks/use-settings";
 
 const AVATARS = [
   "🦊", "🦉", "🐿️", "🦔", "🐻", "🦌", "🐸", "🐢",
@@ -36,6 +37,7 @@ export function CharacterCreator({
   dismissible?: boolean;
 }) {
   const { save } = useCharacter();
+  const { t } = useSettings();
   const [draft, setDraft] = useState<CharacterDraft>({
     name: initial?.name ?? "",
     bio: initial?.bio ?? "",
@@ -84,13 +86,13 @@ export function CharacterCreator({
           <div>
             <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
               <Sparkles className="h-3.5 w-3.5" />
-              {initial ? "Edit explorer" : "New explorer"}
+              {initial ? t("Edit explorer") : t("New explorer")}
             </p>
             <h2 className="mt-1 text-2xl font-bold text-foreground">
-              {initial ? "Refresh your story" : "Begin your story"}
+              {initial ? t("Refresh your story") : t("Begin your story")}
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Pick an avatar, a name, and a motto to carry on every walk.
+              {t("Pick an avatar, a name, and a motto to carry on every walk.")}
             </p>
           </div>
           {dismissible && (
@@ -98,7 +100,7 @@ export function CharacterCreator({
               type="button"
               onClick={onClose}
               className="rounded-full p-1 text-muted-foreground hover:bg-muted"
-              aria-label="Close"
+              aria-label={t("Close")}
             >
               <X className="h-5 w-5" />
             </button>
@@ -118,10 +120,10 @@ export function CharacterCreator({
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              Explorer
+              {t("Explorer")}
             </p>
             <p className="truncate text-lg font-bold text-foreground">
-              {draft.name.trim() || "Your name"}
+              {draft.name.trim() || t("Your name")}
             </p>
             <p className="line-clamp-2 text-xs text-muted-foreground">
               {draft.bio.trim() || placeholder}
@@ -132,7 +134,7 @@ export function CharacterCreator({
         {/* Avatar */}
         <fieldset className="mt-5">
           <legend className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-            Avatar
+            {t("Avatar")}
           </legend>
           <div className="mt-2 grid grid-cols-8 gap-2">
             {AVATARS.map((a) => {
@@ -159,7 +161,7 @@ export function CharacterCreator({
         {/* Accent */}
         <fieldset className="mt-5">
           <legend className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-            Accent
+            {t("Accent")}
           </legend>
           <div className="mt-2 flex flex-wrap gap-2">
             {ACCENTS.map((c) => {
@@ -181,7 +183,7 @@ export function CharacterCreator({
                     style={{ backgroundColor: c.swatch }}
                     aria-hidden
                   />
-                  {c.label}
+                  {t(c.label)}
                 </button>
               );
             })}
@@ -194,7 +196,7 @@ export function CharacterCreator({
             htmlFor="explorer-name"
             className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground"
           >
-            Explorer name
+            {t("Explorer name")}
           </label>
           <input
             id="explorer-name"
@@ -202,7 +204,7 @@ export function CharacterCreator({
             value={draft.name}
             onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))}
             maxLength={40}
-            placeholder="Wandering Fox"
+            placeholder={t("Wandering Fox")}
             className="mt-2 w-full rounded-xl border border-border bg-card px-4 py-3 text-base text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
           />
         </div>
@@ -213,7 +215,7 @@ export function CharacterCreator({
             htmlFor="explorer-bio"
             className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground"
           >
-            Motto / bio
+            {t("Motto / bio")}
           </label>
           <textarea
             id="explorer-bio"
@@ -242,7 +244,7 @@ export function CharacterCreator({
               onClick={onClose}
               className="flex-1 rounded-2xl border border-border bg-card px-4 py-3 text-sm font-semibold text-foreground hover:bg-muted"
             >
-              Cancel
+              {t("Cancel")}
             </button>
           )}
           <button
@@ -254,12 +256,12 @@ export function CharacterCreator({
             {saving ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Saving…
+                {t("Saving…")}
               </>
             ) : initial ? (
-              "Save changes"
+              t("Save changes")
             ) : (
-              "Begin journey"
+              t("Begin journey")
             )}
           </button>
         </div>

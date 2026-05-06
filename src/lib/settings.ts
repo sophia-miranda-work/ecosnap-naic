@@ -2,9 +2,13 @@ export type AdventureStyle = "wanderer" | "observer" | "voyager";
 
 export type TtsVoice = "warm" | "bright" | "calm" | "storyteller";
 
+export type Language = "en" | "ms";
+
 export type Settings = {
   /** Chosen adventure style. `null` until onboarding completes. */
   style: AdventureStyle | null;
+  /** UI language. `null` until onboarding picks one. */
+  language: Language | null;
   /** Custom daily walking goal in meters (any value, even 0). When > 0,
    *  overrides the per-style default required distance. */
   observerGoalMeters: number;
@@ -26,6 +30,7 @@ export type Settings = {
 
 export const DEFAULT_SETTINGS: Settings = {
   style: null,
+  language: null,
   observerGoalMeters: 0,
   celebrationStyle: "sparkly",
   soundEffects: true,

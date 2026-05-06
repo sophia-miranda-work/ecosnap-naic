@@ -18,10 +18,14 @@ export function AdventureStylePicker({
   onClose,
   onSaved,
   dismissible = true,
-  title = "Choose your Adventure Style",
-  subtitle = "Pick the one that fits you best — you can change this anytime in Settings.",
+  title,
+  subtitle,
 }: Props) {
-  const { settings, setStyle, update } = useSettings();
+  const { settings, setStyle, update, t } = useSettings();
+  const titleText = title ?? t("Choose your Adventure Style");
+  const subtitleText =
+    subtitle ??
+    t("Pick the one that fits you best — you can change this anytime in Settings.");
   const [picked, setPicked] = useState<AdventureStyle | null>(settings.style);
   const [observerGoal, setObserverGoal] = useState<number>(
     settings.observerGoalMeters || 200,
@@ -49,17 +53,17 @@ export function AdventureStylePicker({
         <div>
           <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
             <Sparkles className="h-3.5 w-3.5" />
-            Adventure Style
+            {t("Adventure Style")}
           </p>
-          <h2 className="mt-1 text-2xl font-bold text-foreground">{title}</h2>
-          <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
+          <h2 className="mt-1 text-2xl font-bold text-foreground">{titleText}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{subtitleText}</p>
         </div>
         {dismissible && onClose && (
           <button
             type="button"
             onClick={onClose}
             className="rounded-full p-1 text-muted-foreground hover:bg-muted"
-            aria-label="Close"
+            aria-label={t("Close")}
           >
             <X className="h-5 w-5" />
           </button>
@@ -85,11 +89,11 @@ export function AdventureStylePicker({
                   {s.emoji}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="text-base font-bold text-foreground">{s.name}</p>
+                  <p className="text-base font-bold text-foreground">{t(s.name)}</p>
                   <p className="text-xs font-semibold uppercase tracking-wider text-primary">
-                    {s.tagline}
+                    {t(s.tagline)}
                   </p>
-                  <p className="mt-1 text-sm text-muted-foreground">{s.description}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{t(s.description)}</p>
                 </div>
               </button>
             </li>
@@ -103,10 +107,10 @@ export function AdventureStylePicker({
             htmlFor="observer-goal"
             className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground"
           >
-            Daily walking goal (meters)
+            {t("Daily walking goal (meters)")}
           </label>
           <p className="mt-1 text-xs text-muted-foreground">
-            Set anything you like — even 0. There's no minimum.
+            {t("Set anything you like — even 0. There's no minimum.")}
           </p>
           <input
             id="observer-goal"
@@ -127,7 +131,7 @@ export function AdventureStylePicker({
             onClick={onClose}
             className="flex-1 rounded-2xl border border-border bg-card px-4 py-3 text-sm font-semibold text-foreground hover:bg-muted"
           >
-            Cancel
+            {t("Cancel")}
           </button>
         )}
         <button
@@ -139,10 +143,10 @@ export function AdventureStylePicker({
           {saving ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
-              Saving…
+              {t("Saving…")}
             </>
           ) : (
-            "Begin adventure"
+            t("Begin adventure")
           )}
         </button>
       </div>
@@ -156,7 +160,7 @@ export function AdventureStylePicker({
       className="fixed inset-0 z-[70] flex items-end justify-center bg-foreground/40 backdrop-blur-sm sm:items-center"
       onClick={dismissible ? onClose : undefined}
       role="dialog"
-      aria-label="Choose your adventure style"
+      aria-label={t("Choose your Adventure Style")}
     >
       <div onClick={(e) => e.stopPropagation()} className="w-full flex justify-center">
         {card}
