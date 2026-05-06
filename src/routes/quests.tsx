@@ -164,13 +164,13 @@ function QuestCard({
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-sm font-bold leading-tight text-foreground">{quest.title}</h3>
+            <h3 className="text-sm font-bold leading-tight text-foreground">{t(quest.title)}</h3>
             <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${meta.chip}`}>
               <span aria-hidden>{meta.emoji}</span>
               {t(meta.label)}
             </span>
           </div>
-          <p className="mt-1 text-xs text-muted-foreground">{quest.description}</p>
+          <p className="mt-1 text-xs text-muted-foreground">{t(quest.description)}</p>
 
           <div className="mt-3 flex items-center gap-3">
             <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
