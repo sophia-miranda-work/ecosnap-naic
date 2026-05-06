@@ -8,7 +8,6 @@ import { SettingsProvider, useSettings } from "@/hooks/use-settings";
 import { AdventureStylePicker } from "@/components/adventure-style-picker";
 import { LanguagePicker } from "@/components/language-picker";
 import { SplashScreen } from "@/components/splash-screen";
-import { BackgroundMusic } from "@/components/background-music";
 
 function NotFoundComponent() {
   return (
@@ -38,14 +37,18 @@ export const Route = createRootRoute({
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { name: "theme-color", content: "#e8dfc6" },
-      { title: "EcoSnap — Daily nature quests" },
+      { title: "EcoSnap -- Daily nature quests" },
       { name: "description", content: "A cozy walking companion. Get a daily nature quest, track your walk, log your mood, and collect sketched memories in your journal." },
       { name: "author", content: "EcoSnap" },
-      { property: "og:title", content: "EcoSnap" },
-      { property: "og:description", content: "Gamify your daily walks with nature-themed quests, mood tracking, and a sketchbook journal." },
+      { property: "og:title", content: "EcoSnap -- Daily nature quests" },
+      { property: "og:description", content: "A cozy walking companion. Get a daily nature quest, track your walk, log your mood, and collect sketched memories in your journal." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "EcoSnap -- Daily nature quests" },
+      { name: "twitter:description", content: "A cozy walking companion. Get a daily nature quest, track your walk, log your mood, and collect sketched memories in your journal." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/8XyiZ6FspCeqcY2hjGbMQ9Lr19N2/social-images/social-1778083986326-Larger_EcoSnap_logo.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/8XyiZ6FspCeqcY2hjGbMQ9Lr19N2/social-images/social-1778083986326-Larger_EcoSnap_logo.webp" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -89,7 +92,6 @@ function RootComponent() {
           </main>
           <BottomTabs />
           <OnboardingGates />
-          <BackgroundMusic />
         </div>
       </div>
     </SettingsProvider>
