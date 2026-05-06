@@ -11,6 +11,7 @@ import { BadgesDialog } from "@/components/badges-dialog";
 import { BADGES, type BadgeContext } from "@/lib/badges";
 import { useJournal } from "@/hooks/use-journal";
 import { useStreak } from "@/hooks/use-streak";
+import { useQuests } from "@/hooks/use-quests";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -42,6 +43,12 @@ function ProfilePage() {
   const [badgesOpen, setBadgesOpen] = useState(false);
   const { entries } = useJournal();
   const { streak } = useStreak();
+  const { statuses } = useQuests();
+  const claimedQuests =
+    statuses.bronze.filter((s) => s.claimed).length +
+    statuses.silver.filter((s) => s.claimed).length +
+    statuses.gold.filter((s) => s.claimed).length;
+  const questsDone = entries.length + claimedQuests;
 
   const badgeCtx: BadgeContext = {
     entries: entries.map((e) => ({ category: e.category, created_at: e.created_at })),
@@ -53,7 +60,7 @@ function ProfilePage() {
 
   const stats = [
     { icon: Flame, label: t("Day streak"), value: String(streak) },
-    { icon: Sparkles, label: t("Quests done"), value: "23" },
+    { icon: Sparkles, label: t("Quests done"), value: String(questsDone) },
     { icon: Footprints, label: t("Total km"), value: "48.2" },
     { icon: Trophy, label: t("Badges"), value: String(earnedBadges.length) },
   ];
