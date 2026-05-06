@@ -268,9 +268,6 @@ const MS: Record<string, string> = {
   "A handful of woodland friends who take turns handing out quests.":
     "Beberapa rakan hutan yang bergilir-gilir memberikan misi.",
 
-  // Camera
-  "Read to me": "Bacakan untuk saya",
-
   // Customizer tabs
   "Customize": "Sesuaikan",
   "Style your explorer": "Gayakan penjelajah anda",
