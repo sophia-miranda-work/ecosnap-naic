@@ -689,6 +689,105 @@ export function hairLayers(
       break;
     }
 
+    case "natural-curls-short": {
+      // Short natural coily hair — tight curls hugging the head.
+      const dark = darken(color, 0.18);
+      const curls: ReactElement[] = [];
+      const baseR = rx + 4;
+      // Outline puff layer
+      for (let i = 0; i < 22; i++) {
+        const a = Math.PI + (Math.PI * i) / 21; // top semicircle
+        const px = cx + Math.cos(a) * baseR;
+        const py = cy - ry * 0.15 + Math.sin(a) * (baseR * 0.95);
+        if (py > browY - 1) continue;
+        curls.push(<circle key={`nco${i}`} cx={px} cy={py} r={5.5} fill={color} />);
+      }
+      // Inner fill puffs for density
+      for (let i = 0; i < 14; i++) {
+        const a = Math.PI + (Math.PI * i) / 13;
+        const r = baseR - 7;
+        const px = cx + Math.cos(a) * r;
+        const py = cy - ry * 0.15 + Math.sin(a) * (r * 0.9);
+        if (py > browY - 1) continue;
+        curls.push(<circle key={`nci${i}`} cx={px} cy={py} r={5} fill={color} />);
+      }
+      // Curl shading dots
+      for (let i = 0; i < 18; i++) {
+        const a = Math.PI + (Math.PI * i) / 17;
+        const r = baseR - 3;
+        const px = cx + Math.cos(a) * r;
+        const py = cy - ry * 0.15 + Math.sin(a) * (r * 0.95);
+        if (py > browY - 2) continue;
+        curls.push(<circle key={`ncs${i}`} cx={px} cy={py} r={1.5} fill={dark} opacity="0.5" />);
+      }
+      backNode = (
+        <g>
+          {ShortBase()}
+          {curls}
+        </g>
+      );
+      defaultBangsNode = <CurlyBangs />;
+      break;
+    }
+
+    case "natural-curls-long": {
+      // Long natural curly hair — coily volume with flowing curly length.
+      const dark = darken(color, 0.18);
+      const length = ry * 1.45;
+      const els: ReactElement[] = [];
+      // Flowing back base
+      els.push(<g key="flow">{BackFlow(length, rx * 0.7)}</g>);
+      els.push(<g key="full">{FullBase(ry * 1.05)}</g>);
+
+      // Voluminous curl puffs across the crown and sides
+      const baseR = rx + 8;
+      for (let i = 0; i < 26; i++) {
+        const a = Math.PI + (Math.PI * i) / 25;
+        const px = cx + Math.cos(a) * baseR;
+        const py = cy - ry * 0.2 + Math.sin(a) * (baseR * 1);
+        if (py > browY - 1) continue;
+        els.push(<circle key={`nlo${i}`} cx={px} cy={py} r={6.5} fill={color} />);
+      }
+      for (let i = 0; i < 18; i++) {
+        const a = Math.PI + (Math.PI * i) / 17;
+        const r = baseR - 8;
+        const px = cx + Math.cos(a) * r;
+        const py = cy - ry * 0.2 + Math.sin(a) * (r * 0.95);
+        if (py > browY - 1) continue;
+        els.push(<circle key={`nli${i}`} cx={px} cy={py} r={5.5} fill={color} />);
+      }
+      // Curl puffs along the falling length (left & right)
+      const curlsAlong = (xSign: number) => {
+        for (let i = 0; i < 8; i++) {
+          const t = i / 7;
+          const px = cx + xSign * (rx * 0.85 + Math.sin(t * 3) * 4);
+          const py = cy + ry * 0.1 + t * length * 0.95;
+          els.push(<circle key={`ncl${xSign}${i}`} cx={px} cy={py} r={6.5} fill={color} />);
+          els.push(<circle key={`ncl${xSign}${i}b`} cx={px - xSign * 5} cy={py + 3} r={5.5} fill={color} />);
+          els.push(<circle key={`ncl${xSign}${i}s`} cx={px} cy={py} r={1.6} fill={dark} opacity="0.45" />);
+        }
+      };
+      curlsAlong(-1);
+      curlsAlong(1);
+      // Tip tuft
+      els.push(<circle key="tip-l" cx={cx - rx * 0.4} cy={cy + length} r={6} fill={color} />);
+      els.push(<circle key="tip-r" cx={cx + rx * 0.4} cy={cy + length} r={6} fill={color} />);
+      els.push(<circle key="tip-c" cx={cx} cy={cy + length + 3} r={6.5} fill={color} />);
+      // Top shading
+      for (let i = 0; i < 14; i++) {
+        const a = Math.PI + (Math.PI * i) / 13;
+        const r = baseR - 3;
+        const px = cx + Math.cos(a) * r;
+        const py = cy - ry * 0.2 + Math.sin(a) * (r * 0.95);
+        if (py > browY - 2) continue;
+        els.push(<circle key={`nls${i}`} cx={px} cy={py} r={1.7} fill={dark} opacity="0.5" />);
+      }
+
+      backNode = <g>{els}</g>;
+      defaultBangsNode = <CurlyBangs />;
+      break;
+    }
+
     default:
       backNode = FullBase(ry * 0.8);
       defaultBangsNode = <SoftBangs />;

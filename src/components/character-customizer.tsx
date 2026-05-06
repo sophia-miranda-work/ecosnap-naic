@@ -81,6 +81,8 @@ const FREE_HAIRSTYLES: { id: HairStyleId; label: string }[] = [
   { id: "side-sweep", label: "Side sweep" },
   { id: "afro-short", label: "Afro (short)" },
   { id: "afro", label: "Afro (medium)" },
+  { id: "natural-curls-short", label: "Natural curls (short)" },
+  { id: "natural-curls-long", label: "Natural curls (long)" },
   { id: "dreads", label: "Dreads" },
   { id: "topknot", label: "Topknot bun" },
   { id: "fade", label: "Pixie cut" },
