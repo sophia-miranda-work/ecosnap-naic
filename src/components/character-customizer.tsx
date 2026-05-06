@@ -549,6 +549,16 @@ export function CharacterCustomizer({ onClose }: { onClose: () => void }) {
             </>
           )}
         </div>
+        {/* Footer */}
+        <div className="flex shrink-0 items-center justify-end gap-2 border-t border-border bg-card/60 p-3">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-full bg-primary px-5 py-2 text-sm font-bold text-primary-foreground shadow-sm hover:bg-primary/90"
+          >
+            {t("Save")}
+          </button>
+        </div>
       </div>
     </div>
   );
