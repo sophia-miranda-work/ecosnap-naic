@@ -8,6 +8,7 @@ import { SettingsProvider, useSettings } from "@/hooks/use-settings";
 import { AdventureStylePicker } from "@/components/adventure-style-picker";
 import { LanguagePicker } from "@/components/language-picker";
 import { SplashScreen } from "@/components/splash-screen";
+import { BackgroundMusic } from "@/components/background-music";
 
 function NotFoundComponent() {
   return (
@@ -92,6 +93,7 @@ function RootComponent() {
           </main>
           <BottomTabs />
           <OnboardingGates />
+          <BackgroundMusic />
         </div>
       </div>
     </SettingsProvider>
