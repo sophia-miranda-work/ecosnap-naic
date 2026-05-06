@@ -83,7 +83,7 @@ export function DailyExtras({
   indoor?: boolean;
 }) {
   const { character, awardCoins } = useCharacter();
-  const { settings, startAmbience, stopAmbience, currentAmbienceKind } = useSettings();
+  const { settings, startAmbience, stopAmbience, currentAmbienceKind, t } = useSettings();
   const today = todayKey();
   const tasks = useMemo(() => pickDailyTasks(new Date(), indoor), [indoor]);
   const reflection = useMemo(() => pickDailyReflection(new Date(), indoor), [indoor]);
@@ -161,17 +161,17 @@ export function DailyExtras({
     <section className="mt-6">
       <div className="flex items-end justify-between">
         <div>
-          <h2 className="text-lg font-bold text-foreground">Today's extras</h2>
+          <h2 className="text-lg font-bold text-foreground">{t("Today's extras")}</h2>
           <p className="text-xs text-muted-foreground">
             {indoor
-              ? "Tiny bonus moments from right where you are. Tap when done."
-              : "Tiny bonus moments from the woods. Tap when done."}
+              ? t("Tiny bonus moments from right where you are. Tap when done.")
+              : t("Tiny bonus moments from the woods. Tap when done.")}
           </p>
         </div>
         {allDone && (
           <span className="inline-flex items-center gap-1 rounded-full bg-primary/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-primary">
             <Sparkles className="h-3 w-3" />
-            All done!
+            {t("All done!")}
           </span>
         )}
       </div>
@@ -213,7 +213,7 @@ export function DailyExtras({
               </div>
               <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-foreground px-2.5 py-1 text-[10px] font-bold text-background">
                 <Coins className="h-3 w-3 text-accent" />
-                {done ? "Done" : `+${q.coins}`}
+                {done ? t("Done") : `+${q.coins}`}
               </span>
             </div>
           </button>
@@ -259,7 +259,7 @@ export function DailyExtras({
       <div className="parchment-card mt-3 p-4">
         <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
           <NotebookPen className="h-3.5 w-3.5" />
-          Today's reflection
+          {t("Today's reflection")}
         </div>
         <p className="mt-1 text-sm font-bold text-foreground">{reflection.prompt}</p>
         <textarea
@@ -269,7 +269,7 @@ export function DailyExtras({
           onBlur={() => stopAmbience()}
           maxLength={240}
           rows={2}
-          placeholder="A line or two — just for you."
+          placeholder={t("A line or two — just for you.")}
           className="mt-2 w-full resize-none rounded-xl border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
           disabled={state.reflectionAwarded}
         />
@@ -285,7 +285,7 @@ export function DailyExtras({
           {state.reflectionAwarded ? (
             <span className="inline-flex items-center gap-1 rounded-full bg-primary/15 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-primary">
               <Check className="h-3 w-3" />
-              Saved · +{REFLECTION_BONUS} coins
+              {t("Saved · +{x} coins", { x: REFLECTION_BONUS })}
             </span>
           ) : (
             <button
@@ -295,7 +295,7 @@ export function DailyExtras({
               className="inline-flex items-center gap-1 rounded-full bg-foreground px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-background disabled:opacity-40"
             >
               <Coins className="h-3 w-3 text-accent" />
-              Save · +{REFLECTION_BONUS}
+              {t("Save · +{x}", { x: REFLECTION_BONUS })}
             </button>
           )}
         </div>

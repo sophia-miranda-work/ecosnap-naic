@@ -17,6 +17,8 @@ import {
   type TtsVoice,
 } from "@/lib/settings";
 import { ambienceLabel } from "@/lib/ambience";
+import { LANGUAGES } from "@/lib/i18n";
+import type { Language } from "@/lib/settings";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
@@ -36,6 +38,8 @@ function SettingsPage() {
     settings,
     update,
     setStyle,
+    setLanguage,
+    t,
     playChime,
     speak,
     startAmbience,
@@ -52,7 +56,7 @@ function SettingsPage() {
         <button
           type="button"
           onClick={() => navigate({ to: "/profile" })}
-          aria-label="Back to profile"
+          aria-label={t("Back to profile")}
           className="rounded-full border border-border bg-card p-2 text-foreground hover:bg-muted"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -60,14 +64,37 @@ function SettingsPage() {
         <div>
           <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
             <SettingsIcon className="h-3.5 w-3.5" />
-            Preferences
+            {t("Preferences")}
           </p>
-          <h1 className="text-2xl font-bold text-foreground">Settings</h1>
+          <h1 className="text-2xl font-bold text-foreground">{t("Settings")}</h1>
         </div>
       </header>
 
+      {/* Language */}
+      <Section title={t("Language")}>
+        <div className="grid grid-cols-2 gap-2">
+          {LANGUAGES.map((l) => {
+            const active = settings.language === l.id;
+            return (
+              <button
+                key={l.id}
+                type="button"
+                onClick={() => setLanguage(l.id as Language)}
+                aria-pressed={active}
+                className={`flex items-center gap-2 rounded-2xl border-2 p-3 text-left transition-colors ${
+                  active ? "border-primary bg-primary/10" : "border-border bg-card hover:bg-muted"
+                }`}
+              >
+                <span className="text-2xl" aria-hidden>{l.emoji}</span>
+                <span className="text-sm font-bold text-foreground">{l.native}</span>
+              </button>
+            );
+          })}
+        </div>
+      </Section>
+
       {/* Adventure Style */}
-      <Section title="Adventure Style" subtitle="Changes how quests and walks work for you.">
+      <Section title={t("Adventure Style")} subtitle={t("Changes how quests and walks work for you.")}>
         <div className="space-y-2">
           {ADVENTURE_STYLES.map((s) => {
             const active = settings.style === s.id;
@@ -85,12 +112,12 @@ function SettingsPage() {
                   {s.emoji}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold text-foreground">{s.name}</p>
-                  <p className="text-xs text-muted-foreground">{s.description}</p>
+                  <p className="text-sm font-bold text-foreground">{t(s.name)}</p>
+                  <p className="text-xs text-muted-foreground">{t(s.description)}</p>
                 </div>
                 {active && (
                   <span className="shrink-0 rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary-foreground">
-                    Active
+                    {t("Active")}
                   </span>
                 )}
               </button>
@@ -103,10 +130,10 @@ function SettingsPage() {
             htmlFor="walking-goal"
             className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground"
           >
-            Custom walking goal (meters)
+            {t("Custom walking goal (meters)")}
           </label>
           <p className="mt-1 text-xs text-muted-foreground">
-            Any number works — even 0. Set 0 to use this style's default
+            {t("Any number works — even 0. Set 0 to use this style's default")}
             ({defaultMetersFor(settings.style)} m
             {settings.style === "observer" ? " — no walking required" : ""}).
           </p>
@@ -127,27 +154,27 @@ function SettingsPage() {
               onClick={() => update({ observerGoalMeters: observerGoal })}
               className="rounded-xl bg-primary px-4 text-sm font-bold text-primary-foreground"
             >
-              Save
+              {t("Save")}
             </button>
           </div>
         </div>
       </Section>
 
       {/* Visual & Audio */}
-      <Section title="Visual & Audio">
+      <Section title={t("Visual & Audio")}>
         <SegmentedRow
-          label="Quest celebration"
-          help="Switch between confetti animations and a clean static message."
+          label={t("Quest celebration")}
+          help={t("Switch between confetti animations and a clean static message.")}
           value={settings.celebrationStyle}
           options={[
-            { value: "sparkly", label: "✨ Super Sparkly" },
-            { value: "simple", label: "Simple" },
+            { value: "sparkly", label: t("✨ Super Sparkly") },
+            { value: "simple", label: t("Simple") },
           ]}
           onChange={(v) => update({ celebrationStyle: v as "sparkly" | "simple" })}
         />
         <ToggleRow
-          label="Sound effects"
-          help="Play a chime when you complete a quest or earn coins."
+          label={t("Sound effects")}
+          help={t("Play a chime when you complete a quest or earn coins.")}
           checked={settings.soundEffects}
           onChange={(v) => {
             update({ soundEffects: v });
@@ -156,7 +183,7 @@ function SettingsPage() {
           icon={<Volume2 className="h-4 w-4" />}
         />
         <ToggleRow
-          label="Nature sounds while reflecting"
+          label={t("Nature sounds while reflecting")}
           help={`Soft, time-of-day ambience plays while you write your daily reflection. Right now: ${ambienceLabel(currentAmbienceKind)}.`}
           checked={settings.natureSounds}
           onChange={(v) => {
@@ -174,10 +201,10 @@ function SettingsPage() {
       </Section>
 
       {/* Accessibility */}
-      <Section title="Accessibility">
+      <Section title={t("Accessibility")}>
         <ToggleRow
-          label="Read to me"
-          help="Adds a 🔊 button next to quests, NPC dialogue, and fun facts."
+          label={t("Read to me")}
+          help={t("Adds a 🔊 button next to quests, NPC dialogue, and fun facts.")}
           checked={settings.readToMe}
           onChange={(v) => {
             update({ readToMe: v });
@@ -187,14 +214,14 @@ function SettingsPage() {
         />
         {settings.readToMe && (
           <SegmentedRow
-            label="Narrator voice"
-            help="Pick the voice flavor used to read quests aloud."
+            label={t("Narrator voice")}
+            help={t("Pick the voice flavor used to read quests aloud.")}
             value={settings.ttsVoice}
             options={[
-              { value: "warm", label: "Warm" },
-              { value: "bright", label: "Bright" },
-              { value: "calm", label: "Calm" },
-              { value: "storyteller", label: "Storyteller" },
+              { value: "warm", label: t("Warm") },
+              { value: "bright", label: t("Bright") },
+              { value: "calm", label: t("Calm") },
+              { value: "storyteller", label: t("Storyteller") },
             ]}
             onChange={(v) => {
               update({ ttsVoice: v as TtsVoice });
@@ -203,15 +230,15 @@ function SettingsPage() {
           />
         )}
         <ToggleRow
-          label="Voice note quests"
-          help="Replace the camera with a microphone — describe what you found out loud."
+          label={t("Voice note quests")}
+          help={t("Replace the camera with a microphone — describe what you found out loud.")}
           checked={settings.voiceNoteQuests}
           onChange={(v) => update({ voiceNoteQuests: v })}
           icon={<Mic className="h-4 w-4" />}
         />
         <ToggleRow
-          label="Auto-snap camera"
-          help="A big tap-anywhere shutter banner — easier with shaky hands."
+          label={t("Auto-snap camera")}
+          help={t("A big tap-anywhere shutter banner — easier with shaky hands.")}
           checked={settings.autoSnap}
           onChange={(v) => update({ autoSnap: v })}
           icon={<Camera className="h-4 w-4" />}
@@ -219,10 +246,10 @@ function SettingsPage() {
       </Section>
 
       <p className="mt-8 text-center text-[11px] text-muted-foreground">
-        Settings are saved on this device.
+        {t("Settings are saved on this device.")}
         <br />
         <Link to="/profile" className="font-semibold text-primary hover:underline">
-          Back to profile
+          {t("Back to profile")}
         </Link>
       </p>
     </div>

@@ -6,6 +6,7 @@ import { useCharacter, DEFAULT_DRESSUP } from "@/hooks/use-character";
 import { CharacterCreator } from "@/components/character-creator";
 import { DressupAvatar } from "@/components/dressup-avatar";
 import { CharacterCustomizer } from "@/components/character-customizer";
+import { useSettings } from "@/hooks/use-settings";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -31,19 +32,20 @@ const ACCENT_SWATCHES: Record<string, string> = {
 function ProfilePage() {
   const navigate = useNavigate();
   const { character, loading } = useCharacter();
+  const { t } = useSettings();
   const [editing, setEditing] = useState(false);
   const [customizing, setCustomizing] = useState(false);
 
   const stats = [
-    { icon: Flame, label: "Day streak", value: "7" },
-    { icon: Sparkles, label: "Quests done", value: "23" },
-    { icon: Footprints, label: "Total km", value: "48.2" },
-    { icon: Trophy, label: "Badges", value: "4" },
+    { icon: Flame, label: t("Day streak"), value: "7" },
+    { icon: Sparkles, label: t("Quests done"), value: "23" },
+    { icon: Footprints, label: t("Total km"), value: "48.2" },
+    { icon: Trophy, label: t("Badges"), value: "4" },
   ];
 
   const accent = character ? ACCENT_SWATCHES[character.accent] ?? ACCENT_SWATCHES.moss : ACCENT_SWATCHES.moss;
   const avatar = character?.avatar ?? "🦊";
-  const name = character?.name ?? (loading ? "…" : "Wandering Fox");
+  const name = character?.name ?? (loading ? "…" : t("Wandering Fox"));
   const bio = character?.bio ?? "Joined this spring";
   const dressup = character?.dressup ?? DEFAULT_DRESSUP;
   const coins = character?.coins ?? 0;
@@ -62,7 +64,7 @@ function ProfilePage() {
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-            Explorer
+            {t("Explorer")}
           </p>
           <h1 className="truncate text-2xl font-bold text-foreground">{name}</h1>
           <p className="line-clamp-2 text-sm text-muted-foreground">{bio}</p>
@@ -74,7 +76,7 @@ function ProfilePage() {
         <button
           type="button"
           onClick={() => setEditing(true)}
-          aria-label="Edit character"
+          aria-label={t("Edit explorer")}
           className="rounded-full border border-border bg-card p-2 text-foreground hover:bg-muted"
         >
           <Pencil className="h-4 w-4" />
@@ -88,16 +90,16 @@ function ProfilePage() {
         <div className="flex items-start justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              Wardrobe
+              {t("Wardrobe")}
             </p>
-            <h2 className="text-lg font-bold text-foreground">Your dress-up</h2>
+            <h2 className="text-lg font-bold text-foreground">{t("Your dress-up")}</h2>
           </div>
           <Link
             to="/shop"
             className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground"
           >
             <Shirt className="h-3 w-3" />
-            Shop clothes
+            {t("Shop clothes")}
           </Link>
         </div>
         <div className="mt-3 flex justify-center">
@@ -109,7 +111,7 @@ function ProfilePage() {
           onClick={() => setCustomizing(true)}
           className="mt-2 w-full rounded-xl border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground hover:bg-muted"
         >
-          Customize character
+          {t("Customize character")}
         </button>
       </section>
 
@@ -126,7 +128,7 @@ function ProfilePage() {
       </div>
 
       <section className="mt-8">
-        <h2 className="text-lg font-bold text-foreground">Recent badges</h2>
+        <h2 className="text-lg font-bold text-foreground">{t("Recent badges")}</h2>
         <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
           {["🌱 First Step", "🌸 7-day streak", "🍄 Forager", "🐦 Bird spotter"].map((b) => (
             <div
@@ -150,9 +152,9 @@ function ProfilePage() {
               <SettingsIcon className="h-5 w-5" />
             </span>
             <span>
-              <span className="block text-sm font-bold">Settings</span>
+              <span className="block text-sm font-bold">{t("Settings")}</span>
               <span className="block text-xs text-muted-foreground">
-                Adventure style, accessibility, sound
+                {t("Adventure style, accessibility, sound")}
               </span>
             </span>
           </span>

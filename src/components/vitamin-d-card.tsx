@@ -12,6 +12,7 @@ import {
   getCurrentCoords,
 } from "@/lib/vitamin-d";
 import { useCharacter } from "@/hooks/use-character";
+import { useSettings } from "@/hooks/use-settings";
 
 /**
  * Daily Vitamin D card.
@@ -20,6 +21,7 @@ import { useCharacter } from "@/hooks/use-character";
  */
 export function VitaminDCard() {
   const { character, saveSunProfile } = useCharacter();
+  const { t } = useSettings();
   const [editing, setEditing] = useState(false);
 
   // Form state for first-time setup / edit
@@ -78,16 +80,16 @@ export function VitaminDCard() {
           <span className="grid h-10 w-10 place-items-center rounded-full bg-accent/20 text-accent">
             <Sun className="h-6 w-6" />
           </span>
-          <h3 className="text-base font-bold text-foreground">Sun check setup</h3>
+          <h3 className="text-base font-bold text-foreground">{t("Sun check setup")}</h3>
         </div>
         <p className="mt-1 text-xs text-muted-foreground">
-          Tell us a bit about you so we can suggest how long to walk for your daily vitamin D.
+          {t("Tell us a bit about you so we can suggest how long to walk for your daily vitamin D.")}
         </p>
 
         {/* Skin type */}
         <div className="mt-4">
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-            Skin type (Fitzpatrick)
+            {t("Skin type (Fitzpatrick)")}
           </p>
           <div className="mt-2 grid grid-cols-3 gap-1.5">
             {SKIN_TYPES.map((s) => (
@@ -114,7 +116,7 @@ export function VitaminDCard() {
         {/* Age */}
         <div className="mt-4">
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-            Age group
+            {t("Age group")}
           </p>
           <div className="mt-2 grid grid-cols-2 gap-1.5">
             {AGE_GROUPS.map((a) => (
@@ -137,7 +139,7 @@ export function VitaminDCard() {
         {/* Clothing */}
         <div className="mt-4">
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-            What you usually wear outside
+            {t("What you usually wear outside")}
           </p>
           <div className="mt-2 grid grid-cols-2 gap-1.5">
             {CLOTHING_OPTIONS.map((c) => (
@@ -165,7 +167,7 @@ export function VitaminDCard() {
             disabled={!character}
             className="flex-1 rounded-2xl bg-primary px-4 py-2.5 text-sm font-bold text-primary-foreground disabled:opacity-50"
           >
-            Save & check sun
+            {t("Save & check sun")}
           </button>
           {hasProfile && (
             <button
@@ -173,13 +175,13 @@ export function VitaminDCard() {
               onClick={() => setEditing(false)}
               className="rounded-2xl bg-muted px-4 py-2.5 text-sm font-semibold text-foreground"
             >
-              Cancel
+              {t("Cancel")}
             </button>
           )}
         </div>
         {!character && (
           <p className="mt-2 text-[11px] text-muted-foreground">
-            Create your character first to save your sun profile.
+            {t("Create your character first to save your sun profile.")}
           </p>
         )}
         {error && <p className="mt-2 text-xs text-destructive">{error}</p>}
@@ -206,20 +208,20 @@ export function VitaminDCard() {
           <span className="grid h-10 w-10 place-items-center rounded-full bg-accent/20 text-accent shadow-sm">
             <Sun className="h-6 w-6 animate-pulse" />
           </span>
-          <h3 className="text-base font-bold text-foreground">Vitamin D Tracker</h3>
+          <h3 className="text-base font-bold text-foreground">{t("Vitamin D Tracker")}</h3>
         </div>
         <button
           type="button"
           onClick={() => setEditing(true)}
           className="rounded-full bg-muted px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-foreground hover:bg-muted/70"
         >
-          Edit profile
+          {t("Edit profile")}
         </button>
       </div>
 
       {/* Sunscreen toggle */}
       <label className="mt-3 flex items-center justify-between rounded-xl bg-muted/40 px-3 py-2">
-        <span className="text-sm font-semibold text-foreground">Wearing sunscreen?</span>
+        <span className="text-sm font-semibold text-foreground">{t("Wearing sunscreen?")}</span>
         <input
           type="checkbox"
           checked={sunscreen}
@@ -236,14 +238,14 @@ export function VitaminDCard() {
           className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-foreground px-4 py-2.5 text-sm font-bold text-background"
         >
           <MapPin className="h-4 w-4" />
-          Check sun where I am
+          {t("Check sun where I am")}
         </button>
       )}
 
       {loading && (
         <div className="mt-3 flex items-center justify-center gap-2 rounded-2xl bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" />
-          Reading the sky…
+          {t("Reading the sky…")}
         </div>
       )}
 
@@ -255,7 +257,7 @@ export function VitaminDCard() {
             onClick={fetchUV}
             className="ml-2 inline-flex items-center gap-1 text-foreground underline"
           >
-            <RefreshCw className="h-3 w-3" /> Retry
+            <RefreshCw className="h-3 w-3" /> {t("Retry")}
           </button>
         </div>
       )}
@@ -268,10 +270,10 @@ export function VitaminDCard() {
           </div>
           {result.minutes !== null ? (
             <p className="mt-1 text-2xl font-bold text-foreground">
-              {result.minutes} min outside
+              {t("{x} min outside", { x: result.minutes })}
             </p>
           ) : (
-            <p className="mt-1 text-base font-bold text-foreground">No sun D right now</p>
+            <p className="mt-1 text-base font-bold text-foreground">{t("No sun D right now")}</p>
           )}
           <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{result.message}</p>
           <button
@@ -280,13 +282,13 @@ export function VitaminDCard() {
             className="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-primary"
           >
             <RefreshCw className="h-3 w-3" />
-            Recheck
+            {t("Recheck")}
           </button>
         </div>
       )}
 
       <p className="mt-3 text-[10px] leading-relaxed text-muted-foreground">
-        Friendly estimate, not medical advice. UV data: open-meteo.com.
+        {t("Friendly estimate, not medical advice. UV data: open-meteo.com.")}
       </p>
     </section>
   );

@@ -124,6 +124,7 @@ function WalkStatsAndCta({
   isWalking,
   questDone,
   onStart,
+  t,
 }: {
   distanceKm: number;
   goalMeters: number;
@@ -132,6 +133,7 @@ function WalkStatsAndCta({
   isWalking: boolean;
   questDone: boolean;
   onStart: () => void;
+  t: (key: string, vars?: Record<string, string | number>) => string;
 }) {
   return (
     <>
@@ -150,12 +152,12 @@ function WalkStatsAndCta({
                 />
               </div>
               <p className="mt-1 text-xs text-muted-foreground">
-                of {goalKm.toFixed(2)} km goal
+                {t("of {x} km goal", { x: goalKm.toFixed(2) })}
               </p>
             </>
           ) : (
             <p className="text-xs text-muted-foreground">
-              {isWalking ? "tracking live" : "walked this trip"}
+              {isWalking ? t("tracking live") : t("walked this trip")}
             </p>
           )}
         </div>
@@ -164,7 +166,7 @@ function WalkStatsAndCta({
           <p className="mt-3 text-2xl font-bold text-foreground">
             {questDone ? "1" : "0"} / 1
           </p>
-          <p className="text-xs text-muted-foreground">quests today</p>
+          <p className="text-xs text-muted-foreground">{t("quests today")}</p>
         </div>
       </section>
 
@@ -176,9 +178,9 @@ function WalkStatsAndCta({
         >
           <span className="text-left">
             <span className="block text-xs font-semibold uppercase tracking-[0.2em] opacity-70">
-              Ready when you are
+              {t("Ready when you are")}
             </span>
-            <span className="block text-lg font-bold">Start your walk</span>
+            <span className="block text-lg font-bold">{t("Start your walk")}</span>
           </span>
           <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
         </button>
@@ -188,7 +190,7 @@ function WalkStatsAndCta({
 }
 
 function Index() {
-  const { settings, playChime, speak } = useSettings();
+  const { settings, playChime, speak, t } = useSettings();
   const isObserver = settings.style === "observer";
   const isWanderer = settings.style === "wanderer";
 
@@ -214,8 +216,8 @@ function Index() {
   const [coinFlash, setCoinFlash] = useState<number | null>(null);
   const journal = useJournal();
   const { character } = useCharacter();
-  const explorerName = character?.name?.split(" ")[0] ?? "Explorer";
-  const greetingHeadline = welcomeBack ? "Welcome back," : "Good morning,";
+  const explorerName = character?.name?.split(" ")[0] ?? t("Explorer");
+  const greetingHeadline = welcomeBack ? t("Welcome back,") : t("Good morning,");
 
   // Live geolocation tracking — only active during the "walking" phase.
   const tracker = useWalkTracker(walk.phase === "walking");
@@ -278,13 +280,13 @@ function Index() {
         <button
           type="button"
           onClick={() => setStreakOpen(true)}
-          aria-label={`View your streak tree (${streak} day${streak === 1 ? "" : "s"})`}
+          aria-label={`${t("Your streak tree")} (${streak === 1 ? t("{x} day", { x: streak }) : t("{x} days", { x: streak })})`}
           className="parchment-card flex flex-col items-center px-3 py-2 text-center transition-transform hover:scale-105 active:scale-95"
         >
           <span className="text-2xl leading-none" aria-hidden>🌸</span>
           <span className="mt-1 text-lg font-bold leading-none text-foreground">{streak}</span>
           <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-            day streak
+            {t("day streak")}
           </span>
         </button>
       </header>
@@ -306,7 +308,7 @@ function Index() {
               {giver.name} · {giver.role}
               {isObserver && (
                 <span className="ml-1 rounded-full bg-primary-foreground/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider">
-                  Window quest
+                  {t("Window quest")}
                 </span>
               )}
             </div>
@@ -354,12 +356,12 @@ function Index() {
                 {questDone ? (
                   <>
                     <Check className="h-3.5 w-3.5" />
-                    Sketch saved
+                    {t("Sketch saved")}
                   </>
                 ) : (
                   <>
                     <Camera className="h-3.5 w-3.5" />
-                    Tap to capture proof
+                    {t("Tap to capture proof")}
                   </>
                 )}
               </span>
@@ -373,7 +375,7 @@ function Index() {
                 className="inline-flex items-center gap-1.5 rounded-full bg-primary-foreground/15 px-3 py-1 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary-foreground/25"
               >
                 <RefreshCw className="h-3 w-3" />
-                Reroll
+                {t("Reroll")}
               </span>
             </div>
 
@@ -383,7 +385,7 @@ function Index() {
               onClick={(e) => e.stopPropagation()}
               className="mt-3 inline-flex w-full items-center justify-center rounded-full bg-primary-foreground/15 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-primary-foreground hover:bg-primary-foreground/25"
             >
-              Meet the cast
+              {t("Meet the cast")}
             </Link>
           </div>
         </button>
@@ -399,7 +401,7 @@ function Index() {
           />
           <div className="flex-1">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              Quest complete
+              {t("Quest complete")}
             </p>
             <p className="text-sm font-bold text-foreground line-clamp-1">{proofEntry.title}</p>
             {proofEntry.fun_fact && (
@@ -409,7 +411,7 @@ function Index() {
                 </p>
                 {settings.readToMe && (
                   <div className="mt-1">
-                    <TtsButton text={proofEntry.fun_fact} label="Read fact" />
+                    <TtsButton text={proofEntry.fun_fact} label={t("Read fact")} />
                   </div>
                 )}
               </>
@@ -420,7 +422,7 @@ function Index() {
             onClick={() => setCameraOpen(true)}
             className="rounded-full bg-muted px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-foreground hover:bg-muted/70"
           >
-            Retake
+            {t("Retake")}
           </button>
         </section>
       )}
@@ -436,6 +438,7 @@ function Index() {
           isWalking={walk.phase === "walking"}
           questDone={questDone}
           onStart={() => setWalk({ phase: "premood" })}
+          t={t}
         />
       )}
 
@@ -462,6 +465,7 @@ function Index() {
           isWalking={walk.phase === "walking"}
           questDone={questDone}
           onStart={() => setWalk({ phase: "premood" })}
+          t={t}
         />
       )}
 
@@ -471,22 +475,22 @@ function Index() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                Walk in progress
+                {t("Walk in progress")}
               </p>
               <p className="mt-1 text-lg font-bold text-foreground">
                 {distanceKm.toFixed(2)} km · {tracker.points} pts
               </p>
               <p className="mt-1 inline-flex items-center gap-1 text-xs text-muted-foreground">
                 <MapPin className="h-3 w-3" />
-                {tracker.status === "requesting" && "Waiting for GPS…"}
-                {tracker.status === "tracking" && "GPS locked · have fun out there 🍃"}
+                {tracker.status === "requesting" && t("Waiting for GPS…")}
+                {tracker.status === "tracking" && t("GPS locked · have fun out there 🍃")}
                 {tracker.status === "denied" &&
-                  "Location denied — distance won't be tracked."}
+                  t("Location denied — distance won't be tracked.")}
                 {tracker.status === "unavailable" &&
-                  "Geolocation unavailable in this browser."}
+                  t("Geolocation unavailable in this browser.")}
                 {tracker.status === "error" &&
-                  (tracker.error ?? "Couldn't read location.")}
-                {tracker.status === "idle" && "Starting GPS…"}
+                  (tracker.error ?? t("Couldn't read location."))}
+                {tracker.status === "idle" && t("Starting GPS…")}
               </p>
             </div>
             <button
@@ -494,7 +498,7 @@ function Index() {
               onClick={() => setWalk({ phase: "postmood", startMood: walk.startMood })}
               className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
             >
-              Finish
+              {t("Finish")}
             </button>
           </div>
         </section>
@@ -504,11 +508,11 @@ function Index() {
         <section className="mt-4 parchment-card p-4 text-center">
           <p className="text-3xl">🌿</p>
           <p className="mt-1 text-sm text-muted-foreground">
-            Nice walk! You went from{" "}
+            {t("Nice walk! You went from")}{" "}
             <span className="font-semibold text-foreground">
               {MOODS.find((m) => m.value === walk.startMood)?.emoji}
             </span>{" "}
-            to{" "}
+            {t("to")}{" "}
             <span className="font-semibold text-foreground">
               {MOODS.find((m) => m.value === walk.endMood)?.emoji}
             </span>
@@ -518,7 +522,7 @@ function Index() {
             onClick={() => setWalk({ phase: "idle" })}
             className="mt-3 text-xs font-semibold uppercase tracking-wider text-primary"
           >
-            Done
+            {t("Done")}
           </button>
         </section>
       )}
@@ -526,11 +530,11 @@ function Index() {
       {/* Mood modals */}
       {(walk.phase === "premood" || walk.phase === "postmood") && (
         <MoodSheet
-          title={walk.phase === "premood" ? "How are you feeling?" : "How do you feel now?"}
+          title={walk.phase === "premood" ? t("How are you feeling?") : t("How do you feel now?")}
           subtitle={
             walk.phase === "premood"
-              ? "Log your mood before heading out."
-              : "A quick check-in before we wrap up."
+              ? t("Log your mood before heading out.")
+              : t("A quick check-in before we wrap up.")
           }
           onClose={() => setWalk({ phase: "idle" })}
           onPick={(mood) => {
@@ -540,6 +544,7 @@ function Index() {
               setWalk({ phase: "done", startMood: walk.startMood, endMood: mood });
             }
           }}
+          t={t}
         />
       )}
 
@@ -582,7 +587,7 @@ function Index() {
           <div className="parchment-card flex items-center gap-2 px-4 py-2.5">
             <Coins className="h-5 w-5 text-accent" />
             <span className="text-sm font-bold text-foreground">
-              +{coinFlash} coins from {giver.name}!
+              {t("+{x} coins!", { x: coinFlash })} {giver.name}
             </span>
           </div>
         </div>
@@ -603,11 +608,13 @@ function MoodSheet({
   subtitle,
   onClose,
   onPick,
+  t,
 }: {
   title: string;
   subtitle: string;
   onClose: () => void;
   onPick: (mood: string) => void;
+  t: (key: string, vars?: Record<string, string | number>) => string;
 }) {
   return (
     <div
@@ -629,7 +636,7 @@ function MoodSheet({
             type="button"
             onClick={onClose}
             className="rounded-full p-1 text-muted-foreground hover:bg-muted"
-            aria-label="Close"
+            aria-label={t("Close")}
           >
             <X className="h-5 w-5" />
           </button>
@@ -647,7 +654,7 @@ function MoodSheet({
                 {m.emoji}
               </span>
               <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                {m.label}
+                {t(m.label)}
               </span>
             </button>
           ))}

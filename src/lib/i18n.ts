@@ -120,6 +120,8 @@ const MS: Record<string, string> = {
   "Nice walk! You went from": "Perjalanan yang baik! Anda berubah dari",
   "to": "kepada",
   "day streak": "hari berturut",
+  "{x} day": "{x} hari",
+  "{x} days": "{x} hari",
 
   // Daily extras
   "Today's extras": "Tambahan hari ini",
@@ -164,6 +166,9 @@ const MS: Record<string, string> = {
   "Bronze Quests": "Misi Gangsa",
   "Silver Quests": "Misi Perak",
   "Gold Quests": "Misi Emas",
+  "No": "Tiada",
+  "sketches yet": "lakaran lagi",
+  "Active": "Aktif",
   "New batch in {x}d": "Kelompok baru dalam {x}h",
   "New month in {x}d": "Bulan baru dalam {x}h",
   "Already claimed earlier — nice work!": "Sudah dituntut sebelum ini — syabas!",
