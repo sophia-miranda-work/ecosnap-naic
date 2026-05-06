@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { X, Sparkles, Loader2 } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
 import { useCharacter, type Character, type CharacterDraft } from "@/hooks/use-character";
 import { useSettings } from "@/hooks/use-settings";
 
@@ -38,6 +39,7 @@ export function CharacterCreator({
 }) {
   const { save } = useCharacter();
   const { t } = useSettings();
+  const navigate = useNavigate();
   const [draft, setDraft] = useState<CharacterDraft>({
     name: initial?.name ?? "",
     bio: initial?.bio ?? "",
@@ -64,6 +66,9 @@ export function CharacterCreator({
       const saved = await save(draft);
       onSaved?.(saved);
       onClose();
+      if (!initial) {
+        navigate({ to: "/" });
+      }
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Couldn't save your explorer.");
     } finally {
