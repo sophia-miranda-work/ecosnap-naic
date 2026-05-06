@@ -376,6 +376,8 @@ const MS: Record<string, string> = {
   "Midday ocean": "Lautan tengah hari",
   "Evening surf": "Ombak petang",
   "Night crickets": "Cengkerik malam",
+  "Soft, time-of-day ambience plays while you write your daily reflection.": "Bunyi alam lembut mengikut waktu hari dimainkan sambil anda menulis renungan harian.",
+  "Right now": "Sekarang",
 
   // Misc
   "of": "daripada",

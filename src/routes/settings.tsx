@@ -184,7 +184,7 @@ function SettingsPage() {
         />
         <ToggleRow
           label={t("Nature sounds while reflecting")}
-          help={`Soft, time-of-day ambience plays while you write your daily reflection. Right now: ${ambienceLabel(currentAmbienceKind)}.`}
+          help={`${t("Soft, time-of-day ambience plays while you write your daily reflection.")} ${t("Right now")}: ${t(ambienceLabel(currentAmbienceKind))}.`}
           checked={settings.natureSounds}
           onChange={(v) => {
             update({ natureSounds: v });
