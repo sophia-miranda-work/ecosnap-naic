@@ -843,11 +843,11 @@ export const SHOP_ITEMS: ShopItem[] = [
     id: "prem-clip-leaf",
     name: "Leaf Clip",
     slot: "hairClip",
-    price: 100,
+    price: 0,
     emoji: "🍃",
     color: "#9ac84a",
     set: "basic",
-    description: "A pressed-leaf clip for woodland wanderers.",
+    description: "A pressed-leaf clip for woodland wanderers. Free for every explorer!",
   },
   {
     id: "prem-clip-mushroom",

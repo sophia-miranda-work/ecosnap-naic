@@ -916,7 +916,7 @@ function SlotPicker({
           );
         })}
       </div>
-      {currentItem && currentColor && (
+      {currentItem && (
         <div className="mt-3">
           <h4 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
             {t("Color")} · {t(currentItem.name)}
@@ -928,9 +928,9 @@ function SlotPicker({
                 type="button"
                 onClick={() => setItemColor(currentItem.id, c)}
                 aria-label={`Color ${c}`}
-                aria-pressed={currentColor.toLowerCase() === c.toLowerCase()}
+                aria-pressed={(currentColor ?? "").toLowerCase() === c.toLowerCase()}
                 className={`h-7 w-7 rounded-full border-2 transition-transform active:scale-90 ${
-                  currentColor.toLowerCase() === c.toLowerCase()
+                  (currentColor ?? "").toLowerCase() === c.toLowerCase()
                     ? "border-foreground"
                     : "border-transparent"
                 }`}
