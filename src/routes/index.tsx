@@ -16,6 +16,8 @@ import { requiredMetersFor } from "@/lib/settings";
 import { WINDOW_QUEST_POOL } from "@/lib/window-quests";
 import { TtsButton } from "@/components/tts-button";
 import { StreakTreeModal } from "@/components/streak-tree";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -206,6 +208,25 @@ function Index() {
   const { streak, welcomeBack, recordCompletion } = useStreak();
   const [streakOpen, setStreakOpen] = useState(false);
 
+  // One-time wildlife/plant safety notice on first app open.
+  const [wildlifeNoticeOpen, setWildlifeNoticeOpen] = useState(false);
+  useEffect(() => {
+    try {
+      const seen = window.localStorage.getItem("explorer-wildlife-notice:v1");
+      if (!seen) setWildlifeNoticeOpen(true);
+    } catch {
+      // ignore
+    }
+  }, []);
+  const dismissWildlifeNotice = () => {
+    try {
+      window.localStorage.setItem("explorer-wildlife-notice:v1", "1");
+    } catch {
+      // ignore
+    }
+    setWildlifeNoticeOpen(false);
+  };
+
   // Today's quest-giver (rotates daily across our small cast).
   const giver = pickDailyGiver();
   const greeting = pickGreeting(giver);
@@ -272,6 +293,26 @@ function Index() {
 
   return (
     <div className="px-5 pt-8">
+      <Dialog open={wildlifeNoticeOpen} onOpenChange={(open) => { if (!open) dismissWildlifeNotice(); }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <span aria-hidden>🌿</span> {t("A gentle reminder")}
+            </DialogTitle>
+            <DialogDescription className="pt-2 text-left text-sm leading-relaxed">
+              {t("Please don't touch, pick or disturb wildlife and plants on your adventures.")}
+              {" "}
+              {t("Use your camera's zoom to take photos from a safe distance — both you and nature will be happier for it.")}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={dismissWildlifeNotice} className="w-full">
+              {t("I'll explore kindly")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Greeting + streak */}
       <header className="flex items-start justify-between">
         <div>
