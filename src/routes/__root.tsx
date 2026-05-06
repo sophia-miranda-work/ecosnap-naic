@@ -6,6 +6,7 @@ import { useCharacter } from "@/hooks/use-character";
 import { CharacterCreator } from "@/components/character-creator";
 import { SettingsProvider, useSettings } from "@/hooks/use-settings";
 import { AdventureStylePicker } from "@/components/adventure-style-picker";
+import { LanguagePicker } from "@/components/language-picker";
 
 function NotFoundComponent() {
   return (
@@ -97,7 +98,11 @@ function OnboardingGates() {
   const { settings, ready: settingsReady } = useSettings();
   const navigate = useNavigate();
   if (loading || !settingsReady) return null;
-  // Step 1: create the character.
+  // Step 1: pick a language.
+  if (!settings.language) {
+    return <LanguagePicker dismissible={false} />;
+  }
+  // Step 2: create the character.
   if (!character) {
     return (
       <CharacterCreator
@@ -111,7 +116,7 @@ function OnboardingGates() {
       />
     );
   }
-  // Step 2: pick an adventure style.
+  // Step 3: pick an adventure style.
   if (!settings.style) {
     return (
       <AdventureStylePicker
@@ -126,12 +131,13 @@ function OnboardingGates() {
 }
 
 function BottomTabs() {
+  const { t } = useSettings();
   const tabs = [
-    { to: "/", label: "Home", icon: Home },
-    { to: "/quests", label: "Quests", icon: Scroll },
-    { to: "/journal", label: "Journal", icon: BookOpen },
-    { to: "/shop", label: "Shop", icon: ShoppingBag },
-    { to: "/profile", label: "Profile", icon: User },
+    { to: "/", label: t("Home"), icon: Home },
+    { to: "/quests", label: t("Quests"), icon: Scroll },
+    { to: "/journal", label: t("Journal"), icon: BookOpen },
+    { to: "/shop", label: t("Shop"), icon: ShoppingBag },
+    { to: "/profile", label: t("Profile"), icon: User },
   ] as const;
 
   return (
