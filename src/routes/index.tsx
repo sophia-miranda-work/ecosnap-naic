@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, Camera, Check, Coins, Compass, Footprints, MapPin, RefreshCw, Sparkles, X } from "lucide-react";
 import { useWalkTracker } from "@/hooks/use-walk-tracker";
+import { useTotalDistance } from "@/hooks/use-total-distance";
 import { QuestCamera } from "@/components/quest-camera";
 import { useJournal, type JournalEntry } from "@/hooks/use-journal";
 import { useCharacter } from "@/hooks/use-character";
@@ -221,6 +222,7 @@ function Index() {
 
   // Live geolocation tracking — only active during the "walking" phase.
   const tracker = useWalkTracker(walk.phase === "walking");
+  const { addMeters: addTotalMeters } = useTotalDistance();
   // Trip distance persists after "Finish" so capture is allowed afterwards too.
   const [tripMeters, setTripMeters] = useState(0);
   useEffect(() => {
@@ -495,7 +497,10 @@ function Index() {
             </div>
             <button
               type="button"
-              onClick={() => setWalk({ phase: "postmood", startMood: walk.startMood })}
+              onClick={() => {
+                addTotalMeters(tracker.distanceMeters);
+                setWalk({ phase: "postmood", startMood: walk.startMood });
+              }}
               className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
             >
               {t("Finish")}
