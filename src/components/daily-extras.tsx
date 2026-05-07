@@ -223,7 +223,7 @@ export function DailyExtras({
         return (
           <button
             type="button"
-            onClick={completeWeatherQuest}
+            onClick={openWeatherCamera}
             disabled={done || isBusy || !character}
             className={`mt-3 block w-full overflow-hidden rounded-2xl border-2 border-primary/40 bg-gradient-to-br from-primary/15 via-card to-card p-4 text-left transition-transform active:scale-[0.99] ${
               done ? "opacity-70" : ""
@@ -265,7 +265,7 @@ export function DailyExtras({
             <li key={task.id}>
               <button
                 type="button"
-                onClick={() => completeTask(task)}
+                onClick={() => openTaskCamera(task)}
                 disabled={done || isBusy || !character}
                 className={`parchment-card flex w-full items-center gap-3 p-3 text-left transition-transform active:scale-[0.99] ${
                   done ? "opacity-70" : ""
