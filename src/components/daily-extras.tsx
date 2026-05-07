@@ -24,6 +24,8 @@ import { useWeatherQuest } from "@/hooks/use-weather-quest";
 import type { WeatherKind } from "@/lib/weather";
 import { useSettings } from "@/hooks/use-settings";
 import { ambienceLabel } from "@/lib/ambience";
+import { QuestCamera } from "@/components/quest-camera";
+import { useJournal } from "@/hooks/use-journal";
 
 type DailyState = {
   date: string;
@@ -88,6 +90,12 @@ export function DailyExtras({
   const tasks = useMemo(() => pickDailyTasks(new Date(), indoor), [indoor]);
   const reflection = useMemo(() => pickDailyReflection(new Date(), indoor), [indoor]);
   const weather = useWeatherQuest();
+  const journal = useJournal();
+  const [cameraTask, setCameraTask] = useState<
+    | { kind: "task"; id: string; label: string; coins: number }
+    | { kind: "weather"; id: string; label: string; coins: number; giverId: string }
+    | null
+  >(null);
 
   const [state, setState] = useState<DailyState>(() => ({
     date: today,
@@ -106,18 +114,9 @@ export function DailyExtras({
     writeState(state);
   }, [state]);
 
-  async function completeTask(t: MiniTask) {
-    if (!character || state.done.includes(t.id) || busy) return;
-    setBusy(t.id);
-    try {
-      await awardCoins(t.coins);
-      setState((s) => ({ ...s, done: [...s.done, t.id] }));
-      onCoinAward?.(t.coins);
-    } catch {
-      // silent — coin may already be awarded server-side
-    } finally {
-      setBusy(null);
-    }
+  function openTaskCamera(task: MiniTask) {
+    if (!character || state.done.includes(task.id) || busy) return;
+    setCameraTask({ kind: "task", id: task.id, label: task.label, coins: task.coins });
   }
 
   async function saveReflection() {
@@ -136,20 +135,58 @@ export function DailyExtras({
     }
   }
 
-  async function completeWeatherQuest() {
+  function openWeatherCamera() {
     if (!weather.ready || !character || busy) return;
     const q = weather.quest;
     if ((state.weatherDone ?? []).includes(q.id)) return;
-    setBusy(`weather:${q.id}`);
+    setCameraTask({
+      kind: "weather",
+      id: q.id,
+      label: q.label,
+      coins: q.coins,
+      giverId: weather.giver.id,
+    });
+  }
+
+  async function handleCameraCapture(payload: {
+    sketchDataUrl: string;
+    category: string;
+    title: string;
+    funFact: string;
+  }) {
+    if (!cameraTask) return;
+    const giverId =
+      cameraTask.kind === "weather" ? cameraTask.giverId : undefined;
+    setBusy(cameraTask.kind === "weather" ? `weather:${cameraTask.id}` : cameraTask.id);
     try {
-      await awardCoins(q.coins);
-      setState((s) => ({
-        ...s,
-        weatherDone: [...(s.weatherDone ?? []), q.id],
-      }));
-      onCoinAward?.(q.coins);
+      // Save to journal (this also awards journal coins server-side).
+      await journal.addEntry({
+        sketchDataUrl: payload.sketchDataUrl,
+        category: payload.category as never,
+        title: payload.title,
+        funFact: payload.funFact,
+        questTitle: t(cameraTask.label),
+        questGiverId: giverId ?? null,
+        questGiverLine: null,
+      });
+      // Award the extra task's bonus coins on top.
+      try {
+        await awardCoins(cameraTask.coins);
+      } catch {
+        /* ignore */
+      }
+      if (cameraTask.kind === "task") {
+        setState((s) => ({ ...s, done: [...s.done, cameraTask.id] }));
+      } else {
+        setState((s) => ({
+          ...s,
+          weatherDone: [...(s.weatherDone ?? []), cameraTask.id],
+        }));
+      }
+      onCoinAward?.(cameraTask.coins);
+      setCameraTask(null);
     } catch {
-      /* silent */
+      /* silent — leave camera open to retry */
     } finally {
       setBusy(null);
     }
@@ -186,7 +223,7 @@ export function DailyExtras({
         return (
           <button
             type="button"
-            onClick={completeWeatherQuest}
+            onClick={openWeatherCamera}
             disabled={done || isBusy || !character}
             className={`mt-3 block w-full overflow-hidden rounded-2xl border-2 border-primary/40 bg-gradient-to-br from-primary/15 via-card to-card p-4 text-left transition-transform active:scale-[0.99] ${
               done ? "opacity-70" : ""
@@ -228,7 +265,7 @@ export function DailyExtras({
             <li key={task.id}>
               <button
                 type="button"
-                onClick={() => completeTask(task)}
+                onClick={() => openTaskCamera(task)}
                 disabled={done || isBusy || !character}
                 className={`parchment-card flex w-full items-center gap-3 p-3 text-left transition-transform active:scale-[0.99] ${
                   done ? "opacity-70" : ""
@@ -300,6 +337,16 @@ export function DailyExtras({
           )}
         </div>
       </div>
+
+      {cameraTask && (
+        <QuestCamera
+          questTitle={t(cameraTask.label)}
+          walkedMeters={1}
+          requiredMeters={0}
+          onClose={() => setCameraTask(null)}
+          onCapture={handleCameraCapture}
+        />
+      )}
     </section>
   );
 }
