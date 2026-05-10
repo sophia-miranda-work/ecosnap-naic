@@ -1,4 +1,5 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { Home, BookOpen, User, ShoppingBag, Scroll } from "lucide-react";
 
 import appCss from "../styles.css?url";
