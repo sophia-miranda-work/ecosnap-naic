@@ -123,16 +123,11 @@ function OnboardingGates() {
       />
     );
   }
-  // Step 3: pick an adventure style.
+  // Step 3: pick an adventure style (optional — default to wanderer so the
+  // "Begin journey" button takes the user straight to the home page).
   if (!settings.style) {
-    return (
-      <AdventureStylePicker
-        dismissible={false}
-        onSaved={() => {
-          navigate({ to: "/" });
-        }}
-      />
-    );
+    setStyle("wanderer");
+    return <SplashScreen />;
   }
   return null;
 }
