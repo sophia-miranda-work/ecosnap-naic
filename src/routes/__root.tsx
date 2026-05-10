@@ -1,4 +1,4 @@
-import { Outlet, Link, createRootRoute, HeadContent, Scripts, useNavigate } from "@tanstack/react-router";
+import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { Home, BookOpen, User, ShoppingBag, Scroll } from "lucide-react";
 
@@ -6,7 +6,6 @@ import appCss from "../styles.css?url";
 import { useCharacter } from "@/hooks/use-character";
 import { CharacterCreator } from "@/components/character-creator";
 import { SettingsProvider, useSettings } from "@/hooks/use-settings";
-import { AdventureStylePicker } from "@/components/adventure-style-picker";
 import { LanguagePicker } from "@/components/language-picker";
 import { SplashScreen } from "@/components/splash-screen";
 import { BackgroundMusic } from "@/components/background-music";
@@ -104,7 +103,6 @@ function RootComponent() {
 function OnboardingGates() {
   const { character, loading } = useCharacter();
   const { settings, ready: settingsReady, setStyle } = useSettings();
-  const navigate = useNavigate();
   useEffect(() => {
     if (settingsReady && settings.language && character && !settings.style) {
       setStyle("wanderer");
