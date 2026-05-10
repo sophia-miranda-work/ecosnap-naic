@@ -1,11 +1,11 @@
-import { Outlet, Link, createRootRoute, HeadContent, Scripts, useNavigate } from "@tanstack/react-router";
+import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { Home, BookOpen, User, ShoppingBag, Scroll } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import { useCharacter } from "@/hooks/use-character";
 import { CharacterCreator } from "@/components/character-creator";
 import { SettingsProvider, useSettings } from "@/hooks/use-settings";
-import { AdventureStylePicker } from "@/components/adventure-style-picker";
 import { LanguagePicker } from "@/components/language-picker";
 import { SplashScreen } from "@/components/splash-screen";
 import { BackgroundMusic } from "@/components/background-music";
@@ -102,8 +102,12 @@ function RootComponent() {
 
 function OnboardingGates() {
   const { character, loading } = useCharacter();
-  const { settings, ready: settingsReady } = useSettings();
-  const navigate = useNavigate();
+  const { settings, ready: settingsReady, setStyle } = useSettings();
+  useEffect(() => {
+    if (settingsReady && settings.language && character && !settings.style) {
+      setStyle("wanderer");
+    }
+  }, [settingsReady, settings.language, settings.style, character, setStyle]);
   if (loading || !settingsReady) return <SplashScreen />;
   // Step 1: pick a language.
   if (!settings.language) {
@@ -123,16 +127,10 @@ function OnboardingGates() {
       />
     );
   }
-  // Step 3: pick an adventure style.
+  // Step 3: pick an adventure style (optional — default to wanderer so the
+  // "Begin journey" button takes the user straight to the home page).
   if (!settings.style) {
-    return (
-      <AdventureStylePicker
-        dismissible={false}
-        onSaved={() => {
-          navigate({ to: "/" });
-        }}
-      />
-    );
+    return <SplashScreen />;
   }
   return null;
 }
