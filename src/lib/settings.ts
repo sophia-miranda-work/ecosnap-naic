@@ -83,7 +83,7 @@ export const ADVENTURE_STYLES: Array<{
  *  Used as the fallback when the user hasn't set a custom goal. */
 export function defaultMetersFor(style: AdventureStyle | null): number {
   if (style === "observer") return 0;
-  return 0;
+  return 100;
 }
 
 /** Effective required walking distance: user's custom goal if set,
