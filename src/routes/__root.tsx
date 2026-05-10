@@ -102,8 +102,13 @@ function RootComponent() {
 
 function OnboardingGates() {
   const { character, loading } = useCharacter();
-  const { settings, ready: settingsReady } = useSettings();
+  const { settings, ready: settingsReady, setStyle } = useSettings();
   const navigate = useNavigate();
+  useEffect(() => {
+    if (settingsReady && settings.language && character && !settings.style) {
+      setStyle("wanderer");
+    }
+  }, [settingsReady, settings.language, settings.style, character, setStyle]);
   if (loading || !settingsReady) return <SplashScreen />;
   // Step 1: pick a language.
   if (!settings.language) {
@@ -126,7 +131,6 @@ function OnboardingGates() {
   // Step 3: pick an adventure style (optional — default to wanderer so the
   // "Begin journey" button takes the user straight to the home page).
   if (!settings.style) {
-    setStyle("wanderer");
     return <SplashScreen />;
   }
   return null;
