@@ -95,6 +95,22 @@ export const QUEST_GIVERS: QuestGiver[] = [
     habitat: "Sunny meadows & garden paths",
     catchphrase: "Today's the loveliest day yet!",
   },
+  {
+    id: "jack",
+    name: "Jack the Sailor Sparrow",
+    role: "the Seafarin' Sparrow",
+    avatar: "🦜",
+    accent: "bg-primary-foreground",
+    greetings: [
+      "Ahoy there, matey! Fair winds brought ye to me shore.",
+      "Yarrr, just the swabbie I were hopin' to spy!",
+      "Avast! Drop anchor a moment, I've a quest fer ye.",
+      "Shiver me timbers, a fresh deckhand at last!",
+    ],
+    bio: "Jack be a salt-soaked sailor who drifts ashore between voyages, huntin' fer little souvenirs to tuck in his sea-chest. Every pebble, feather, an' shiny leaf is treasure to carry on the next leg o' his journey.",
+    habitat: "Harbours, tide pools & shorelines",
+    catchphrase: "Bring ol' Jack a keepsake, an' I'll be sailin' richer than a king, arr!",
+  },
 ];
 
 /** Deterministic daily pick so the giver is stable across reloads. */
