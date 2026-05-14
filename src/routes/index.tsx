@@ -8,6 +8,7 @@ import { useJournal, type JournalEntry } from "@/hooks/use-journal";
 import { useCharacter } from "@/hooks/use-character";
 import { useStreak } from "@/hooks/use-streak";
 import { pickDailyGiver, pickGreeting, getQuestIntro } from "@/lib/quest-givers";
+import { getDisplayAvatar, getCostumeLabel } from "@/lib/halloween";
 import { Link } from "@tanstack/react-router";
 import { DailyExtras } from "@/components/daily-extras";
 import { VitaminDCard } from "@/components/vitamin-d-card";
