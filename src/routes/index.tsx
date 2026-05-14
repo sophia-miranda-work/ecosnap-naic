@@ -253,8 +253,11 @@ function Index() {
 
   // Today's quest-giver (rotates daily across our small cast).
   const giver = pickDailyGiver();
-  const greeting = pickGreeting(giver);
-  const questIntro = getQuestIntro(quest.title, giver.id);
+  const greeting =
+    (halloweenActive && pickHalloweenGreeting(giver.id)) || pickGreeting(giver);
+  const questIntro = halloweenActive
+    ? getHalloweenQuestIntro(quest.title, giver.id) ?? getQuestIntro(quest.title, giver.id)
+    : getQuestIntro(quest.title, giver.id);
 
   const [walk, setWalk] = useState<WalkState>({ phase: "idle" });
   const [cameraOpen, setCameraOpen] = useState(false);
