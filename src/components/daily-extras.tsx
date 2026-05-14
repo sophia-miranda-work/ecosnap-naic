@@ -86,9 +86,16 @@ export function DailyExtras({
 }) {
   const { character, awardCoins } = useCharacter();
   const { settings, startAmbience, stopAmbience, currentAmbienceKind, t } = useSettings();
+  const halloweenActive = useSettings().halloweenActive;
   const today = todayKey();
-  const tasks = useMemo(() => pickDailyTasks(new Date(), indoor), [indoor]);
-  const reflection = useMemo(() => pickDailyReflection(new Date(), indoor), [indoor]);
+  const tasks = useMemo(
+    () => pickDailyTasks(new Date(), indoor, halloweenActive),
+    [indoor, halloweenActive],
+  );
+  const reflection = useMemo(
+    () => pickDailyReflection(new Date(), indoor, halloweenActive),
+    [indoor, halloweenActive],
+  );
   const weather = useWeatherQuest();
   const journal = useJournal();
   const [cameraTask, setCameraTask] = useState<
