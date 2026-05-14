@@ -8,8 +8,13 @@ import { useJournal, type JournalEntry } from "@/hooks/use-journal";
 import { useCharacter } from "@/hooks/use-character";
 import { useStreak } from "@/hooks/use-streak";
 import { pickDailyGiver, pickGreeting, getQuestIntro } from "@/lib/quest-givers";
-import { getDisplayAvatar, getCostumeLabel } from "@/lib/halloween";
-import { HALLOWEEN_QUEST_POOL } from "@/lib/halloween";
+import {
+  getDisplayAvatar,
+  getCostumeLabel,
+  HALLOWEEN_QUEST_POOL,
+  pickHalloweenGreeting,
+  getHalloweenQuestIntro,
+} from "@/lib/halloween";
 import { Link } from "@tanstack/react-router";
 import { DailyExtras } from "@/components/daily-extras";
 import { VitaminDCard } from "@/components/vitamin-d-card";
@@ -248,8 +253,11 @@ function Index() {
 
   // Today's quest-giver (rotates daily across our small cast).
   const giver = pickDailyGiver();
-  const greeting = pickGreeting(giver);
-  const questIntro = getQuestIntro(quest.title, giver.id);
+  const greeting =
+    (halloweenActive && pickHalloweenGreeting(giver.id)) || pickGreeting(giver);
+  const questIntro = halloweenActive
+    ? getHalloweenQuestIntro(quest.title, giver.id) ?? getQuestIntro(quest.title, giver.id)
+    : getQuestIntro(quest.title, giver.id);
 
   const [walk, setWalk] = useState<WalkState>({ phase: "idle" });
   const [cameraOpen, setCameraOpen] = useState(false);
