@@ -85,8 +85,7 @@ export function DailyExtras({
   indoor?: boolean;
 }) {
   const { character, awardCoins } = useCharacter();
-  const { settings, startAmbience, stopAmbience, currentAmbienceKind, t } = useSettings();
-  const halloweenActive = useSettings().halloweenActive;
+  const { settings, startAmbience, stopAmbience, currentAmbienceKind, t, halloweenActive } = useSettings();
   const today = todayKey();
   const tasks = useMemo(
     () => pickDailyTasks(new Date(), indoor, halloweenActive),
