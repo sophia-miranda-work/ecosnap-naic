@@ -4,6 +4,7 @@ import { Coins, Check, Sparkles, Lock, ShoppingBag } from "lucide-react";
 import { useCharacter } from "@/hooks/use-character";
 import { SHOP_ITEMS, type ShopItem } from "@/lib/shop";
 import { QUEST_GIVERS, getGiverById } from "@/lib/quest-givers";
+import { getDisplayAvatar } from "@/lib/halloween";
 import { useSettings } from "@/hooks/use-settings";
 
 export const Route = createFileRoute("/shop")({
@@ -22,7 +23,7 @@ type SetTab = "all" | "basic" | "willow" | "professor-hoot" | "pip" | "mossback"
 
 function ShopPage() {
   const { character, ownedItems, purchase, equipItem } = useCharacter();
-  const { t } = useSettings();
+  const { t, halloweenActive } = useSettings();
   const [tab, setTab] = useState<SetTab>("all");
   const [busy, setBusy] = useState<string | null>(null);
   const [flash, setFlash] = useState<{ kind: "ok" | "err"; msg: string } | null>(null);
@@ -75,7 +76,7 @@ function ShopPage() {
     ...QUEST_GIVERS.map((g) => ({
       id: g.id as SetTab,
       label: g.name,
-      emoji: g.avatar,
+      emoji: getDisplayAvatar(g.id, halloweenActive),
     })),
   ];
 
@@ -165,7 +166,7 @@ function ShopPage() {
                   aria-label={`From ${giver.name}'s set`}
                   title={`${giver.name}'s set`}
                 >
-                  {giver.avatar}
+                  {getDisplayAvatar(giver.id, halloweenActive)}
                 </span>
               )}
               <div
