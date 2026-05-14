@@ -348,6 +348,30 @@ function Index() {
         </button>
       </header>
 
+      {/* Seasonal mode banner */}
+      {activeSeason && (
+        <section className="mt-4 parchment-card flex items-start gap-3 p-3">
+          <span className="text-2xl leading-none" aria-hidden>
+            {SEASON_META[activeSeason].emoji}
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+              {t("Seasonal mode")} · {t(SEASON_META[activeSeason].label)}
+            </p>
+            {seasonalReminder ? (
+              <p className="mt-0.5 text-xs leading-snug text-foreground">
+                <span aria-hidden className="mr-1">{seasonalReminder.emoji}</span>
+                {t(seasonalReminder.text)}
+              </p>
+            ) : (
+              <p className="mt-0.5 text-xs leading-snug text-muted-foreground">
+                {t("Today's quests are tuned for the season.")}
+              </p>
+            )}
+          </div>
+        </section>
+      )}
+
       {/* Daily Quest card */}
       <section className="mt-6">
         <button
