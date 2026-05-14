@@ -195,7 +195,7 @@ function WalkStatsAndCta({
 }
 
 function Index() {
-  const { settings, playChime, speak, t } = useSettings();
+  const { settings, playChime, speak, t, halloweenActive } = useSettings();
   const isObserver = settings.style === "observer";
   const isWanderer = settings.style === "wanderer";
   const activeSeason = settings.seasonalMode
@@ -401,7 +401,7 @@ function Index() {
                 className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary-foreground text-3xl shadow-md ring-2 ring-primary-foreground/40"
                 aria-hidden
               >
-                {giver.avatar}
+                {getDisplayAvatar(giver.id, halloweenActive)}
               </div>
               <div className="relative flex-1 rounded-2xl rounded-tl-sm bg-primary-foreground/95 p-3 text-foreground shadow-sm">
                 <span
