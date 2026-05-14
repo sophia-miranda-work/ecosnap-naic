@@ -19,6 +19,7 @@ import {
 import { t as translate } from "@/lib/i18n";
 import { AmbiencePlayer, pickAmbienceForHour, type AmbienceKind } from "@/lib/ambience";
 import { resolveSeason } from "@/lib/seasons";
+import { isHalloweenDate } from "@/lib/halloween";
 
 type Ctx = {
   settings: Settings;
@@ -43,6 +44,8 @@ type Ctx = {
   stopAmbience: () => void;
   /** What ambience would play right now (for UI labels). */
   currentAmbienceKind: AmbienceKind;
+  /** True on Oct 31 or when the dev override is on. */
+  halloweenActive: boolean;
 };
 
 const SettingsContext = createContext<Ctx | null>(null);
@@ -136,6 +139,18 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       root.removeAttribute("data-season");
     }
   }, [settings.seasonalMode, settings.devSeasonOverride]);
+
+  // Halloween overlay — Oct 31 always wins, dev override forces it on.
+  const halloweenActive = (ready && (isHalloweenDate() || settings.devHalloweenOverride)) || false;
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const root = document.documentElement;
+    if (halloweenActive) {
+      root.setAttribute("data-halloween", "true");
+    } else {
+      root.removeAttribute("data-halloween");
+    }
+  }, [halloweenActive]);
 
   const update = useCallback((patch: Partial<Settings>) => {
     setSettings((s) => ({ ...s, ...patch }));
@@ -320,6 +335,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       startAmbience,
       stopAmbience,
       currentAmbienceKind,
+      halloweenActive,
     }),
     [
       settings,
@@ -336,6 +352,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       startAmbience,
       stopAmbience,
       currentAmbienceKind,
+      halloweenActive,
     ],
   );
 
