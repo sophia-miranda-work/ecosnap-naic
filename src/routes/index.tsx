@@ -9,12 +9,12 @@ import { useCharacter } from "@/hooks/use-character";
 import { useStreak } from "@/hooks/use-streak";
 import { pickDailyGiver, pickGreeting, getQuestIntro } from "@/lib/quest-givers";
 import {
-  getDisplayAvatar,
   getCostumeLabel,
   HALLOWEEN_QUEST_POOL,
   pickHalloweenGreeting,
   getHalloweenQuestIntro,
 } from "@/lib/halloween";
+import { getDisplayGiver } from "@/lib/winter";
 import { Link } from "@tanstack/react-router";
 import { DailyExtras } from "@/components/daily-extras";
 import { VitaminDCard } from "@/components/vitamin-d-card";
@@ -201,7 +201,7 @@ function WalkStatsAndCta({
 }
 
 function Index() {
-  const { settings, playChime, speak, t, halloweenActive } = useSettings();
+  const { settings, playChime, speak, t, halloweenActive, winterActive } = useSettings();
   const isObserver = settings.style === "observer";
   const isWanderer = settings.style === "wanderer";
   const activeSeason = settings.seasonalMode
@@ -253,6 +253,7 @@ function Index() {
 
   // Today's quest-giver (rotates daily across our small cast).
   const giver = pickDailyGiver();
+  const giverDisplay = getDisplayGiver(giver.id, { halloweenActive, winterActive });
   const greeting =
     (halloweenActive && pickHalloweenGreeting(giver.id)) || pickGreeting(giver);
   const questIntro = halloweenActive
@@ -400,10 +401,15 @@ function Index() {
           <div className="relative">
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground/80">
               <Compass className="h-3.5 w-3.5" />
-              {t(giver.name)} · {t(giver.role)}
+              {t(giverDisplay.name)} · {t(giverDisplay.role)}
               {halloweenActive && getCostumeLabel(giver.id, halloweenActive) && (
                 <span className="ml-1 rounded-full bg-primary-foreground/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider">
                   🎃 {t(getCostumeLabel(giver.id, halloweenActive)!)}
+                </span>
+              )}
+              {!halloweenActive && giverDisplay.swapLabel && (
+                <span className="ml-1 rounded-full bg-primary-foreground/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider">
+                  ❄️ {t(giverDisplay.swapLabel)}
                 </span>
               )}
               {isObserver && (
@@ -419,7 +425,7 @@ function Index() {
                 className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary-foreground text-3xl shadow-md ring-2 ring-primary-foreground/40"
                 aria-hidden
               >
-                {getDisplayAvatar(giver.id, halloweenActive)}
+                {giverDisplay.avatar}
               </div>
               <div className="relative flex-1 rounded-2xl rounded-tl-sm bg-primary-foreground/95 p-3 text-foreground shadow-sm">
                 <span

@@ -5,7 +5,7 @@ import { useJournal, type JournalEntry } from "@/hooks/use-journal";
 import { CATEGORIES, CATEGORY_BY_ID, type CategoryId } from "@/lib/journal-categories";
 import { getGiverById } from "@/lib/quest-givers";
 import { useSettings } from "@/hooks/use-settings";
-import { getDisplayAvatar } from "@/lib/halloween";
+import { getDisplayGiver } from "@/lib/winter";
 
 export const Route = createFileRoute("/journal")({
   head: () => ({
@@ -23,7 +23,7 @@ type Filter = "all" | CategoryId;
 
 function JournalPage() {
   const { entries, loading, error } = useJournal();
-  const { t, halloweenActive } = useSettings();
+  const { t, halloweenActive, winterActive } = useSettings();
   const [filter, setFilter] = useState<Filter>("all");
   const [open, setOpen] = useState<JournalEntry | null>(null);
 
@@ -157,7 +157,7 @@ function JournalPage() {
         </div>
       )}
 
-     {open && <EntryModal entry={open} onClose={() => setOpen(null)} t={t} halloweenActive={halloweenActive} />}
+     {open && <EntryModal entry={open} onClose={() => setOpen(null)} t={t} halloweenActive={halloweenActive} winterActive={winterActive} />}
     </div>
   );
 }
