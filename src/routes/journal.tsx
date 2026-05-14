@@ -5,6 +5,7 @@ import { useJournal, type JournalEntry } from "@/hooks/use-journal";
 import { CATEGORIES, CATEGORY_BY_ID, type CategoryId } from "@/lib/journal-categories";
 import { getGiverById } from "@/lib/quest-givers";
 import { useSettings } from "@/hooks/use-settings";
+import { getDisplayAvatar } from "@/lib/halloween";
 
 export const Route = createFileRoute("/journal")({
   head: () => ({
@@ -22,7 +23,7 @@ type Filter = "all" | CategoryId;
 
 function JournalPage() {
   const { entries, loading, error } = useJournal();
-  const { t } = useSettings();
+  const { t, halloweenActive } = useSettings();
   const [filter, setFilter] = useState<Filter>("all");
   const [open, setOpen] = useState<JournalEntry | null>(null);
 
@@ -156,7 +157,7 @@ function JournalPage() {
         </div>
       )}
 
-      {open && <EntryModal entry={open} onClose={() => setOpen(null)} t={t} />}
+     {open && <EntryModal entry={open} onClose={() => setOpen(null)} t={t} halloweenActive={halloweenActive} />}
     </div>
   );
 }
@@ -197,10 +198,12 @@ function EntryModal({
   entry,
   onClose,
   t,
+  halloweenActive,
 }: {
   entry: JournalEntry;
   onClose: () => void;
   t: (key: string, vars?: Record<string, string | number>) => string;
+  halloweenActive: boolean;
 }) {
   const cat = CATEGORY_BY_ID[entry.category];
   const date = new Date(entry.created_at).toLocaleDateString(undefined, {
@@ -250,7 +253,7 @@ function EntryModal({
             return (
               <div className="mt-3 flex items-start gap-2 rounded-2xl border border-border bg-card/60 p-3">
                 <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-muted text-xl" aria-hidden>
-                  {g.avatar}
+                  {getDisplayAvatar(g.id, halloweenActive)}
                 </span>
                 <div className="min-w-0">
                   <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">

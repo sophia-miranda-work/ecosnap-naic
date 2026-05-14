@@ -171,8 +171,7 @@ function SettingsPage() {
           onChange={(v) => update({ seasonalMode: v })}
           icon={<Leaf className="h-4 w-4" />}
         />
-        {settings.seasonalMode && (
-          <div className="parchment-card p-4">
+        <div className="parchment-card p-4">
             <p className="text-sm font-bold text-foreground">
               {t("Developer testing — force season")}
             </p>
@@ -214,8 +213,23 @@ function SettingsPage() {
                 );
               })}
             </div>
+            <button
+              type="button"
+              onClick={() => update({ devHalloweenOverride: !settings.devHalloweenOverride })}
+              aria-pressed={settings.devHalloweenOverride}
+              className={`mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-[11px] font-bold uppercase tracking-wider transition-colors ${
+                settings.devHalloweenOverride
+                  ? "bg-foreground text-background"
+                  : "bg-card text-muted-foreground border border-border hover:bg-muted"
+              }`}
+            >
+              <span aria-hidden>🎃</span>
+              {t("Halloween")}
+            </button>
+            <p className="mt-2 text-[10px] text-muted-foreground">
+              {t("Halloween auto-activates on October 31st and overrides the seasonal theme with cobwebs and NPC costume swaps.")}
+            </p>
           </div>
-        )}
         <SegmentedRow
           label={t("Quest celebration")}
           help={t("Switch between confetti animations and a clean static message.")}

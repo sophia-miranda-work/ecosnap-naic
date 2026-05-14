@@ -34,6 +34,8 @@ export type Settings = {
   seasonalMode: boolean;
   /** Developer testing: force a specific season (overrides the date). */
   devSeasonOverride: Season | null;
+  /** Developer testing: force the Halloween (Oct 31) overlay on. */
+  devHalloweenOverride: boolean;
 };
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -50,6 +52,7 @@ export const DEFAULT_SETTINGS: Settings = {
   backgroundMusic: true,
   seasonalMode: false,
   devSeasonOverride: null,
+  devHalloweenOverride: false,
 };
 
 export const STORAGE_KEY = "explorer-settings:v1";

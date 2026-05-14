@@ -8,6 +8,7 @@ import { useJournal, type JournalEntry } from "@/hooks/use-journal";
 import { useCharacter } from "@/hooks/use-character";
 import { useStreak } from "@/hooks/use-streak";
 import { pickDailyGiver, pickGreeting, getQuestIntro } from "@/lib/quest-givers";
+import { getDisplayAvatar, getCostumeLabel } from "@/lib/halloween";
 import { Link } from "@tanstack/react-router";
 import { DailyExtras } from "@/components/daily-extras";
 import { VitaminDCard } from "@/components/vitamin-d-card";
@@ -194,7 +195,7 @@ function WalkStatsAndCta({
 }
 
 function Index() {
-  const { settings, playChime, speak, t } = useSettings();
+  const { settings, playChime, speak, t, halloweenActive } = useSettings();
   const isObserver = settings.style === "observer";
   const isWanderer = settings.style === "wanderer";
   const activeSeason = settings.seasonalMode
@@ -387,6 +388,11 @@ function Index() {
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground/80">
               <Compass className="h-3.5 w-3.5" />
               {t(giver.name)} · {t(giver.role)}
+              {halloweenActive && getCostumeLabel(giver.id, halloweenActive) && (
+                <span className="ml-1 rounded-full bg-primary-foreground/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider">
+                  🎃 {t(getCostumeLabel(giver.id, halloweenActive)!)}
+                </span>
+              )}
               {isObserver && (
                 <span className="ml-1 rounded-full bg-primary-foreground/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider">
                   {t("Window quest")}
@@ -400,7 +406,7 @@ function Index() {
                 className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary-foreground text-3xl shadow-md ring-2 ring-primary-foreground/40"
                 aria-hidden
               >
-                {giver.avatar}
+                {getDisplayAvatar(giver.id, halloweenActive)}
               </div>
               <div className="relative flex-1 rounded-2xl rounded-tl-sm bg-primary-foreground/95 p-3 text-foreground shadow-sm">
                 <span
