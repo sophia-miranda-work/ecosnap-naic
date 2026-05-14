@@ -388,6 +388,11 @@ function Index() {
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground/80">
               <Compass className="h-3.5 w-3.5" />
               {t(giver.name)} · {t(giver.role)}
+              {halloweenActive && getCostumeLabel(giver.id, halloweenActive) && (
+                <span className="ml-1 rounded-full bg-primary-foreground/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider">
+                  🎃 {t(getCostumeLabel(giver.id, halloweenActive)!)}
+                </span>
+              )}
               {isObserver && (
                 <span className="ml-1 rounded-full bg-primary-foreground/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider">
                   {t("Window quest")}
