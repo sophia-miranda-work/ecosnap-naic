@@ -4,7 +4,7 @@ import { Coins, Check, Sparkles, Lock, ShoppingBag } from "lucide-react";
 import { useCharacter } from "@/hooks/use-character";
 import { SHOP_ITEMS, type ShopItem } from "@/lib/shop";
 import { QUEST_GIVERS, getGiverById } from "@/lib/quest-givers";
-import { getDisplayAvatar } from "@/lib/halloween";
+import { getDisplayGiver, WINTER_SUBSTITUTES } from "@/lib/winter";
 import { useSettings } from "@/hooks/use-settings";
 
 export const Route = createFileRoute("/shop")({
@@ -23,7 +23,7 @@ type SetTab = "all" | "basic" | "willow" | "professor-hoot" | "pip" | "mossback"
 
 function ShopPage() {
   const { character, ownedItems, purchase, equipItem } = useCharacter();
-  const { t, halloweenActive } = useSettings();
+  const { t, halloweenActive, winterActive } = useSettings();
   const [tab, setTab] = useState<SetTab>("all");
   const [busy, setBusy] = useState<string | null>(null);
   const [flash, setFlash] = useState<{ kind: "ok" | "err"; msg: string } | null>(null);
@@ -73,34 +73,50 @@ function ShopPage() {
   const TABS: { id: SetTab; label: string; emoji: string }[] = [
     { id: "all", label: t("All"), emoji: "🛍️" },
     { id: "basic", label: t("Basics"), emoji: "🧺" },
-    ...QUEST_GIVERS.map((g) => ({
-      id: g.id as SetTab,
-      label: g.name,
-      emoji: getDisplayAvatar(g.id, halloweenActive),
-    })),
+    ...QUEST_GIVERS.map((g) => {
+      const d = getDisplayGiver(g.id, { halloweenActive, winterActive });
+      return {
+        id: g.id as SetTab,
+        label: d.name,
+        emoji: d.avatar,
+      };
+    }),
   ];
+
+  const shopkeeper = winterActive && !halloweenActive ? WINTER_SUBSTITUTES.bjorn : null;
+  const shopName = shopkeeper ? `${shopkeeper.name}'s Shop` : "Björn's Shop";
+  const shopAvatar = shopkeeper?.avatar ?? "🐻";
+  const shopWelcome = shopkeeper ? "Welcome to the iceberg" : "Welcome to the den";
+  const shopBlurb = shopkeeper
+    ? "\"Bring something cosy. The ice gets bitter.\""
+    : "\"Pick something warm. The forest gets chilly.\"";
 
   return (
     <div className="px-5 pt-8 pb-8">
       {/* Björn header */}
       <header className="parchment-card relative overflow-hidden p-5">
         <div className="absolute -right-4 -top-4 text-[7rem] opacity-10 select-none" aria-hidden>
-          🧸
+          {shopkeeper ? "🧊" : "🧸"}
         </div>
         <div className="relative flex items-start gap-4">
           <div
             className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-card text-4xl shadow-inner ring-2 ring-border"
             aria-hidden
           >
-            🐻
+            {shopAvatar}
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              {t("Welcome to the den")}
+              {t(shopWelcome)}
             </p>
-            <h1 className="text-2xl font-bold text-foreground">{t("Björn's Shop")}</h1>
+            <h1 className="text-2xl font-bold text-foreground">{t(shopName)}</h1>
+            {shopkeeper && (
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-primary">
+                ❄️ {t(`filling in for ${shopkeeper.fillingInFor}`)}
+              </p>
+            )}
             <p className="mt-1 text-sm text-muted-foreground">
-              {t("\"Pick something warm. The forest gets chilly.\"")}
+              {t(shopBlurb)}
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-1.5 rounded-full bg-foreground px-3 py-1.5 text-background shadow-sm">
@@ -157,16 +173,19 @@ function ShopPage() {
           const canAfford = coins >= item.price;
           const isBusy = busy === item.id;
           const giver = item.set !== "basic" ? getGiverById(item.set) : null;
+          const giverDisplay = giver
+            ? getDisplayGiver(giver.id, { halloweenActive, winterActive })
+            : null;
 
           return (
             <li key={item.id} className="parchment-card relative flex flex-col p-3">
-              {giver && (
+              {giver && giverDisplay && (
                 <span
                   className="absolute right-2 top-2 text-base"
-                  aria-label={`From ${giver.name}'s set`}
-                  title={`${giver.name}'s set`}
+                  aria-label={`From ${giverDisplay.name}'s set`}
+                  title={`${giverDisplay.name}'s set`}
                 >
-                  {getDisplayAvatar(giver.id, halloweenActive)}
+                  {giverDisplay.avatar}
                 </span>
               )}
               <div
