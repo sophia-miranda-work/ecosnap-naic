@@ -1,5 +1,7 @@
 import { QUEST_GIVERS, type QuestGiver } from "./quest-givers";
-import type { MiniTask, Reflection } from "./daily-extras";
+
+type MiniTask = { id: string; emoji: string; label: string; coins: number };
+type Reflection = { id: string; prompt: string };
 
 /** True on October 31 (any year). */
 export function isHalloweenDate(date: Date = new Date()): boolean {
