@@ -4,6 +4,8 @@ export type TtsVoice = "warm" | "bright" | "calm" | "storyteller";
 
 export type Language = "en" | "ms";
 
+import type { Season } from "./seasons";
+
 export type Settings = {
   /** Chosen adventure style. `null` until onboarding completes. */
   style: AdventureStyle | null;
@@ -28,6 +30,10 @@ export type Settings = {
   autoSnap: boolean;
   /** Loop a soft music track in the background while the app is open. */
   backgroundMusic: boolean;
+  /** When true, theme + quest pool follow the current season automatically. */
+  seasonalMode: boolean;
+  /** Developer testing: force a specific season (overrides the date). */
+  devSeasonOverride: Season | null;
 };
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -42,6 +48,8 @@ export const DEFAULT_SETTINGS: Settings = {
   voiceNoteQuests: false,
   autoSnap: false,
   backgroundMusic: true,
+  seasonalMode: false,
+  devSeasonOverride: null,
 };
 
 export const STORAGE_KEY = "explorer-settings:v1";
