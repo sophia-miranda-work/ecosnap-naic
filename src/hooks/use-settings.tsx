@@ -18,6 +18,7 @@ import {
 } from "@/lib/settings";
 import { t as translate } from "@/lib/i18n";
 import { AmbiencePlayer, pickAmbienceForHour, type AmbienceKind } from "@/lib/ambience";
+import { resolveSeason } from "@/lib/seasons";
 
 type Ctx = {
   settings: Settings;
@@ -123,6 +124,18 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       root.removeAttribute("data-voyager");
     }
   }, [settings.style]);
+
+  // Apply seasonal theme attribute when seasonal mode is on.
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const root = document.documentElement;
+    if (settings.seasonalMode) {
+      const season = resolveSeason(settings.devSeasonOverride);
+      root.setAttribute("data-season", season);
+    } else {
+      root.removeAttribute("data-season");
+    }
+  }, [settings.seasonalMode, settings.devSeasonOverride]);
 
   const update = useCallback((patch: Partial<Settings>) => {
     setSettings((s) => ({ ...s, ...patch }));

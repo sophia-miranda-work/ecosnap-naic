@@ -20,6 +20,7 @@ import {
 import { ambienceLabel } from "@/lib/ambience";
 import { LANGUAGES } from "@/lib/i18n";
 import type { Language } from "@/lib/settings";
+import { SEASON_META, SEASONS, getSeasonForDate, type Season } from "@/lib/seasons";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
@@ -163,6 +164,58 @@ function SettingsPage() {
 
       {/* Visual & Audio */}
       <Section title={t("Visual & Audio")}>
+        <ToggleRow
+          label={t("Seasonal mode")}
+          help={t("Theme & quests follow the seasons (spring, summer, autumn, winter) automatically.")}
+          checked={settings.seasonalMode}
+          onChange={(v) => update({ seasonalMode: v })}
+          icon={<Leaf className="h-4 w-4" />}
+        />
+        {settings.seasonalMode && (
+          <div className="parchment-card p-4">
+            <p className="text-sm font-bold text-foreground">
+              {t("Developer testing — force season")}
+            </p>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              {t("Override the calendar to preview each season's theme & quests.")}
+              {" "}
+              {t("Today's actual season")}: {t(SEASON_META[getSeasonForDate()].label)}.
+            </p>
+            <div className="mt-3 grid grid-cols-5 gap-1.5">
+              <button
+                type="button"
+                onClick={() => update({ devSeasonOverride: null })}
+                aria-pressed={settings.devSeasonOverride === null}
+                className={`rounded-lg px-2 py-2 text-[11px] font-bold transition-colors ${
+                  settings.devSeasonOverride === null
+                    ? "bg-foreground text-background"
+                    : "bg-card text-muted-foreground border border-border hover:bg-muted"
+                }`}
+              >
+                {t("Auto")}
+              </button>
+              {SEASONS.map((s) => {
+                const active = settings.devSeasonOverride === s;
+                return (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => update({ devSeasonOverride: s as Season })}
+                    aria-pressed={active}
+                    className={`flex flex-col items-center gap-0.5 rounded-lg px-2 py-2 text-[10px] font-bold uppercase tracking-wider transition-colors ${
+                      active
+                        ? "bg-foreground text-background"
+                        : "bg-card text-muted-foreground border border-border hover:bg-muted"
+                    }`}
+                  >
+                    <span aria-hidden className="text-base">{SEASON_META[s].emoji}</span>
+                    {t(SEASON_META[s].label)}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
         <SegmentedRow
           label={t("Quest celebration")}
           help={t("Switch between confetti animations and a clean static message.")}

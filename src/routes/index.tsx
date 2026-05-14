@@ -14,6 +14,7 @@ import { VitaminDCard } from "@/components/vitamin-d-card";
 import { useSettings } from "@/hooks/use-settings";
 import { requiredMetersFor } from "@/lib/settings";
 import { WINDOW_QUEST_POOL } from "@/lib/window-quests";
+import { SEASONAL_QUEST_POOL, SEASON_META, getSeasonalReminder, resolveSeason } from "@/lib/seasons";
 import { TtsButton } from "@/components/tts-button";
 import { StreakTreeModal } from "@/components/streak-tree";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -196,12 +197,24 @@ function Index() {
   const { settings, playChime, speak, t } = useSettings();
   const isObserver = settings.style === "observer";
   const isWanderer = settings.style === "wanderer";
+  const activeSeason = settings.seasonalMode
+    ? resolveSeason(settings.devSeasonOverride)
+    : null;
+  const seasonalReminder = activeSeason ? getSeasonalReminder(activeSeason) : null;
 
   // Mock: stable quest for the day (later: pick by date seed + persist).
   const [questIndex, setQuestIndex] = useState(0);
   const activePool = useMemo(
-    () => (isObserver ? WINDOW_QUEST_POOL : QUEST_POOL),
-    [isObserver],
+    () => {
+      if (activeSeason) {
+        // Seasonal pool takes priority; mix with the appropriate base pool
+        // so users still get variety across rerolls.
+        const base = isObserver ? WINDOW_QUEST_POOL : QUEST_POOL;
+        return [...SEASONAL_QUEST_POOL[activeSeason], ...base];
+      }
+      return isObserver ? WINDOW_QUEST_POOL : QUEST_POOL;
+    },
+    [isObserver, activeSeason],
   );
   const safeIndex = questIndex % activePool.length;
   const quest = activePool[safeIndex];
@@ -334,6 +347,30 @@ function Index() {
           </span>
         </button>
       </header>
+
+      {/* Seasonal mode banner */}
+      {activeSeason && (
+        <section className="mt-4 parchment-card flex items-start gap-3 p-3">
+          <span className="text-2xl leading-none" aria-hidden>
+            {SEASON_META[activeSeason].emoji}
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+              {t("Seasonal mode")} · {t(SEASON_META[activeSeason].label)}
+            </p>
+            {seasonalReminder ? (
+              <p className="mt-0.5 text-xs leading-snug text-foreground">
+                <span aria-hidden className="mr-1">{seasonalReminder.emoji}</span>
+                {t(seasonalReminder.text)}
+              </p>
+            ) : (
+              <p className="mt-0.5 text-xs leading-snug text-muted-foreground">
+                {t("Today's quests are tuned for the season.")}
+              </p>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* Daily Quest card */}
       <section className="mt-6">
