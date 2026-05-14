@@ -46,6 +46,8 @@ type Ctx = {
   currentAmbienceKind: AmbienceKind;
   /** True on Oct 31 or when the dev override is on. */
   halloweenActive: boolean;
+  /** True when seasonal mode is on and the active season is winter. */
+  winterActive: boolean;
 };
 
 const SettingsContext = createContext<Ctx | null>(null);
@@ -151,6 +153,16 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       root.removeAttribute("data-halloween");
     }
   }, [halloweenActive]);
+
+  // Winter substitute roster is active when seasonal mode is on AND the
+  // resolved season is winter. Halloween (Oct 31) takes priority and
+  // suppresses winter for the day so the costume swap stays coherent.
+  const winterActive =
+    (ready &&
+      settings.seasonalMode &&
+      resolveSeason(settings.devSeasonOverride) === "winter" &&
+      !halloweenActive) ||
+    false;
 
   const update = useCallback((patch: Partial<Settings>) => {
     setSettings((s) => ({ ...s, ...patch }));
@@ -336,6 +348,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       stopAmbience,
       currentAmbienceKind,
       halloweenActive,
+      winterActive,
     }),
     [
       settings,
@@ -353,6 +366,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       stopAmbience,
       currentAmbienceKind,
       halloweenActive,
+      winterActive,
     ],
   );
 
