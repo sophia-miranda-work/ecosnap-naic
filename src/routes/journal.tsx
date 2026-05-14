@@ -5,6 +5,7 @@ import { useJournal, type JournalEntry } from "@/hooks/use-journal";
 import { CATEGORIES, CATEGORY_BY_ID, type CategoryId } from "@/lib/journal-categories";
 import { getGiverById } from "@/lib/quest-givers";
 import { useSettings } from "@/hooks/use-settings";
+import { getDisplayAvatar } from "@/lib/halloween";
 
 export const Route = createFileRoute("/journal")({
   head: () => ({
@@ -22,7 +23,7 @@ type Filter = "all" | CategoryId;
 
 function JournalPage() {
   const { entries, loading, error } = useJournal();
-  const { t } = useSettings();
+  const { t, halloweenActive } = useSettings();
   const [filter, setFilter] = useState<Filter>("all");
   const [open, setOpen] = useState<JournalEntry | null>(null);
 
@@ -250,7 +251,7 @@ function EntryModal({
             return (
               <div className="mt-3 flex items-start gap-2 rounded-2xl border border-border bg-card/60 p-3">
                 <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-muted text-xl" aria-hidden>
-                  {g.avatar}
+                  {getDisplayAvatar(g.id, halloweenActive)}
                 </span>
                 <div className="min-w-0">
                   <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
