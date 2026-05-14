@@ -157,7 +157,7 @@ function JournalPage() {
         </div>
       )}
 
-      {open && <EntryModal entry={open} onClose={() => setOpen(null)} t={t} />}
+     {open && <EntryModal entry={open} onClose={() => setOpen(null)} t={t} halloweenActive={halloweenActive} />}
     </div>
   );
 }
@@ -198,10 +198,12 @@ function EntryModal({
   entry,
   onClose,
   t,
+  halloweenActive,
 }: {
   entry: JournalEntry;
   onClose: () => void;
   t: (key: string, vars?: Record<string, string | number>) => string;
+  halloweenActive: boolean;
 }) {
   const cat = CATEGORY_BY_ID[entry.category];
   const date = new Date(entry.created_at).toLocaleDateString(undefined, {
