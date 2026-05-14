@@ -1361,6 +1361,32 @@ const MS: Record<string, string> = {
   "🌸 7-day streak": "🌸 Rentetan 7 hari",
   "🍄 Forager": "🍄 Pencari Hutan",
   "🐦 Bird spotter": "🐦 Pengintai Burung",
+
+  // Seasonal mode
+  "Seasonal mode": "Mod bermusim",
+  "Spring": "Musim Bunga",
+  "Summer": "Musim Panas",
+  "Autumn": "Musim Luruh",
+  "Winter": "Musim Sejuk",
+  "Today's quests are tuned for the season.":
+    "Misi hari ini disesuaikan dengan musim.",
+  "Sunny season — sip water often. If it's scorching, explore from the shade or wait for golden hour.":
+    "Musim panas — kerap minum air. Jika terlalu terik, jelajah dari tempat teduh atau tunggu waktu keemasan.",
+  "Theme & quests follow the seasons (spring, summer, autumn, winter) automatically.":
+    "Tema & misi mengikut musim (bunga, panas, luruh, sejuk) secara automatik.",
+  "Developer testing — force season": "Ujian pembangun — paksa musim",
+  "Override the calendar to preview each season's theme & quests.":
+    "Atasi kalendar untuk melihat tema & misi setiap musim.",
+  "Today's actual season": "Musim sebenar hari ini",
+  "Auto": "Auto",
+
+  // Halloween
+  "Halloween": "Halloween",
+  "Halloween auto-activates on October 31st and overrides the seasonal theme with cobwebs and NPC costume swaps.":
+    "Halloween diaktifkan secara automatik pada 31 Oktober dan mengatasi tema bermusim dengan sarang labah-labah dan pertukaran kostum watak.",
+  "Background music": "Muzik latar",
+  "Loop a soft music track while you explore the app.":
+    "Mainkan trek muzik lembut secara berulang sambil anda meneroka aplikasi.",
 };
 
 const DICTIONARIES: Record<Language, Record<string, string>> = {
