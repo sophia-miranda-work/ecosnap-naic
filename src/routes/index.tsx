@@ -9,6 +9,7 @@ import { useCharacter } from "@/hooks/use-character";
 import { useStreak } from "@/hooks/use-streak";
 import { pickDailyGiver, pickGreeting, getQuestIntro } from "@/lib/quest-givers";
 import { getDisplayAvatar, getCostumeLabel } from "@/lib/halloween";
+import { HALLOWEEN_QUEST_POOL } from "@/lib/halloween";
 import { Link } from "@tanstack/react-router";
 import { DailyExtras } from "@/components/daily-extras";
 import { VitaminDCard } from "@/components/vitamin-d-card";
@@ -207,6 +208,10 @@ function Index() {
   const [questIndex, setQuestIndex] = useState(0);
   const activePool = useMemo(
     () => {
+      if (halloweenActive) {
+        // Halloween overrides the daily quest pool entirely for the day.
+        return HALLOWEEN_QUEST_POOL;
+      }
       if (activeSeason) {
         // Seasonal pool takes priority; mix with the appropriate base pool
         // so users still get variety across rerolls.
@@ -215,7 +220,7 @@ function Index() {
       }
       return isObserver ? WINDOW_QUEST_POOL : QUEST_POOL;
     },
-    [isObserver, activeSeason],
+    [isObserver, activeSeason, halloweenActive],
   );
   const safeIndex = questIndex % activePool.length;
   const quest = activePool[safeIndex];
