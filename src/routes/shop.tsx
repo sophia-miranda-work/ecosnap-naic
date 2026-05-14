@@ -142,22 +142,22 @@ function ShopPage() {
       {/* Tabs */}
       <nav className="mt-5 -mx-5 overflow-x-auto px-5">
         <ul className="flex gap-2">
-          {TABS.map((t) => {
-            const active = tab === t.id;
-            const giver = t.id !== "all" && t.id !== "basic" ? getGiverById(t.id) : null;
+          {TABS.map((tabItem) => {
+            const active = tab === tabItem.id;
+            const isGiver = tabItem.id !== "all" && tabItem.id !== "basic";
             return (
-              <li key={t.id}>
+              <li key={tabItem.id}>
                 <button
                   type="button"
-                  onClick={() => setTab(t.id)}
+                  onClick={() => setTab(tabItem.id)}
                   className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
                     active
                       ? "border-foreground bg-foreground text-background"
                       : "border-border bg-card text-foreground hover:bg-muted"
                   }`}
                 >
-                  <span aria-hidden>{t.emoji}</span>
-                  {giver ? giver.name.split(" ")[0] : t.label}
+                  <span aria-hidden>{tabItem.emoji}</span>
+                  {isGiver ? tabItem.label.split(" ")[0] : tabItem.label}
                 </button>
               </li>
             );
