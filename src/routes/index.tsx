@@ -14,6 +14,7 @@ import { VitaminDCard } from "@/components/vitamin-d-card";
 import { useSettings } from "@/hooks/use-settings";
 import { requiredMetersFor } from "@/lib/settings";
 import { WINDOW_QUEST_POOL } from "@/lib/window-quests";
+import { SEASONAL_QUEST_POOL, SEASON_META, getSeasonalReminder, resolveSeason } from "@/lib/seasons";
 import { TtsButton } from "@/components/tts-button";
 import { StreakTreeModal } from "@/components/streak-tree";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -196,12 +197,24 @@ function Index() {
   const { settings, playChime, speak, t } = useSettings();
   const isObserver = settings.style === "observer";
   const isWanderer = settings.style === "wanderer";
+  const activeSeason = settings.seasonalMode
+    ? resolveSeason(settings.devSeasonOverride)
+    : null;
+  const seasonalReminder = activeSeason ? getSeasonalReminder(activeSeason) : null;
 
   // Mock: stable quest for the day (later: pick by date seed + persist).
   const [questIndex, setQuestIndex] = useState(0);
   const activePool = useMemo(
-    () => (isObserver ? WINDOW_QUEST_POOL : QUEST_POOL),
-    [isObserver],
+    () => {
+      if (activeSeason) {
+        // Seasonal pool takes priority; mix with the appropriate base pool
+        // so users still get variety across rerolls.
+        const base = isObserver ? WINDOW_QUEST_POOL : QUEST_POOL;
+        return [...SEASONAL_QUEST_POOL[activeSeason], ...base];
+      }
+      return isObserver ? WINDOW_QUEST_POOL : QUEST_POOL;
+    },
+    [isObserver, activeSeason],
   );
   const safeIndex = questIndex % activePool.length;
   const quest = activePool[safeIndex];
