@@ -9,6 +9,7 @@ import { AdventureStylePicker } from "@/components/adventure-style-picker";
 import { LanguagePicker } from "@/components/language-picker";
 import { SplashScreen } from "@/components/splash-screen";
 import { BackgroundMusic } from "@/components/background-music";
+import { HalloweenCobwebs } from "@/components/cobwebs";
 
 function NotFoundComponent() {
   return (
@@ -94,10 +95,17 @@ function RootComponent() {
           <BottomTabs />
           <OnboardingGates />
           <BackgroundMusic />
+          <HalloweenOverlay />
         </div>
       </div>
     </SettingsProvider>
   );
+}
+
+function HalloweenOverlay() {
+  const { halloweenActive } = useSettings();
+  if (!halloweenActive) return null;
+  return <HalloweenCobwebs />;
 }
 
 function OnboardingGates() {
