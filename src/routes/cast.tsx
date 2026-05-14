@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { QUEST_GIVERS, pickDailyGiver } from "@/lib/quest-givers";
 import { useSettings } from "@/hooks/use-settings";
-import { getDisplayAvatar, getCostumeLabel } from "@/lib/halloween";
+import { getCostumeLabel } from "@/lib/halloween";
+import { getDisplayGiver } from "@/lib/winter";
 
 export const Route = createFileRoute("/cast")({
   head: () => ({
@@ -18,7 +19,7 @@ export const Route = createFileRoute("/cast")({
 
 function CastPage() {
   const todays = pickDailyGiver();
-  const { t, halloweenActive } = useSettings();
+  const { t, halloweenActive, winterActive } = useSettings();
   return (
     <div className="px-5 pt-8 pb-8">
       <header className="mb-5">
@@ -38,6 +39,7 @@ function CastPage() {
       <ul className="space-y-4">
         {QUEST_GIVERS.map((g) => {
           const isToday = g.id === todays.id;
+          const display = getDisplayGiver(g.id, { halloweenActive, winterActive });
           return (
             <li key={g.id} className="parchment-card relative p-5">
               {isToday && (
@@ -50,14 +52,17 @@ function CastPage() {
                   className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-muted text-4xl shadow-inner ring-2 ring-border"
                   aria-hidden
                 >
-                  {getDisplayAvatar(g.id, halloweenActive)}
+                  {display.avatar}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h2 className="text-xl font-bold leading-tight text-foreground">{t(g.name)}</h2>
+                  <h2 className="text-xl font-bold leading-tight text-foreground">{t(display.name)}</h2>
                   <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    {t(g.role)}
+                    {t(display.role)}
                     {halloweenActive && getCostumeLabel(g.id, halloweenActive) && (
                       <span className="ml-1 normal-case text-primary"> · 🎃 {t(getCostumeLabel(g.id, halloweenActive)!)}</span>
+                    )}
+                    {!halloweenActive && display.swapLabel && (
+                      <span className="ml-1 normal-case text-primary"> · ❄️ {t(display.swapLabel)}</span>
                     )}
                   </p>
                   <p className="mt-1 text-[11px] text-muted-foreground">
