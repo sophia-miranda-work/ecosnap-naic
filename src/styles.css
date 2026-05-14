@@ -259,3 +259,121 @@
   color: oklch(1 0 0) !important;
 }
 
+/*
+ * Seasonal Mode — applied when <html data-season="spring|summer|autumn|winter">.
+ * Each palette retunes the core tokens so the whole app shifts mood.
+ * Voyager mode wins (it sets data-voyager) — these only apply otherwise.
+ */
+
+/* Spring — light & dark green, bloom pink accent */
+:root[data-season="spring"]:not([data-voyager="true"]) {
+  --background: oklch(0.97 0.04 145);
+  --foreground: oklch(0.28 0.06 150);
+  --card: oklch(0.99 0.03 145);
+  --card-foreground: oklch(0.28 0.06 150);
+  --popover: oklch(0.99 0.03 145);
+  --popover-foreground: oklch(0.28 0.06 150);
+  --primary: oklch(0.55 0.16 145);
+  --primary-foreground: oklch(0.98 0.02 145);
+  --secondary: oklch(0.78 0.13 145);
+  --secondary-foreground: oklch(0.25 0.06 150);
+  --muted: oklch(0.93 0.04 145);
+  --muted-foreground: oklch(0.42 0.06 150);
+  --accent: oklch(0.82 0.12 350);
+  --accent-foreground: oklch(0.28 0.06 150);
+  --border: oklch(0.85 0.06 145);
+  --input: oklch(0.88 0.05 145);
+  --ring: oklch(0.55 0.16 145);
+  --leaf: oklch(0.6 0.16 145);
+  --moss: oklch(0.42 0.1 145);
+  --bloom: oklch(0.78 0.16 350);
+  --parchment: oklch(0.97 0.04 145);
+  --parchment-deep: oklch(0.9 0.06 145);
+  --gradient-parchment: linear-gradient(180deg, oklch(0.98 0.04 145), oklch(0.92 0.06 145));
+  --gradient-quest: linear-gradient(135deg, oklch(0.6 0.16 145), oklch(0.42 0.1 145));
+}
+
+/* Summer — coral & yellow */
+:root[data-season="summer"]:not([data-voyager="true"]) {
+  --background: oklch(0.97 0.04 85);
+  --foreground: oklch(0.3 0.08 35);
+  --card: oklch(0.99 0.03 85);
+  --card-foreground: oklch(0.3 0.08 35);
+  --popover: oklch(0.99 0.03 85);
+  --popover-foreground: oklch(0.3 0.08 35);
+  --primary: oklch(0.68 0.18 30);
+  --primary-foreground: oklch(0.99 0.02 90);
+  --secondary: oklch(0.85 0.16 90);
+  --secondary-foreground: oklch(0.3 0.08 35);
+  --muted: oklch(0.94 0.04 85);
+  --muted-foreground: oklch(0.45 0.08 35);
+  --accent: oklch(0.85 0.16 90);
+  --accent-foreground: oklch(0.3 0.08 35);
+  --border: oklch(0.85 0.08 60);
+  --input: oklch(0.88 0.06 70);
+  --ring: oklch(0.68 0.18 30);
+  --leaf: oklch(0.6 0.14 130);
+  --moss: oklch(0.45 0.09 130);
+  --bloom: oklch(0.7 0.2 25);
+  --parchment: oklch(0.97 0.04 85);
+  --parchment-deep: oklch(0.9 0.07 70);
+  --gradient-parchment: linear-gradient(180deg, oklch(0.98 0.04 90), oklch(0.92 0.08 60));
+  --gradient-quest: linear-gradient(135deg, oklch(0.7 0.2 25), oklch(0.82 0.18 80));
+}
+
+/* Autumn — oranges & reds */
+:root[data-season="autumn"]:not([data-voyager="true"]) {
+  --background: oklch(0.95 0.04 60);
+  --foreground: oklch(0.28 0.08 40);
+  --card: oklch(0.98 0.03 60);
+  --card-foreground: oklch(0.28 0.08 40);
+  --popover: oklch(0.98 0.03 60);
+  --popover-foreground: oklch(0.28 0.08 40);
+  --primary: oklch(0.58 0.17 45);
+  --primary-foreground: oklch(0.98 0.02 90);
+  --secondary: oklch(0.55 0.2 25);
+  --secondary-foreground: oklch(0.98 0.02 90);
+  --muted: oklch(0.92 0.04 60);
+  --muted-foreground: oklch(0.45 0.08 40);
+  --accent: oklch(0.7 0.16 55);
+  --accent-foreground: oklch(0.28 0.08 40);
+  --border: oklch(0.83 0.08 50);
+  --input: oklch(0.87 0.06 55);
+  --ring: oklch(0.58 0.17 45);
+  --leaf: oklch(0.55 0.18 45);
+  --moss: oklch(0.42 0.1 60);
+  --bloom: oklch(0.55 0.22 25);
+  --parchment: oklch(0.95 0.04 60);
+  --parchment-deep: oklch(0.88 0.08 50);
+  --gradient-parchment: linear-gradient(180deg, oklch(0.97 0.04 70), oklch(0.9 0.09 45));
+  --gradient-quest: linear-gradient(135deg, oklch(0.58 0.18 45), oklch(0.45 0.2 25));
+}
+
+/* Winter — blues & purples */
+:root[data-season="winter"]:not([data-voyager="true"]) {
+  --background: oklch(0.96 0.025 250);
+  --foreground: oklch(0.28 0.06 270);
+  --card: oklch(0.99 0.02 250);
+  --card-foreground: oklch(0.28 0.06 270);
+  --popover: oklch(0.99 0.02 250);
+  --popover-foreground: oklch(0.28 0.06 270);
+  --primary: oklch(0.5 0.14 270);
+  --primary-foreground: oklch(0.98 0.02 250);
+  --secondary: oklch(0.65 0.12 235);
+  --secondary-foreground: oklch(0.99 0.02 250);
+  --muted: oklch(0.93 0.03 250);
+  --muted-foreground: oklch(0.45 0.06 270);
+  --accent: oklch(0.7 0.13 290);
+  --accent-foreground: oklch(0.28 0.06 270);
+  --border: oklch(0.85 0.05 250);
+  --input: oklch(0.88 0.04 250);
+  --ring: oklch(0.5 0.14 270);
+  --leaf: oklch(0.6 0.12 220);
+  --moss: oklch(0.45 0.08 250);
+  --bloom: oklch(0.7 0.14 290);
+  --parchment: oklch(0.96 0.025 250);
+  --parchment-deep: oklch(0.88 0.05 250);
+  --gradient-parchment: linear-gradient(180deg, oklch(0.97 0.025 250), oklch(0.9 0.05 260));
+  --gradient-quest: linear-gradient(135deg, oklch(0.5 0.14 270), oklch(0.42 0.12 230));
+}
+
