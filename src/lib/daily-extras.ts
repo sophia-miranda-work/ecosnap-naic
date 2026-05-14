@@ -2,6 +2,8 @@
 // We pick 3 mini-tasks and 1 reflection deterministically from the date
 // so the same items appear all day. Completion lives in localStorage.
 
+import { HALLOWEEN_MINI_TASKS, HALLOWEEN_REFLECTIONS } from "./halloween";
+
 export type MiniTask = { id: string; emoji: string; label: string; coins: number };
 export type Reflection = { id: string; prompt: string };
 
@@ -70,9 +72,13 @@ function seedFromDate(date = new Date()): number {
 }
 
 /** Picks 3 distinct mini-tasks for today, deterministic by date. */
-export function pickDailyTasks(date = new Date(), indoor = false): MiniTask[] {
+export function pickDailyTasks(date = new Date(), indoor = false, halloween = false): MiniTask[] {
   const seed = seedFromDate(date);
-  const pool = indoor ? INDOOR_MINI_TASKS : MINI_TASKS;
+  const pool = halloween
+    ? HALLOWEEN_MINI_TASKS
+    : indoor
+      ? INDOOR_MINI_TASKS
+      : MINI_TASKS;
   const out: MiniTask[] = [];
   const used = new Set<number>();
   let i = 0;
@@ -87,9 +93,13 @@ export function pickDailyTasks(date = new Date(), indoor = false): MiniTask[] {
   return out;
 }
 
-export function pickDailyReflection(date = new Date(), indoor = false): Reflection {
+export function pickDailyReflection(date = new Date(), indoor = false, halloween = false): Reflection {
   const seed = seedFromDate(date);
-  const pool = indoor ? INDOOR_REFLECTIONS : REFLECTIONS;
+  const pool = halloween
+    ? HALLOWEEN_REFLECTIONS
+    : indoor
+      ? INDOOR_REFLECTIONS
+      : REFLECTIONS;
   return pool[seed % pool.length];
 }
 
